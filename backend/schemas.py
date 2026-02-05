@@ -1,0 +1,28 @@
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+
+class DeviceBase(BaseModel):
+    device_name: str
+    ip_address: str
+    type: Optional[str] = None
+
+class DeviceCreate(DeviceBase):
+    pass
+
+class DeviceUpdate(BaseModel):
+    device_name: Optional[str] = None
+    ip_address: Optional[str] = None
+    type: Optional[str] = None
+
+class Device(DeviceBase):
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+class HealthCheck(BaseModel):
+    status: str
+    message: str

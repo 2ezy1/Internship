@@ -5,7 +5,7 @@
 
 # Dependencies
 node_modules/
-venv/
+backend/venv/
 *.pyc
 __pycache__/
 *.egg-info/
@@ -27,10 +27,10 @@ Thumbs.db
 /frontend/dist/
 /frontend/.vite/
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
+# Database (but include for initial demo)
+# *.db
+# *.sqlite
+# *.sqlite3
 
 # Logs
 npm-debug.log*
