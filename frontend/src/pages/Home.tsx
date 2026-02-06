@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Layout, Card, Form, Input, Button, Space, message, Modal, Select, DatePicker } from 'antd'
+import { Layout, Card, Form, Input, Button, Space, message, Modal, Select } from 'antd'
 import axios from 'axios'
 import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
@@ -89,7 +89,6 @@ export default function Home() {
       deviceName: device.deviceName,
       ipAddress: device.ipAddress,
       type: device.type,
-      dateInstalled: device.dateInstalled ? dayjs(device.dateInstalled) : null,
     })
     console.log('📋 Form populated with device data:', device)
     setIsModalOpen(true)
@@ -104,7 +103,7 @@ export default function Home() {
         device_name: values.deviceName?.trim(),
         ip_address: values.ipAddress?.trim(),
         type: values.type?.trim() || 'Generic',
-        date_installed: values.dateInstalled ? values.dateInstalled.toISOString() : null,
+        date_installed: editingDevice && editingDevice.dateInstalled ? editingDevice.dateInstalled : new Date().toISOString(),
       }
       
       console.log('📦 Payload prepared:', payload)
@@ -385,14 +384,6 @@ export default function Home() {
               <Select.Option value="Raspberry Pi">Raspberry Pi (Raspi)</Select.Option>
               <Select.Option value="Arduino">Arduino</Select.Option>
             </Select>
-          </Form.Item>
-
-          <Form.Item
-            name="dateInstalled"
-            label="Date Installed"
-            rules={[{ required: true, message: 'Please select install date' }]}
-          >
-            <DatePicker style={{ width: '100%' }} />
           </Form.Item>
 
           <Form.Item>
