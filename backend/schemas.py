@@ -6,6 +6,7 @@ class DeviceBase(BaseModel):
     device_name: str
     ip_address: str
     type: Optional[str] = None
+    date_installed: Optional[datetime] = None
 
 class DeviceCreate(DeviceBase):
     pass
@@ -14,9 +15,11 @@ class DeviceUpdate(BaseModel):
     device_name: Optional[str] = None
     ip_address: Optional[str] = None
     type: Optional[str] = None
+    date_installed: Optional[datetime] = None
 
 class Device(DeviceBase):
     id: int
+    date_installed: datetime
     created_at: datetime
     updated_at: Optional[datetime] = None
 

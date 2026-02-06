@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="240" viewBox="0 0 320 240">
+  <defs>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="320" height="240" fill="#f5f5f5"/>
+  
+  <!-- PCB Board (Green) -->
+  <rect x="35" y="25" width="250" height="190" rx="8" fill="#2d5016" filter="url(#shadow)"/>
+  
+  <!-- CPU Chip (Gray) -->
+  <rect x="95" y="50" width="80" height="80" rx="4" fill="#a0a0a0"/>
+  <text x="135" y="98" text-anchor="middle" font-family="Arial" font-size="11" fill="#333" font-weight="bold">BCM2835</text>
+  
+  <!-- RAM Chip -->
+  <rect x="210" y="55" width="45" height="45" rx="2" fill="#9a7d6b"/>
+  <text x="232" y="83" text-anchor="middle" font-family="Arial" font-size="8" fill="#fff">RAM</text>
+  
+  <!-- USB Ports (left side) -->
+  <rect x="50" y="120" width="15" height="20" rx="2" fill="#a0a0a0"/>
+  <rect x="50" y="145" width="15" height="20" rx="2" fill="#a0a0a0"/>
+  
+  <!-- HDMI Port -->
+  <rect x="255" y="130" width="20" height="25" rx="2" fill="#000"/>
+  
+  <!-- Micro SD Slot -->
+  <rect x="50" y="175" width="40" height="18" rx="2" fill="#8b4513" opacity="0.6"/>
+  <text x="70" y="186" text-anchor="middle" font-family="Arial" font-size="8" fill="#fff">MicroSD</text>
+  
+  <!-- GPIO Header pins -->
+  <g id="gpio">
+    <rect x="140" y="150" width="3" height="8" fill="#ffd700"/>
+    <rect x="148" y="150" width="3" height="8" fill="#ffd700"/>
+    <rect x="156" y="150" width="3" height="8" fill="#ffd700"/>
+    <rect x="164" y="150" width="3" height="8" fill="#ffd700"/>
+    <rect x="172" y="150" width="3" height="8" fill="#ffd700"/>
+    <rect x="140" y="165" width="3" height="8" fill="#ffd700"/>
+    <rect x="148" y="165" width="3" height="8" fill="#ffd700"/>
+    <rect x="156" y="165" width="3" height="8" fill="#ffd700"/>
+    <rect x="164" y="165" width="3" height="8" fill="#ffd700"/>
+    <rect x="172" y="165" width="3" height="8" fill="#ffd700"/>
+  </g>
+  
+  <!-- Text label -->
+  <text x="160" y="220" text-anchor="middle" font-family="Arial" font-size="16" fill="#333" font-weight="bold">Raspberry Pi</text>
+</svg>

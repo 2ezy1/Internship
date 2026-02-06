@@ -9,5 +9,6 @@ class Device(Base):
     device_name = Column(String, unique=False, index=True, nullable=False)
     ip_address = Column(String, unique=True, index=True, nullable=False)
     type = Column(String, nullable=True)
+    date_installed = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

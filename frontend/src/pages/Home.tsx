@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Layout, Card, Form, Input, Button, Table, Space, message, Modal } from 'antd'
+import { Layout, Card, Form, Input, Button, Space, message, Modal, Select, DatePicker } from 'antd'
 import axios from 'axios'
 import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import dayjs from 'dayjs'
+import esp32Image from '../assets/esp32.png'
+import raspiImage from '../assets/raspi.svg'
+import arduinoImage from '../assets/arduino.png'
 import '../styles/Home.css'
 
 const { Header, Content, Footer } = Layout
@@ -13,6 +17,7 @@ type Device = {
   ipAddress: string
   type: string
   status: string
+  dateInstalled: string
 }
 
 export default function Home() {
@@ -22,9 +27,17 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [fetchLoading, setFetchLoading] = useState(true)
   const [editingDevice, setEditingDevice] = useState<Device | null>(null)
+  const [filterType, setFilterType] = useState('All')
   const navigate = useNavigate()
 
   const apiBase = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:8000'
+
+  const getDeviceImage = (deviceType: string) => {
+    if (deviceType === 'ESP32') return esp32Image
+    if (deviceType === 'Arduino') return arduinoImage
+    if (deviceType === 'Raspberry Pi') return raspiImage
+    return esp32Image
+  }
 
   // Fetch devices on component mount
   useEffect(() => {
@@ -45,6 +58,7 @@ export default function Home() {
         ipAddress: device.ip_address,
         type: device.type || 'Generic',
         status: 'Active',
+        dateInstalled: device.date_installed || device.created_at,
       }))
       
       setDevices(fetchedDevices)
@@ -75,6 +89,7 @@ export default function Home() {
       deviceName: device.deviceName,
       ipAddress: device.ipAddress,
       type: device.type,
+      dateInstalled: device.dateInstalled ? dayjs(device.dateInstalled) : null,
     })
     console.log('📋 Form populated with device data:', device)
     setIsModalOpen(true)
@@ -89,6 +104,7 @@ export default function Home() {
         device_name: values.deviceName?.trim(),
         ip_address: values.ipAddress?.trim(),
         type: values.type?.trim() || 'Generic',
+        date_installed: values.dateInstalled?.toISOString?.() || null,
       }
       
       console.log('📦 Payload prepared:', payload)
@@ -113,6 +129,7 @@ export default function Home() {
                   ipAddress: updated.ip_address,
                   type: updated.type,
                   status: 'Active',
+                  dateInstalled: updated.date_installed || updated.created_at,
                 }
               : d
           )
@@ -140,6 +157,7 @@ export default function Home() {
           ipAddress: created.ip_address,
           type: created.type,
           status: 'Active',
+          dateInstalled: created.date_installed || created.created_at,
         }
         
         setDevices((prev) => {
@@ -203,64 +221,14 @@ export default function Home() {
     }
   }
 
-  const columns = [
-    {
-      title: 'Device Name',
-      dataIndex: 'deviceName',
-      key: 'deviceName',
-      render: (text: string) => <span style={{ fontWeight: 500 }}>{text}</span>,
-    },
-    {
-      title: 'IP Address',
-      dataIndex: 'ipAddress',
-      key: 'ipAddress',
-    },
-    {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => (
-        <span
-          style={{
-            color: status === 'Active' ? '#52c41a' : '#f5222d',
-            fontWeight: 600,
-          }}
-        >
-          {status}
-        </span>
-      ),
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (_: any, record: Device) => (
-        <Space>
-          <Button
-            type="text"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => onEditClick(record)}
-          >
-            Edit
-          </Button>
-          <Button
-            type="text"
-            danger
-            size="small"
-            icon={<DeleteOutlined />}
-            onClick={() => onDelete(record.key)}
-          >
-            Delete
-          </Button>
-        </Space>
-      ),
-    },
-  ]
+  const filteredDevices = filterType === 'All' 
+    ? devices 
+    : devices.filter(device => {
+        if (filterType === 'ESP32') return device.type === 'ESP32'
+        if (filterType === 'Arduino') return device.type === 'Arduino'
+        if (filterType === 'Raspi') return device.type === 'Raspberry Pi'
+        return true
+      })
 
   const handleLogout = () => {
     navigate('/login')
@@ -297,13 +265,76 @@ export default function Home() {
             }
             className="devices-card"
           >
-            <Table<Device> 
-              dataSource={devices} 
-              columns={columns} 
-              pagination={{ pageSize: 10 }} 
-              loading={fetchLoading}
-            />
-            {!fetchLoading && devices.length === 0 && (
+            <div style={{ marginBottom: '20px' }}>
+              <Space>
+                <span style={{ fontWeight: 500 }}>Filter by Type:</span>
+                <Button 
+                  type={filterType === 'All' ? 'primary' : 'default'}
+                  onClick={() => setFilterType('All')}
+                >
+                  All
+                </Button>
+                <Button 
+                  type={filterType === 'ESP32' ? 'primary' : 'default'}
+                  onClick={() => setFilterType('ESP32')}
+                >
+                  ESP32
+                </Button>
+                <Button 
+                  type={filterType === 'Arduino' ? 'primary' : 'default'}
+                  onClick={() => setFilterType('Arduino')}
+                >
+                  Arduino
+                </Button>
+                <Button 
+                  type={filterType === 'Raspi' ? 'primary' : 'default'}
+                  onClick={() => setFilterType('Raspi')}
+                >
+                  Raspi
+                </Button>
+              </Space>
+            </div>
+            <div className="device-grid">
+              {filteredDevices.map((device) => (
+                <div key={device.key} className="device-card">
+                  <div className="device-card-media">
+                    <img src={getDeviceImage(device.type)} alt={device.type} className="device-image" />
+                    <div className="device-hover">
+                      <div className="device-hover-title">{device.deviceName}</div>
+                      <div className="device-hover-row">IP: {device.ipAddress}</div>
+                      <div className="device-hover-row">Status: {device.status}</div>
+                      <div className="device-hover-row">
+                        Installed: {device.dateInstalled ? dayjs(device.dateInstalled).format('MMM D, YYYY') : 'Unknown'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="device-card-body">
+                    <div className="device-title">{device.deviceName}</div>
+                    <div className="device-subtitle">{device.type}</div>
+                    <div className="device-actions">
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<EditOutlined />}
+                        onClick={() => onEditClick(device)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        type="text"
+                        danger
+                        size="small"
+                        icon={<DeleteOutlined />}
+                        onClick={() => onDelete(device.key)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {!fetchLoading && filteredDevices.length === 0 && (
               <div className="empty-state">
                 <p>No devices yet. Click "Add Device" to get started.</p>
               </div>
@@ -348,8 +379,20 @@ export default function Home() {
             <Input placeholder="e.g., 192.168.1.100" />
           </Form.Item>
 
-          <Form.Item name="type" label="Device Type" rules={[{ required: true }]}>
-            <Input placeholder="e.g., Server, Laptop, Router" />
+          <Form.Item name="type" label="Device Type" rules={[{ required: true, message: 'Please select device type' }]}>
+            <Select placeholder="Select device type">
+              <Select.Option value="ESP32">ESP32</Select.Option>
+              <Select.Option value="Raspberry Pi">Raspberry Pi (Raspi)</Select.Option>
+              <Select.Option value="Arduino">Arduino</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="dateInstalled"
+            label="Date Installed"
+            rules={[{ required: true, message: 'Please select install date' }]}
+          >
+            <DatePicker style={{ width: '100%' }} />
           </Form.Item>
 
           <Form.Item>
