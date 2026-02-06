@@ -5,7 +5,8 @@ import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, Exclamation
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import esp32Image from '../assets/esp32.png'
-import raspiImage from '../assets/raspi.svg'
+// Using actual Raspberry Pi image from online source
+const raspiImage = 'https://recoverit.wondershare.com/images/article/2020/08/format-sd-card-raspberry-pi-0.jpg'
 import arduinoImage from '../assets/arduino.png'
 import '../styles/Home.css'
 
