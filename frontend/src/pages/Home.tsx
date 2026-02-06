@@ -5,9 +5,8 @@ import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, Exclamation
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import esp32Image from '../assets/esp32.png'
-// Using high-quality device images
-const arduinoImage = 'https://store-usa.arduino.cc/cdn/shop/products/A000066_03.front_643x483.jpg?v=1629816150'
-const raspiImage = 'https://www.raspberrypi.com/app/uploads/2019/06/Raspberry-Pi-4-1-1820x1228.jpg'
+import arduinoImage from '../assets/arduino.png'
+import raspiImage from '../assets/raspi.png'
 import '../styles/Home.css'
 
 const { Header, Content, Footer } = Layout
