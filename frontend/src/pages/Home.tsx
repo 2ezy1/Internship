@@ -5,9 +5,9 @@ import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, Exclamation
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import esp32Image from '../assets/esp32.png'
-// Using actual device images from online sources
-const arduinoImage = 'https://docs.arduino.cc/static/2b141eb1cfe6f465a949c203d4af5b8f/4ef49/uno-rev3-angle.jpg'
-const raspiImage = 'https://assets.raspberrypi.com/static/51035ec4c2f8f630b3d26c32e90c93f1/2b8d7/raspberry-pi-4-labelled.png'
+// Using high-quality device images
+const arduinoImage = 'https://store-usa.arduino.cc/cdn/shop/products/A000066_03.front_643x483.jpg?v=1629816150'
+const raspiImage = 'https://www.raspberrypi.com/app/uploads/2019/06/Raspberry-Pi-4-1-1820x1228.jpg'
 import '../styles/Home.css'
 
 const { Header, Content, Footer } = Layout
@@ -105,7 +105,7 @@ export default function Home() {
         device_name: values.deviceName?.trim(),
         ip_address: values.ipAddress?.trim(),
         type: values.type?.trim() || 'Generic',
-        date_installed: values.dateInstalled?.toISOString?.() || null,
+        date_installed: values.dateInstalled ? values.dateInstalled.toISOString() : null,
       }
       
       console.log('📦 Payload prepared:', payload)
