@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Layout, Card, Form, Input, Button, Space, message, Modal, Select } from 'antd'
+import { Layout, Card, Form, Input, Button, Space, message, Modal, Select, Segmented, Skeleton, Badge, Tooltip, Dropdown, Empty } from 'antd'
+import type { MenuProps } from 'antd'
 import axios from 'axios'
-import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
+import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, ExclamationCircleOutlined, SearchOutlined, MoreOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import esp32Image from '../assets/esp32.png'
@@ -27,7 +28,8 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [fetchLoading, setFetchLoading] = useState(true)
   const [editingDevice, setEditingDevice] = useState<Device | null>(null)
-  const [filterType, setFilterType] = useState('All')
+  const [filterType, setFilterType] = useState<string>('All')
+  const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
 
   const apiBase = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:8000'
@@ -37,6 +39,13 @@ export default function Home() {
     if (deviceType === 'Arduino') return arduinoImage
     if (deviceType === 'Raspberry Pi') return raspiImage
     return esp32Image
+  }
+
+  const getDeviceTypeColor = (deviceType: string) => {
+    if (deviceType === 'ESP32') return '#3b82f6' // Blue
+    if (deviceType === 'Arduino') return '#06b6d4' // Cyan
+    if (deviceType === 'Raspberry Pi') return '#ec4899' // Pink
+    return '#6366f1' // Indigo
   }
 
   // Fetch devices on component mount
@@ -187,47 +196,58 @@ export default function Home() {
   const onDelete = async (key: string) => {
     console.log('🗑️  DELETE INITIATED - Device ID:', key)
     
-    // Use native confirm dialog (works reliably without Ant Design context issues)
-    const confirmed = window.confirm('Are you sure you want to delete this device? This action cannot be undone.')
-    
-    if (!confirmed) {
-      console.log('❌ User cancelled delete')
-      return
-    }
-    
-    console.log('✋ User confirmed DELETE, removing device:', key)
-    
-    try {
-      console.log('📤 Sending DELETE request to backend:', `${apiBase}/devices/${key}`)
-      const response = await axios.delete(`${apiBase}/devices/${key}`)
-      console.log('✅ DELETE successful, status:', response.status)
-      console.log('📊 Server response:', response.data)
-      
-      // Update state to remove device
-      setDevices((prevDevices) => {
-        const filtered = prevDevices.filter((d) => d.key !== key)
-        console.log('🔄 State updated. Before:', prevDevices.length, 'After:', filtered.length)
-        return filtered
-      })
-      
-      message.success('Device deleted successfully')
-      console.log('✅ Device ID', key, 'deleted from UI')
-    } catch (error: any) {
-      console.error('❌ DELETE FAILED:', error)
-      const errorMsg = error?.response?.data?.detail || error?.message || 'Failed to delete device'
-      console.error('Error details:', errorMsg)
-      message.error(errorMsg)
-    }
+    Modal.confirm({
+      title: 'Delete Device',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Are you sure you want to delete this device? This action cannot be undone.',
+      okText: 'Delete',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        console.log('✋ User confirmed DELETE, removing device:', key)
+        
+        try {
+          console.log('📤 Sending DELETE request to backend:', `${apiBase}/devices/${key}`)
+          const response = await axios.delete(`${apiBase}/devices/${key}`)
+          console.log('✅ DELETE successful, status:', response.status)
+          console.log('📊 Server response:', response.data)
+          
+          // Update state to remove device
+          setDevices((prevDevices) => {
+            const filtered = prevDevices.filter((d) => d.key !== key)
+            console.log('🔄 State updated. Before:', prevDevices.length, 'After:', filtered.length)
+            return filtered
+          })
+          
+          message.success('Device deleted successfully')
+          console.log('✅ Device ID', key, 'deleted from UI')
+        } catch (error: any) {
+          console.error('❌ DELETE FAILED:', error)
+          const errorMsg = error?.response?.data?.detail || error?.message || 'Failed to delete device'
+          console.error('Error details:', errorMsg)
+          message.error(errorMsg)
+        }
+      },
+      onCancel() {
+        console.log('❌ User cancelled delete')
+      },
+    })
   }
 
-  const filteredDevices = filterType === 'All' 
-    ? devices 
-    : devices.filter(device => {
-        if (filterType === 'ESP32') return device.type === 'ESP32'
-        if (filterType === 'Arduino') return device.type === 'Arduino'
-        if (filterType === 'Raspi') return device.type === 'Raspberry Pi'
-        return true
-      })
+  const filteredDevices = devices.filter(device => {
+    // Filter by type
+    const matchesType = filterType === 'All' || 
+      (filterType === 'ESP32' && device.type === 'ESP32') ||
+      (filterType === 'Arduino' && device.type === 'Arduino') ||
+      (filterType === 'Raspberry Pi' && device.type === 'Raspberry Pi')
+    
+    // Filter by search query
+    const matchesSearch = searchQuery === '' || 
+      device.deviceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      device.ipAddress.includes(searchQuery)
+    
+    return matchesType && matchesSearch
+  })
 
   const handleLogout = () => {
     navigate('/login')
@@ -239,15 +259,25 @@ export default function Home() {
         <div className="header-left">
           <h1>Device Management System</h1>
         </div>
-        <Button
-          type="text"
-          danger
-          icon={<LogoutOutlined />}
-          onClick={handleLogout}
-          style={{ color: '#fff' }}
-        >
-          Logout
-        </Button>
+        <Space size="middle">
+          <Input
+            placeholder="Search devices..."
+            prefix={<SearchOutlined />}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: 250 }}
+            allowClear
+          />
+          <Button
+            type="text"
+            danger
+            icon={<LogoutOutlined />}
+            onClick={handleLogout}
+            style={{ color: '#fff' }}
+          >
+            Logout
+          </Button>
+        </Space>
       </Header>
 
       <Content className="home-content">
@@ -256,7 +286,7 @@ export default function Home() {
             title="Devices"
             extra={
               <Space>
-                <Button onClick={fetchDevices}>Refresh</Button>
+                <Button onClick={fetchDevices} loading={fetchLoading}>Refresh</Button>
                 <Button type="primary" icon={<PlusOutlined />} onClick={onAddClick}>
                   Add Device
                 </Button>
@@ -264,79 +294,114 @@ export default function Home() {
             }
             className="devices-card"
           >
-            <div style={{ marginBottom: '20px' }}>
-              <Space>
-                <span style={{ fontWeight: 500 }}>Filter by Type:</span>
-                <Button 
-                  type={filterType === 'All' ? 'primary' : 'default'}
-                  onClick={() => setFilterType('All')}
-                >
-                  All
-                </Button>
-                <Button 
-                  type={filterType === 'ESP32' ? 'primary' : 'default'}
-                  onClick={() => setFilterType('ESP32')}
-                >
-                  ESP32
-                </Button>
-                <Button 
-                  type={filterType === 'Arduino' ? 'primary' : 'default'}
-                  onClick={() => setFilterType('Arduino')}
-                >
-                  Arduino
-                </Button>
-                <Button 
-                  type={filterType === 'Raspi' ? 'primary' : 'default'}
-                  onClick={() => setFilterType('Raspi')}
-                >
-                  Raspi
-                </Button>
-              </Space>
+            <div style={{ marginBottom: '24px' }}>
+              <Segmented
+                value={filterType}
+                onChange={(value) => setFilterType(value as string)}
+                options={[
+                  { label: 'All Devices', value: 'All' },
+                  { label: 'ESP32', value: 'ESP32' },
+                  { label: 'Arduino', value: 'Arduino' },
+                  { label: 'Raspberry Pi', value: 'Raspberry Pi' },
+                ]}
+                block
+                style={{ maxWidth: 600 }}
+              />
             </div>
-            <div className="device-grid">
-              {filteredDevices.map((device) => (
-                <div key={device.key} className="device-card">
-                  <div className="device-card-media">
-                    <img src={getDeviceImage(device.type)} alt={device.type} className="device-image" />
-                    <div className="device-hover">
-                      <div className="device-hover-title">{device.deviceName}</div>
-                      <div className="device-hover-row">IP: {device.ipAddress}</div>
-                      <div className="device-hover-row">Status: {device.status}</div>
-                      <div className="device-hover-row">
-                        Installed: {device.dateInstalled ? dayjs(device.dateInstalled).format('MMM D, YYYY') : 'Unknown'}
-                      </div>
+            
+            {fetchLoading ? (
+              <div className="device-grid">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <Card key={i} className="device-card-skeleton">
+                    <Skeleton.Image active style={{ width: '100%', height: 160 }} />
+                    <div style={{ padding: '12px 14px' }}>
+                      <Skeleton active paragraph={{ rows: 2 }} />
                     </div>
-                  </div>
-                  <div className="device-card-body">
-                    <div className="device-title">{device.deviceName}</div>
-                    <div className="device-subtitle">{device.type}</div>
-                    <div className="device-actions">
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={<EditOutlined />}
-                        onClick={() => onEditClick(device)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        type="text"
-                        danger
-                        size="small"
-                        icon={<DeleteOutlined />}
-                        onClick={() => onDelete(device.key)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {!fetchLoading && filteredDevices.length === 0 && (
-              <div className="empty-state">
-                <p>No devices yet. Click "Add Device" to get started.</p>
+                  </Card>
+                ))}
               </div>
+            ) : (
+              <>
+                <div className="device-grid">
+                  {filteredDevices.map((device) => {
+                    const menuItems: MenuProps['items'] = [
+                      {
+                        key: 'edit',
+                        label: 'Edit Device',
+                        icon: <EditOutlined />,
+                        onClick: () => onEditClick(device),
+                      },
+                      {
+                        key: 'delete',
+                        label: 'Delete Device',
+                        icon: <DeleteOutlined />,
+                        danger: true,
+                        onClick: () => onDelete(device.key),
+                      },
+                    ]
+
+                    return (
+                      <div 
+                        key={device.key} 
+                        className="device-card"
+                        style={{ borderTop: `4px solid ${getDeviceTypeColor(device.type)}` }}
+                      >
+                        <div className="device-card-media">
+                          <img src={getDeviceImage(device.type)} alt={device.type} className="device-image" />
+                          <div className="device-hover">
+                            <div className="device-hover-title">{device.deviceName}</div>
+                            <div className="device-hover-row">IP: {device.ipAddress}</div>
+                            <div className="device-hover-row">
+                              Status: <Badge status={device.status === 'Active' ? 'success' : 'error'} text={device.status} />
+                            </div>
+                            <div className="device-hover-row">
+                              Installed: {device.dateInstalled ? dayjs(device.dateInstalled).format('MMM D, YYYY') : 'Unknown'}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="device-card-body">
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                            <div style={{ flex: 1 }}>
+                              <div className="device-title">{device.deviceName}</div>
+                              <div className="device-subtitle">{device.type}</div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <Tooltip title={device.status === 'Active' ? 'Online' : 'Offline'}>
+                                {device.status === 'Active' ? (
+                                  <CheckCircleOutlined style={{ color: '#10b981', fontSize: 18 }} />
+                                ) : (
+                                  <CloseCircleOutlined style={{ color: '#ef4444', fontSize: 18 }} />
+                                )}
+                              </Tooltip>
+                              <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
+                                <Button type="text" icon={<MoreOutlined />} size="small" />
+                              </Dropdown>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+                
+                {filteredDevices.length === 0 && (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={
+                      searchQuery || filterType !== 'All' 
+                        ? 'No devices match your filters' 
+                        : 'No devices yet. Click "Add Device" to get started.'
+                    }
+                    style={{ padding: '48px 24px' }}
+                  >
+                    {(searchQuery || filterType !== 'All') && (
+                      <Button type="primary" onClick={() => { setSearchQuery(''); setFilterType('All'); }}>
+                        Clear Filters
+                      </Button>
+                    )}
+                  </Empty>
+                )}
+              </>
             )}
           </Card>
         </div>
