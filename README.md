@@ -15,4 +15,4 @@ to run frontend: navigate to your Internship/frontend folder
 to run backend: navigate to your Internship/backend folder
 
     source venv/bin/activate
-    uvicorn main:app --reloa --host 0.0.0.0 port 8000
+    uvicorn main:app --reload --host 0.0.0.0 port 8000
