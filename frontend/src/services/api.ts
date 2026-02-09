@@ -41,4 +41,10 @@ export const deviceAPI = {
   },
 }
 
+export const authAPI = {
+  login: (payload: { username: string; password: string }) => {
+    return api.post('/auth/login', payload)
+  },
+}
+
 export default api

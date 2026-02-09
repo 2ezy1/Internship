@@ -1,23 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 .login-container {
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+  background: radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.18), transparent 40%),
+    radial-gradient(circle at 80% 10%, rgba(34, 197, 94, 0.16), transparent 35%),
+    linear-gradient(135deg, #0b1120 0%, #0f172a 55%, #111827 100%);
   padding: 20px;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .login-card {
   width: 100%;
-  max-width: 340px;
-  border-radius: 16px;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+  max-width: 360px;
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(2, 6, 23, 0.6);
   padding: 56px 44px !important;
-  background: #ffffff;
-  border: none;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  backdrop-filter: blur(12px);
 }
 
 .login-card .ant-card-body {
@@ -31,16 +36,16 @@
 
 .login-header h1 {
   margin: 0 0 4px 0;
-  font-size: 36px;
-  font-weight: 800;
+  font-size: 34px;
+  font-weight: 700;
   line-height: 1.1;
-  color: #1a1a1a;
-  letter-spacing: -0.5px;
+  color: #f8fafc;
+  letter-spacing: 0.2px;
 }
 
 .login-subtitle {
   text-align: center;
-  color: #888;
+  color: #94a3b8;
   font-size: 14px;
   margin-bottom: 36px;
   line-height: 1.6;
@@ -60,39 +65,39 @@
 }
 
 .form-label {
-  color: #d32f2f;
-  font-size: 13px;
+  color: #fca5a5;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.6px;
 }
 
 .login-input {
-  border-radius: 8px !important;
-  border: 1.5px solid #e0e0e0 !important;
-  background: #f9f9f9 !important;
-  height: 44px !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+  background: rgba(15, 23, 42, 0.8) !important;
+  height: 46px !important;
   transition: all 0.3s ease !important;
 }
 
 .login-input input {
   font-size: 15px;
-  color: #333;
+  color: #e2e8f0;
   background: transparent !important;
 }
 
 .login-input input::placeholder {
-  color: #bbb;
+  color: rgba(148, 163, 184, 0.6);
 }
 
 .login-input:hover {
-  border-color: #d0d0d0 !important;
-  background: #fafafa !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  background: rgba(15, 23, 42, 0.9) !important;
 }
 
 .login-input:focus-within {
-  border-color: #4f46e5 !important;
-  background: #ffffff !important;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08) !important;
+  border-color: rgba(56, 189, 248, 0.7) !important;
+  background: rgba(15, 23, 42, 1) !important;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15) !important;
 }
 
 .button-item {
@@ -101,19 +106,19 @@
 }
 
 .login-button {
-  height: 44px;
-  font-size: 16px;
+  height: 46px;
+  font-size: 15px;
   font-weight: 600 !important;
-  border-radius: 8px !important;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  border-radius: 10px !important;
+  background: linear-gradient(135deg, #0ea5e9 0%, #22c55e 100%) !important;
   border: none !important;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
   transition: all 0.3s ease !important;
 }
 
 .login-button:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%) !important;
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3) !important;
+  background: linear-gradient(135deg, #0284c7 0%, #16a34a 100%) !important;
+  box-shadow: 0 12px 26px rgba(2, 6, 23, 0.5) !important;
 }
 
 .login-button:active {
@@ -123,28 +128,29 @@
 .demo-credentials {
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 1px solid #efefef;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
   text-align: center;
 }
 
 .demo-title {
-  font-weight: 700;
-  color: #1a1a1a;
+  font-weight: 600;
+  color: #e2e8f0;
   margin-bottom: 14px;
-  font-size: 13px;
-  letter-spacing: 0.2px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .demo-credentials p {
   font-size: 12px;
-  color: #999;
+  color: #94a3b8;
   margin: 7px 0;
   line-height: 1.5;
   font-weight: 400;
 }
 
 .demo-credentials span {
-  color: #4f46e5;
+  color: #38bdf8;
   font-weight: 600;
 }
 
@@ -155,7 +161,7 @@
   }
 
   .login-header h1 {
-    font-size: 32px;
+    font-size: 30px;
   }
 
   .login-subtitle {

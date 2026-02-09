@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from database import engine, get_db, Base
-from models import Device as DeviceModel
-from schemas import Device, DeviceCreate, DeviceUpdate, HealthCheck
+from models import Device as DeviceModel, User as UserModel
+from schemas import Device, DeviceCreate, DeviceUpdate, HealthCheck, UserLogin, LoginResponse
 from typing import List
+import hashlib
+import os
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -21,6 +23,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def hash_password(password: str) -> str:
+    salt = os.getenv("AUTH_SALT", "device-mgmt-salt")
+    return hashlib.sha256(f"{salt}:{password}".encode("utf-8")).hexdigest()
+
+def verify_password(password: str, hashed_password: str) -> bool:
+    return hash_password(password) == hashed_password
+
+@app.on_event("startup")
+def ensure_default_user():
+    username = os.getenv("ADMIN_USERNAME", "admin")
+    password = os.getenv("ADMIN_PASSWORD", "password")
+    db = next(get_db())
+    try:
+        existing = db.query(UserModel).filter(UserModel.username == username).first()
+        if not existing:
+            db.add(UserModel(username=username, hashed_password=hash_password(password)))
+            db.commit()
+    finally:
+        db.close()
+
 # Health check endpoint
 @app.get("/health", response_model=HealthCheck)
 def health_check():
@@ -31,6 +53,14 @@ def health_check():
 @app.get("/")
 def read_root():
     return {"message": "Device Management API - Running on FastAPI"}
+
+
+@app.post("/auth/login", response_model=LoginResponse, tags=["Auth"])
+def login(payload: UserLogin, db: Session = Depends(get_db)):
+    user = db.query(UserModel).filter(UserModel.username == payload.username).first()
+    if not user or not verify_password(payload.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    return LoginResponse(message="Login successful", username=user.username)
 
 # CRUD Endpoints for Devices
 

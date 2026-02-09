@@ -1,6 +1,6 @@
 # Device Management System - Backend API
 
-FastAPI-based REST API for device management with SQLAlchemy ORM and SQLite database.
+FastAPI-based REST API for device management with SQLAlchemy ORM and PostgreSQL database.
 
 ## 🚀 Quick Start
 
@@ -21,7 +21,16 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Run the API:
+3. Configure PostgreSQL (example):
+```bash
+export DATABASE_URL="postgresql+psycopg2://postgres:bisumain@localhost:5432/devices_db"
+export ADMIN_USERNAME="admin"
+export ADMIN_PASSWORD="password"
+```
+
+You can also create a `.env` file from [backend/.env.example](backend/.env.example) and set your values there.
+
+4. Run the API:
 ```bash
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
@@ -37,7 +46,6 @@ backend/
 ├── models.py         # SQLAlchemy ORM models
 ├── schemas.py        # Pydantic validation schemas
 ├── database.py       # Database configuration
-├── devices.db        # SQLite database file
 └── requirements.txt  # Python dependencies
 ```
 
@@ -76,4 +84,4 @@ Currently allows all origins (`"*"`). For production, change to specific fronten
 - **SQLAlchemy** - ORM for database operations
 - **Pydantic** - Data validation
 - **Uvicorn** - ASGI server
-- **SQLite** - Lightweight database
+- **PostgreSQL** - Relational database

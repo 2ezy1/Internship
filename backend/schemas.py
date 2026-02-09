@@ -29,3 +29,13 @@ class Device(DeviceBase):
 class HealthCheck(BaseModel):
     status: str
     message: str
+
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
+class LoginResponse(BaseModel):
+    message: str
+    username: str

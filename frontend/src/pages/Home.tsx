@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Layout, Card, Form, Input, Button, Space, message, Modal, Select, Segmented, Skeleton, Badge, Tooltip, Dropdown, Empty } from 'antd'
+import { Layout, Card, Form, Input, Button, Space, message, Modal, Select, Skeleton, Badge, Tooltip, Dropdown, Empty } from 'antd'
 import type { MenuProps } from 'antd'
 import axios from 'axios'
 import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, ExclamationCircleOutlined, SearchOutlined, MoreOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
@@ -30,6 +30,7 @@ export default function Home() {
   const [editingDevice, setEditingDevice] = useState<Device | null>(null)
   const [filterType, setFilterType] = useState<string>('All')
   const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'All' | 'Online' | 'Warning' | 'Offline'>('All')
   const navigate = useNavigate()
 
   const apiBase = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:8000'
@@ -240,18 +241,50 @@ export default function Home() {
       (filterType === 'ESP32' && device.type === 'ESP32') ||
       (filterType === 'Arduino' && device.type === 'Arduino') ||
       (filterType === 'Raspberry Pi' && device.type === 'Raspberry Pi')
+
+    const normalizedStatus = device.status?.toLowerCase() || ''
+    const matchesStatus = statusFilter === 'All' ||
+      (statusFilter === 'Online' && normalizedStatus === 'active') ||
+      (statusFilter === 'Warning' && normalizedStatus === 'warning') ||
+      (statusFilter === 'Offline' && (normalizedStatus === 'inactive' || normalizedStatus === 'offline'))
     
     // Filter by search query
     const matchesSearch = searchQuery === '' || 
       device.deviceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       device.ipAddress.includes(searchQuery)
     
-    return matchesType && matchesSearch
+    return matchesType && matchesStatus && matchesSearch
   })
+  const getTypeMenuItems = (selectedType: string): MenuProps['items'] => {
+    const allItems: MenuProps['items'] = [
+      { key: 'All', label: 'All Devices' },
+      { key: 'ESP32', label: 'ESP32' },
+      { key: 'Arduino', label: 'Arduino' },
+      { key: 'Raspberry Pi', label: 'Raspberry Pi' },
+    ]
+
+    return allItems.filter((item) => item?.key !== selectedType)
+  }
+
+  const handleTypeSelect: MenuProps['onClick'] = ({ key }) => {
+    setFilterType(String(key))
+  }
+
 
   const handleLogout = () => {
     navigate('/login')
   }
+
+  const handleDeviceClick = (device: Device) => {
+    navigate(`/devices/${device.key}`, { state: { device } })
+  }
+
+  const totalDevices = devices.length
+  const activeDevices = devices.filter((device) => device.status === 'Active').length
+  const installsThisMonth = devices.filter((device) => {
+    if (!device.dateInstalled) return false
+    return dayjs(device.dateInstalled).isSame(dayjs(), 'month')
+  }).length
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -265,7 +298,7 @@ export default function Home() {
             prefix={<SearchOutlined />}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: 250 }}
+            style={{ width: 250, color: '#fff' }}
             allowClear
           />
           <Button
@@ -282,6 +315,31 @@ export default function Home() {
 
       <Content className="home-content">
         <div className="content-container">
+          <div className="dashboard-hero">
+            <div className="hero-copy">
+              <div className="eyebrow">Monitoring</div>
+              <h2>Device monitoring.</h2>
+              <p>Track installs, uptime, and device mix with a minimalist lens.</p>
+            </div>
+            <div className="hero-metrics">
+              <div className="metric-card">
+                <div className="metric-title">Total devices</div>
+                <div className="metric-value">{totalDevices}</div>
+                <div className="metric-sub">Active: {activeDevices}</div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-title">Installs this month</div>
+                <div className="metric-value">{installsThisMonth}</div>
+                <div className="metric-sub">New deployments</div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-title">Uptime</div>
+                <div className="metric-value">{totalDevices ? Math.round((activeDevices / totalDevices) * 100) : 0}%</div>
+                <div className="metric-sub">Last 30 days</div>
+              </div>
+            </div>
+          </div>
+
           <Card
             title="Devices"
             extra={
@@ -294,19 +352,30 @@ export default function Home() {
             }
             className="devices-card"
           >
-            <div style={{ marginBottom: '24px' }}>
-              <Segmented
-                value={filterType}
-                onChange={(value) => setFilterType(value as string)}
-                options={[
-                  { label: 'All Devices', value: 'All' },
-                  { label: 'ESP32', value: 'ESP32' },
-                  { label: 'Arduino', value: 'Arduino' },
-                  { label: 'Raspberry Pi', value: 'Raspberry Pi' },
-                ]}
-                block
-                style={{ maxWidth: 600 }}
-              />
+            <div className="device-filter-row">
+              <Dropdown
+                menu={{ items: getTypeMenuItems(filterType), onClick: handleTypeSelect }}
+                trigger={['hover']}
+                placement="bottomLeft"
+              >
+                <Button className="filter-dropdown" type="default">
+                  {filterType === 'All' ? 'All Devices' : filterType}
+                </Button>
+              </Dropdown>
+              <div className="status-chips">
+                {['Online', 'Warning', 'Offline'].map((status) => (
+                  <button
+                    key={status}
+                    type="button"
+                    className={`status-chip ${statusFilter === status ? 'active' : ''} ${status.toLowerCase()}`}
+                    onClick={() => {
+                      setStatusFilter((prev) => (prev === status ? 'All' : (status as 'Online' | 'Warning' | 'Offline')))
+                    }}
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
             </div>
             
             {fetchLoading ? (
@@ -345,6 +414,7 @@ export default function Home() {
                         key={device.key} 
                         className="device-card"
                         style={{ borderTop: `4px solid ${getDeviceTypeColor(device.type)}` }}
+                        onClick={() => handleDeviceClick(device)}
                       >
                         <div className="device-card-media">
                           <img src={getDeviceImage(device.type)} alt={device.type} className="device-image" />
@@ -374,7 +444,12 @@ export default function Home() {
                                 )}
                               </Tooltip>
                               <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
-                                <Button type="text" icon={<MoreOutlined />} size="small" />
+                                <Button
+                                  type="text"
+                                  icon={<MoreOutlined />}
+                                  size="small"
+                                  onClick={(event) => event.stopPropagation()}
+                                />
                               </Dropdown>
                             </div>
                           </div>
@@ -416,9 +491,11 @@ export default function Home() {
           setIsModalOpen(false)
           setEditingDevice(null)
           form.resetFields()
+          
         }}
         footer={null}
         width={500}
+        
       >
         <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item

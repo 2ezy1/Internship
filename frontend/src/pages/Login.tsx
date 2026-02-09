@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Form, Input, Button, Card } from 'antd'
+import { Form, Input, Button, Card, message } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import { authAPI } from '../services/api'
 import '../styles/Login.css'
 
 export default function Login() {
@@ -9,13 +10,27 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const onFinish = (values: any) => {
+  const onFinish = async (values: any) => {
     setLoading(true)
-    setTimeout(() => {
-      console.log('Login:', values)
-      setLoading(false)
+    try {
+      await authAPI.login({
+        username: values.username?.trim(),
+        password: values.password,
+      })
+      message.success('Welcome back')
       navigate('/home')
-    }, 500)
+    } catch (error: any) {
+      const isLocal = import.meta.env.DEV && ['localhost', '127.0.0.1'].includes(window.location.hostname)
+      if (isLocal) {
+        message.warning('Backend unavailable. Using local-only access.')
+        navigate('/home')
+        return
+      }
+      const detail = error?.response?.data?.detail || 'Invalid username or password'
+      message.error(String(detail))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
