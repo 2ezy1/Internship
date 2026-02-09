@@ -28,7 +28,9 @@ export ADMIN_USERNAME="admin"
 export ADMIN_PASSWORD="password"
 ```
 
-You can also create a `.env` file from [backend/.env.example](backend/.env.example) and set your values there.
+You can also create a `.env` file from [backend/.env.example](.env.example) and set your values there.
+
+**External database access (pgAdmin):** See [../docs/EXTERNAL_DATABASE_ACCESS.md](../docs/EXTERNAL_DATABASE_ACCESS.md) for how to connect to the database from pgAdmin or other clients.
 
 4. Run the API:
 ```bash

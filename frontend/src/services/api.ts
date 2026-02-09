@@ -1,6 +1,16 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:8000'
+// Use environment variable if set, otherwise detect from current host
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE) {
+    return import.meta.env.VITE_API_BASE
+  }
+  // If running on network, use the same host as the frontend
+  const host = window.location.hostname
+  return `http://${host}:8000`
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 const api = axios.create({
   baseURL: API_BASE_URL,
