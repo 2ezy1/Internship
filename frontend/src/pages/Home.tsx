@@ -319,7 +319,7 @@ export default function Home() {
             <div className="hero-copy">
               <div className="eyebrow">Monitoring</div>
               <h2>Device monitoring.</h2>
-              <p>Track installs, uptime, and device mix with a minimalist lens.</p>
+              
             </div>
             <div className="hero-metrics">
               <div className="metric-card">
@@ -448,6 +448,7 @@ export default function Home() {
                                   type="text"
                                   icon={<MoreOutlined />}
                                   size="small"
+                                  className="more-menu-button"
                                   onClick={(event) => event.stopPropagation()}
                                 />
                               </Dropdown>

@@ -10,7 +10,9 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px 28px !important;
+  padding: 18px 28px 14px !important;
+  height: auto !important;
+  line-height: normal !important;
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
@@ -73,6 +75,20 @@
   color: #f8fafc;
 }
 
+.running-status {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.running-status.active {
+  color: #22c55e;
+}
+
+.running-status.inactive {
+  color: #f97316;
+}
+
 .device-status-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -96,6 +112,9 @@
 .chart-header h3 {
   margin: 0;
   color: #f8fafc;
+  font-size: 18pt;
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+  font-weight: 600;
 }
 
 .chart-header p {
@@ -104,15 +123,29 @@
   font-size: 12px;
 }
 
+.chart-title {
+  flex: 1;
+  text-align: center;
+}
+
+.chart-badge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: #f59e0b;
+}
+
 .sensor-chart {
   width: 100%;
-  height: 180px;
-  stroke: #38bdf8;
-  margin-top: 8px;
+  height: 200px;
+  margin-top: 0;
+  display: block;
 }
 
 .sensor-chart circle {
-  fill: #22c55e;
+  fill: #0ea5e9;
+  stroke: #dbeafe;
+  stroke-width: 1;
 }
 
 .sensor-chart-wrap {
@@ -125,25 +158,150 @@
 .sensor-chart-area {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  position: relative;
+  padding: 0;
+  border-radius: 12px;
+  background: #0a0e1a;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.7), 0 10px 28px rgba(2, 6, 23, 0.55);
+  overflow: hidden;
+}
+
+.sensor-chart-area::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #1e293b 1px, transparent 1px),
+    linear-gradient(180deg, #1e293b 1px, transparent 1px);
+  background-size: 10% 20%;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.sensor-chart-area::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 70% 10%, rgba(0, 212, 255, 0.18), transparent 45%);
+  pointer-events: none;
 }
 
 .sensor-y-axis {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 180px;
+  height: 200px;
   color: #94a3b8;
-  font-size: 11px;
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.sensor-y-label {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: rgba(148, 163, 184, 0.7);
+  margin-bottom: 6px;
 }
 
 .sensor-x-axis {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(28px, 1fr));
-  gap: 4px;
-  color: #94a3b8;
-  font-size: 10px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0;
+  color: rgba(148, 163, 184, 0.9);
+  font-size: 9px;
   text-align: center;
+  padding: 0 10px 10px;
+}
+
+.sensor-x-axis span {
+  white-space: nowrap;
+}
+
+.sensor-line-glow {
+  opacity: 0.65;
+}
+
+.sensor-line {
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.55));
+}
+
+.sensor-point {
+  fill: #ffffff;
+  stroke: none;
+}
+
+.sensor-badge {
+  position: absolute;
+  transform: translate(-50%, -140%);
+  background: #ffffff;
+  color: #0a0e1a;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.5);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.sensor-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #e2e8f0;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.sensor-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 0;
+  pointer-events: none;
+}
+
+.sensor-marker-line {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 160px;
+  background: rgba(56, 189, 248, 0.4);
+}
+
+.sensor-marker-dot {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+}
+
+.sensor-marker-label {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0ea5e9;
+  color: #02131f;
+  font-weight: 600;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  box-shadow: 0 8px 18px rgba(14, 165, 233, 0.35);
 }
 
 .chart-legend {
