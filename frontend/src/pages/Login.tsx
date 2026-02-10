@@ -46,7 +46,7 @@ export default function Login() {
         <Form form={form} onFinish={onFinish} layout="vertical" className="login-form">
           <Form.Item
             name="username"
-            label={<span className="form-label">* Username</span>}
+            label={<span className="form-label">Username</span>}
             rules={[{ required: true, message: 'Please enter username' }]}
             className="form-item"
           >
@@ -60,7 +60,7 @@ export default function Login() {
 
           <Form.Item
             name="password"
-            label={<span className="form-label">* Password</span>}
+            label={<span className="form-label">Password</span>}
             rules={[{ required: true, message: 'Please enter password' }]}
             className="form-item"
           >
