@@ -19,6 +19,20 @@ const api = axios.create({
   },
 })
 
+// Add authentication token to all requests
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
 export const deviceAPI = {
   // Create a new device
   createDevice: (deviceData: { device_name: string; ip_address: string; type?: string }) => {

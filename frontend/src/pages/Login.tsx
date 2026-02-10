@@ -13,21 +13,33 @@ export default function Login() {
   const onFinish = async (values: any) => {
     setLoading(true)
     try {
-      await authAPI.login({
+      const response = await authAPI.login({
         username: values.username?.trim(),
         password: values.password,
       })
+      
+      // Store authentication token
+      if (response.data.access_token) {
+        localStorage.setItem('token', response.data.access_token)
+        localStorage.setItem('username', response.data.username)
+        localStorage.setItem('role', response.data.role)
+      }
+      
       message.success('Welcome back')
       navigate('/home')
     } catch (error: any) {
-      const isLocal = import.meta.env.DEV && ['localhost', '127.0.0.1'].includes(window.location.hostname)
-      if (isLocal) {
-        message.warning('Backend unavailable. Using local-only access.')
-        navigate('/home')
-        return
+      console.error('Login error:', error)
+      let errorMessage = 'Login failed. Please check your credentials.'
+      
+      if (error?.response?.data?.detail) {
+        errorMessage = error.response.data.detail
+      } else if (error?.response?.status === 403) {
+        errorMessage = 'Access denied. Only authorized accounts can log in.'
+      } else if (error?.response?.status === 401) {
+        errorMessage = 'Wrong credentials. Please check your username and password.'
       }
-      const detail = error?.response?.data?.detail || 'Invalid username or password'
-      message.error(String(detail))
+      
+      message.error(errorMessage, 5) // Show for 5 seconds
     } finally {
       setLoading(false)
     }

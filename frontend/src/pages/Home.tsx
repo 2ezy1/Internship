@@ -66,6 +66,13 @@ export default function Home() {
 
   // Fetch devices on component mount
   useEffect(() => {
+    // Check if user is authenticated
+    const token = localStorage.getItem('token')
+    if (!token) {
+      message.warning('Please login first')
+      navigate('/login')
+      return
+    }
     fetchDevices()
   }, [])
 
@@ -73,7 +80,11 @@ export default function Home() {
     setFetchLoading(true)
     try {
       console.log('📥 Fetching devices from:', `${apiBase}/devices/`)
-      const res = await axios.get(`${apiBase}/devices/`)
+      const res = await axios.get(`${apiBase}/devices/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
       console.log('✅ Fetch successful, received:', res.data.length, 'devices')
       console.log('📊 Devices data:', res.data)
       
@@ -94,6 +105,12 @@ export default function Home() {
       }
     } catch (err: any) {
       console.error('❌ Failed to fetch devices:', err)
+      if (err.response?.status === 401) {
+        message.error('Session expired. Please login again.')
+        localStorage.clear()
+        navigate('/login')
+        return
+      }
       message.error('Failed to load devices: ' + (err.message || 'Unknown error'))
     } finally {
       setFetchLoading(false)
@@ -291,6 +308,8 @@ export default function Home() {
 
 
   const handleLogout = () => {
+    localStorage.clear()
+    message.info('Logged out successfully')
     navigate('/login')
   }
 
