@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Layout, Card, Form, Input, Button, Space, message, Modal, Select, Skeleton, Badge, Tooltip, Dropdown, Empty } from 'antd'
+import { Layout, Card, Form, Input, Button, Space, message, Modal, Select, Skeleton, Badge, Tooltip, Dropdown, Empty, Alert } from 'antd'
 import type { MenuProps } from 'antd'
 import axios from 'axios'
 import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, ExclamationCircleOutlined, SearchOutlined, MoreOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
@@ -31,7 +31,22 @@ export default function Home() {
   const [filterType, setFilterType] = useState<string>('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'All' | 'Online' | 'Warning' | 'Offline'>('All')
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const navigate = useNavigate()
+
+  /** Build a user-friendly error message from an axios error (handles FastAPI detail string or array). */
+  const getErrorMessage = (err: any): string => {
+    if (!err) return 'Something went wrong.'
+    const detail = err?.response?.data?.detail
+    if (detail == null) {
+      if (err.code === 'ERR_NETWORK') return 'Cannot reach the server. Is the backend running on ' + apiBase + '?'
+      return err?.message || 'Failed to save device.'
+    }
+    if (Array.isArray(detail)) {
+      return detail.map((e: any) => e.msg || e.message || JSON.stringify(e)).join(' ')
+    }
+    return String(detail)
+  }
 
   const apiBase = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:8000'
 
@@ -88,6 +103,7 @@ export default function Home() {
   const onAddClick = () => {
     console.log('➕ Add Device button clicked')
     setEditingDevice(null)
+    setSubmitError(null)
     form.resetFields()
     setIsModalOpen(true)
   }
@@ -95,6 +111,7 @@ export default function Home() {
   const onEditClick = (device: Device) => {
     console.log('✏️  Edit Device button clicked for ID:', device.key)
     setEditingDevice(device)
+    setSubmitError(null)
     form.setFieldsValue({
       deviceName: device.deviceName,
       ipAddress: device.ipAddress,
@@ -106,6 +123,7 @@ export default function Home() {
 
   const onFinish = async (values: any) => {
     setLoading(true)
+    setSubmitError(null)
     console.log('📝 Form submitted with values:', values)
     
     try {
@@ -185,10 +203,11 @@ export default function Home() {
       setEditingDevice(null)
       
     } catch (err: any) {
+      const msg = getErrorMessage(err)
       console.error('❌ Error saving device:', err)
-      const msg = err?.response?.data?.detail || err?.message || 'Failed to save device'
       console.error('Error message:', msg)
-      message.error(String(msg))
+      setSubmitError(msg)
+      message.error(msg)
     } finally {
       setLoading(false)
     }
@@ -491,14 +510,25 @@ export default function Home() {
         onCancel={() => {
           setIsModalOpen(false)
           setEditingDevice(null)
+          setSubmitError(null)
           form.resetFields()
-          
         }}
         footer={null}
         width={500}
         
       >
         <Form form={form} layout="vertical" onFinish={onFinish}>
+          {submitError && (
+            <Alert
+              type="error"
+              message="Submission failed"
+              description={submitError}
+              showIcon
+              closable
+              onClose={() => setSubmitError(null)}
+              style={{ marginBottom: 16 }}
+            />
+          )}
           <Form.Item
             name="deviceName"
             label="Device Name"
