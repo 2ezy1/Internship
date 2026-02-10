@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Form, Input, Button, Card, message } from 'antd'
+import { Form, Input, Button, Card, message, Alert } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { authAPI } from '../services/api'
@@ -8,10 +8,12 @@ import '../styles/Login.css'
 export default function Login() {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
   const onFinish = async (values: any) => {
     setLoading(true)
+    setError(null) // Clear previous errors
     try {
       const response = await authAPI.login({
         username: values.username?.trim(),
@@ -39,6 +41,7 @@ export default function Login() {
         errorMessage = 'Wrong credentials. Please check your username and password.'
       }
       
+      setError(errorMessage) // Set error state for display
       message.error(errorMessage, 5) // Show for 5 seconds
     } finally {
       setLoading(false)
@@ -54,6 +57,17 @@ export default function Login() {
           <h1>System</h1>
         </div>
         <p className="login-subtitle">Sign in to your account</p>
+
+        {error && (
+          <Alert
+            message={error}
+            type="error"
+            showIcon
+            closable
+            onClose={() => setError(null)}
+            style={{ marginBottom: '20px' }}
+          />
+        )}
 
         <Form form={form} onFinish={onFinish} layout="vertical" className="login-form">
           <Form.Item
