@@ -8,7 +8,7 @@ load_dotenv()
 # Database configuration
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+psycopg2://postgres:bisumain@localhost:5432/devices_db",
+    "sqlite:///./devices.db",
 )
 
 # Create engine

@@ -71,4 +71,30 @@ export const authAPI = {
   },
 }
 
+export const sensorAPI = {
+  // Get sensor readings for a device
+  getSensorReadings: (deviceId: number, limit: number = 100) => {
+    return api.get(`/sensors/readings/${deviceId}`, { params: { limit } })
+  },
+
+  // Get latest sensor reading for a device
+  getLatestReading: (deviceId: number) => {
+    return api.get(`/sensors/latest/${deviceId}`)
+  },
+
+  // Create sensor reading (for ESP32 or testing)
+  createReading: (data: {
+    device_id: number
+    temperature?: string
+    humidity?: string
+    pressure?: string
+    light?: string
+    motion?: string
+    distance?: string  // Ultrasonic distance in cm
+    custom_data?: string
+  }) => {
+    return api.post('/sensors/readings', data)
+  },
+}
+
 export default api

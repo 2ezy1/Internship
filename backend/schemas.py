@@ -57,3 +57,27 @@ class UserWithDevices(UserBase):
 
 class DeviceWithOwner(Device):
     owner: Optional[UserBase] = None
+
+
+# Sensor Reading Schemas
+class SensorReadingBase(BaseModel):
+    device_id: int
+    temperature: Optional[str] = None
+    humidity: Optional[str] = None
+    pressure: Optional[str] = None
+    light: Optional[str] = None
+    motion: Optional[str] = None
+    distance: Optional[str] = None  # Ultrasonic distance in cm
+    custom_data: Optional[str] = None
+
+
+class SensorReadingCreate(SensorReadingBase):
+    pass
+
+
+class SensorReading(SensorReadingBase):
+    id: int
+    timestamp: datetime
+
+    class Config:
+        from_attributes = True

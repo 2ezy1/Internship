@@ -158,7 +158,11 @@ export default function Home() {
         console.log('✏️  UPDATING device ID:', editingDevice.key)
         console.log('📤 PUT request to:', `${apiBase}/devices/${editingDevice.key}`)
         
-        const res = await axios.put(`${apiBase}/devices/${editingDevice.key}`, payload)
+        const res = await axios.put(`${apiBase}/devices/${editingDevice.key}`, payload, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
         const updated = res.data
         
         console.log('✅ UPDATE successful, response:', updated)
@@ -189,7 +193,11 @@ export default function Home() {
         console.log('➕ CREATING new device')
         console.log('📤 POST request to:', `${apiBase}/devices/`)
         
-        const res = await axios.post(`${apiBase}/devices/`, payload)
+        const res = await axios.post(`${apiBase}/devices/`, payload, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        })
         const created = res.data
         
         console.log('✅ CREATE successful, response:', created)
@@ -245,7 +253,11 @@ export default function Home() {
         
         try {
           console.log('📤 Sending DELETE request to backend:', `${apiBase}/devices/${key}`)
-          const response = await axios.delete(`${apiBase}/devices/${key}`)
+          const response = await axios.delete(`${apiBase}/devices/${key}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          })
           console.log('✅ DELETE successful, status:', response.status)
           console.log('📊 Server response:', response.data)
           
