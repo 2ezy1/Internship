@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { Form, Input, Button, Card, message, Alert } from 'antd'
-import { UserOutlined, LockOutlined } from '@ant-design/icons'
+import {
+  UserOutlined,
+  LockOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
+} from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { authAPI } from '../services/api'
 import '../styles/Login.css'
@@ -13,26 +18,25 @@ export default function Login() {
 
   const onFinish = async (values: any) => {
     setLoading(true)
-    setError(null) // Clear previous errors
+    setError(null)
     try {
       const response = await authAPI.login({
         username: values.username?.trim(),
         password: values.password,
       })
-      
-      // Store authentication token
+
       if (response.data.access_token) {
         localStorage.setItem('token', response.data.access_token)
         localStorage.setItem('username', response.data.username)
         localStorage.setItem('role', response.data.role)
       }
-      
+
       message.success('Welcome back')
       navigate('/home')
     } catch (error: any) {
       console.error('Login error:', error)
       let errorMessage = 'Login failed. Please check your credentials.'
-      
+
       if (error?.response?.data?.detail) {
         errorMessage = error.response.data.detail
       } else if (error?.response?.status === 403) {
@@ -40,9 +44,9 @@ export default function Login() {
       } else if (error?.response?.status === 401) {
         errorMessage = 'Wrong credentials. Please check your username and password.'
       }
-      
-      setError(errorMessage) // Set error state for display
-      message.error(errorMessage, 5) // Show for 5 seconds
+
+      setError(errorMessage)
+      message.error(errorMessage, 5)
     } finally {
       setLoading(false)
     }
@@ -50,13 +54,15 @@ export default function Login() {
 
   return (
     <div className="login-container">
+      <div className="login-surface" aria-hidden="true" />
       <Card className="login-card">
+        <div className="brand-tag">Industrial Monitoring Suite</div>
+
         <div className="login-header">
-          <h1>Device</h1>
-          <h1>Management</h1>
-          <h1>System</h1>
+          <p className="login-kicker">Secure Access Portal</p>
+          <h1>Device Management System</h1>
+          <p className="login-subtitle">Sign in to continue to your operational dashboard</p>
         </div>
-        <p className="login-subtitle">Sign in to your account</p>
 
         {error && (
           <Alert
@@ -65,7 +71,7 @@ export default function Login() {
             showIcon
             closable
             onClose={() => setError(null)}
-            style={{ marginBottom: '20px' }}
+            className="login-alert"
           />
         )}
 
@@ -77,10 +83,12 @@ export default function Login() {
             className="form-item"
           >
             <Input
-              prefix={<UserOutlined style={{ color: '#999' }} />}
-              placeholder=""
+              prefix={<UserOutlined style={{ color: '#7f93b8' }} />}
+              placeholder="Enter your username"
               size="large"
               className="login-input"
+              autoComplete="username"
+              allowClear
             />
           </Form.Item>
 
@@ -91,11 +99,18 @@ export default function Login() {
             className="form-item"
           >
             <Input.Password
-              prefix={<LockOutlined style={{ color: '#999' }} />}
-              placeholder=""
+              prefix={<LockOutlined style={{ color: '#7f93b8' }} />}
+              placeholder="Enter your password"
               size="large"
               className="login-input"
-              iconRender={(visible) => (visible ? '👁' : '👁‍🗨')}
+              autoComplete="current-password"
+              iconRender={(visible) =>
+                visible ? (
+                  <EyeOutlined style={{ color: '#89a0c8' }} />
+                ) : (
+                  <EyeInvisibleOutlined style={{ color: '#89a0c8' }} />
+                )
+              }
             />
           </Form.Item>
 
@@ -113,6 +128,11 @@ export default function Login() {
           </Form.Item>
         </Form>
 
+        <div className="login-meta">
+          <span>Authorized users only</span>
+          <span className="meta-dot" aria-hidden="true" />
+          <span>Encrypted session</span>
+        </div>
       </Card>
     </div>
   )

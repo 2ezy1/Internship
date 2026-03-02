@@ -16,11 +16,23 @@ import jwt
 from datetime import datetime, timedelta
 import json
 import asyncio
+from modbus_polling import ModbusPoller
 
 # Create tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Device Management API", version="1.0.0")
+
+MODBUS_PORT = os.getenv("MODBUS_PORT", "COM5")
+MODBUS_BAUDRATE = int(os.getenv("MODBUS_BAUDRATE", "9600"))
+MODBUS_SLAVE_ID = int(os.getenv("MODBUS_SLAVE_ID", "1"))
+MODBUS_POLL_INTERVAL_MS = int(os.getenv("MODBUS_POLL_INTERVAL_MS", "1000"))
+MODBUS_BRAND = os.getenv("MODBUS_BRAND", "teco")
+MODBUS_DEVICE_ID = os.getenv("MODBUS_DEVICE_ID")
+MODBUS_DEVICE_ID = int(MODBUS_DEVICE_ID) if MODBUS_DEVICE_ID else None
+MODBUS_REGISTER_PATH = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "frontend", "public", "vfd_brand_model_registers.json")
+)
 
 # JWT Configuration
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
@@ -164,6 +176,25 @@ def ensure_default_user():
     finally:
         db.close()
 
+    poller = ModbusPoller(
+        port=MODBUS_PORT,
+        baudrate=MODBUS_BAUDRATE,
+        slave_id=MODBUS_SLAVE_ID,
+        poll_interval_ms=MODBUS_POLL_INTERVAL_MS,
+        register_source_path=MODBUS_REGISTER_PATH,
+        brand_key=MODBUS_BRAND,
+        device_id=MODBUS_DEVICE_ID,
+    )
+    poller.start()
+    app.state.modbus_poller = poller
+
+
+@app.on_event("shutdown")
+def stop_modbus_poller():
+    poller = getattr(app.state, "modbus_poller", None)
+    if poller:
+        poller.stop()
+
 # Health check endpoint
 @app.get("/health", response_model=HealthCheck)
 def health_check():
@@ -242,11 +273,15 @@ def get_devices(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user)
 ):
-    """Get devices for current user (requires authentication)"""
-    # Users can only see their own devices
-    devices = db.query(DeviceModel).filter(
-        DeviceModel.user_id == current_user.id
-    ).offset(skip).limit(limit).all()
+    """Get devices (all devices for admin, own devices for regular users)"""
+    if current_user.role == "admin":
+        # Admins can see all devices
+        devices = db.query(DeviceModel).offset(skip).limit(limit).all()
+    else:
+        # Regular users can only see their own devices
+        devices = db.query(DeviceModel).filter(
+            DeviceModel.user_id == current_user.id
+        ).offset(skip).limit(limit).all()
     return devices
 
 @app.get("/devices/{device_id}", response_model=Device, tags=["Devices"])
@@ -258,11 +293,20 @@ def get_device(device_id: int, db: Session = Depends(get_db)):
     return device
 
 @app.put("/devices/{device_id}", response_model=Device, tags=["Devices"])
-def update_device(device_id: int, device: DeviceUpdate, db: Session = Depends(get_db)):
-    """Update a device"""
+def update_device(
+    device_id: int, 
+    device: DeviceUpdate, 
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user)
+):
+    """Update a device (requires authentication and ownership)"""
     db_device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
     if not db_device:
         raise HTTPException(status_code=404, detail="Device not found")
+    
+    # Check if user owns the device or is an admin
+    if db_device.user_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="You do not have permission to update this device")
     
     try:
         update_data = device.dict(exclude_unset=True)
@@ -283,11 +327,19 @@ def update_device(device_id: int, device: DeviceUpdate, db: Session = Depends(ge
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.delete("/devices/{device_id}", tags=["Devices"])
-def delete_device(device_id: int, db: Session = Depends(get_db)):
-    """Delete a device"""
+def delete_device(
+    device_id: int, 
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user)
+):
+    """Delete a device (requires authentication and ownership)"""
     db_device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
     if not db_device:
         raise HTTPException(status_code=404, detail="Device not found")
+    
+    # Check if user owns the device or is an admin
+    if db_device.user_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="You do not have permission to delete this device")
     
     db.delete(db_device)
     db.commit()
@@ -408,7 +460,7 @@ def get_system_stats(
     }
 
 
-# ==================== ESP32 / SENSOR READING ENDPOINTS ====================
+# ==================== RS485 / SENSOR READING ENDPOINTS ====================
 
 @app.post("/sensors/readings", response_model=SensorReading, tags=["Sensors"])
 async def create_sensor_reading(
@@ -416,8 +468,8 @@ async def create_sensor_reading(
     db: Session = Depends(get_db)
 ):
     """
-    Store a sensor reading from ESP32 or other IoT device.
-    This endpoint can be called by ESP32 to send sensor data.
+    Store a sensor reading from RS485 or other IoT device.
+    This endpoint can be called by RS485 to send sensor data.
     """
     try:
         # Verify device exists
@@ -530,7 +582,7 @@ def get_latest_sensor_reading(
 async def websocket_device_endpoint(websocket: WebSocket, device_id: int):
     """
     WebSocket endpoint for real-time sensor data streaming.
-    Frontend clients connect here to receive live updates from ESP32 devices.
+    Frontend clients connect here to receive live updates from RS485 devices.
     """
     await manager.connect(websocket, device_id)
     
@@ -551,26 +603,26 @@ async def websocket_device_endpoint(websocket: WebSocket, device_id: int):
         manager.disconnect(websocket, device_id)
 
 
-@app.websocket("/ws/esp32/send/{device_id}")
-async def websocket_esp32_sender(websocket: WebSocket, device_id: int):
+@app.websocket("/ws/rs485/send/{device_id}")
+async def websocket_rs485_sender(websocket: WebSocket, device_id: int):
     """
-    WebSocket endpoint for ESP32 to send sensor data.
-    ESP32 connects here and sends JSON data which is stored and broadcast to clients.
+    WebSocket endpoint for RS485 to send sensor data.
+    RS485 connects here and sends JSON data which is stored and broadcast to clients.
     """
     await websocket.accept()
-    print(f"🔌 ESP32 connected for device {device_id}")
+    print(f"🔌 RS485 connected for device {device_id}")
     
     # Get DB session for this connection
     db = next(get_db())
     
     try:
         while True:
-            # Receive sensor data from ESP32
+            # Receive sensor data from RS485
             data = await websocket.receive_text()
             
             try:
                 sensor_data = json.loads(data)
-                print(f"📡 Received data from ESP32 device {device_id}: {sensor_data}")
+                print(f"📡 Received data from RS485 device {device_id}: {sensor_data}")
                 
                 # Validate device exists
                 device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
@@ -611,18 +663,18 @@ async def websocket_esp32_sender(websocket: WebSocket, device_id: int):
                 }
                 await manager.broadcast_to_device(device_id, message)
                 
-                # Acknowledge to ESP32
+                # Acknowledge to RS485
                 await websocket.send_json({"status": "ok", "reading_id": db_reading.id})
                 
             except json.JSONDecodeError:
                 await websocket.send_json({"error": "Invalid JSON format"})
             except Exception as e:
-                print(f"❌ Error processing ESP32 data: {e}")
+                print(f"❌ Error processing RS485 data: {e}")
                 await websocket.send_json({"error": str(e)})
                 
     except WebSocketDisconnect:
-        print(f"🔌 ESP32 disconnected from device {device_id}")
+        print(f"🔌 RS485 disconnected from device {device_id}")
     except Exception as e:
-        print(f"⚠️ ESP32 WebSocket error: {e}")
+        print(f"⚠️ RS485 WebSocket error: {e}")
     finally:
         db.close()

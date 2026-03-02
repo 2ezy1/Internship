@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react'
-import { Layout, Card, Form, Input, Button, Space, message, Modal, Select, Skeleton, Badge, Tooltip, Dropdown, Empty, Alert } from 'antd'
+import { Layout, Card, Form, Input, Button, Space, message, Modal, Select, Skeleton, Badge, Tooltip, Dropdown, Empty, Alert, App } from 'antd'
 import type { MenuProps } from 'antd'
 import axios from 'axios'
 import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, ExclamationCircleOutlined, SearchOutlined, MoreOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
-import esp32Image from '../assets/esp32.png'
-import arduinoImage from '../assets/arduino.png'
-import raspiImage from '../assets/raspi.png'
+import rs485Image from '../assets/rs485.png'
 import '../styles/Home.css'
 
 const { Header, Content, Footer } = Layout
@@ -33,6 +31,7 @@ export default function Home() {
   const [statusFilter, setStatusFilter] = useState<'All' | 'Online' | 'Warning' | 'Offline'>('All')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const navigate = useNavigate()
+  const { modal } = App.useApp()
 
   /** Build a user-friendly error message from an axios error (handles FastAPI detail string or array). */
   const getErrorMessage = (err: any): string => {
@@ -51,16 +50,11 @@ export default function Home() {
   const apiBase = (import.meta.env.VITE_API_BASE as string) || 'http://localhost:8000'
 
   const getDeviceImage = (deviceType: string) => {
-    if (deviceType === 'ESP32') return esp32Image
-    if (deviceType === 'Arduino') return arduinoImage
-    if (deviceType === 'Raspberry Pi') return raspiImage
-    return esp32Image
+    return rs485Image
   }
 
   const getDeviceTypeColor = (deviceType: string) => {
-    if (deviceType === 'ESP32') return '#3b82f6' // Blue
-    if (deviceType === 'Arduino') return '#06b6d4' // Cyan
-    if (deviceType === 'Raspberry Pi') return '#ec4899' // Pink
+    if (deviceType === 'RS485') return '#06b6d4' // Cyan
     return '#6366f1' // Indigo
   }
 
@@ -238,44 +232,18 @@ export default function Home() {
     }
   }
 
-  const onDelete = async (key: string) => {
+  const onDelete = (key: string) => {
     console.log('🗑️  DELETE INITIATED - Device ID:', key)
     
-    Modal.confirm({
+    modal.confirm({
       title: 'Delete Device',
       icon: <ExclamationCircleOutlined />,
       content: 'Are you sure you want to delete this device? This action cannot be undone.',
       okText: 'Delete',
       okType: 'danger',
       cancelText: 'Cancel',
-      onOk: async () => {
-        console.log('✋ User confirmed DELETE, removing device:', key)
-        
-        try {
-          console.log('📤 Sending DELETE request to backend:', `${apiBase}/devices/${key}`)
-          const response = await axios.delete(`${apiBase}/devices/${key}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          })
-          console.log('✅ DELETE successful, status:', response.status)
-          console.log('📊 Server response:', response.data)
-          
-          // Update state to remove device
-          setDevices((prevDevices) => {
-            const filtered = prevDevices.filter((d) => d.key !== key)
-            console.log('🔄 State updated. Before:', prevDevices.length, 'After:', filtered.length)
-            return filtered
-          })
-          
-          message.success('Device deleted successfully')
-          console.log('✅ Device ID', key, 'deleted from UI')
-        } catch (error: any) {
-          console.error('❌ DELETE FAILED:', error)
-          const errorMsg = error?.response?.data?.detail || error?.message || 'Failed to delete device'
-          console.error('Error details:', errorMsg)
-          message.error(errorMsg)
-        }
+      onOk() {
+        return handleConfirmDelete(key)
       },
       onCancel() {
         console.log('❌ User cancelled delete')
@@ -283,12 +251,51 @@ export default function Home() {
     })
   }
 
+  const handleConfirmDelete = async (deviceId: string) => {
+    console.log('✋ User confirmed DELETE, removing device:', deviceId)
+    
+    try {
+      console.log('📤 Sending DELETE request to backend:', `${apiBase}/devices/${deviceId}`)
+      const response = await axios.delete(`${apiBase}/devices/${deviceId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      console.log('✅ DELETE successful, status:', response.status)
+      console.log('📊 Server response:', response.data)
+      
+      // Update state to remove device IMMEDIATELY
+      setDevices((prevDevices) => {
+        const filtered = prevDevices.filter((d) => d.key !== deviceId)
+        console.log('🔄 State updated. Before:', prevDevices.length, 'After:', filtered.length)
+        console.log('🗑️  Remaining devices:', filtered.map(d => ({ id: d.key, name: d.deviceName })))
+        return filtered
+      })
+      
+      message.success('Device deleted successfully')
+      console.log('✅ Device ID', deviceId, 'deleted from UI')
+      return true // Resolution without error
+    } catch (error: any) {
+      console.error('DELETE FAILED:', error)
+      const errorMsg = error?.response?.data?.detail || error?.message || 'Failed to delete device'
+      console.error('Error details:', errorMsg)
+      message.error(errorMsg)
+      
+      if (error?.response?.status === 401) {
+        console.log('🔐 Unauthorized - redirecting to login')
+        localStorage.clear()
+        navigate('/login')
+        return false
+      }
+      // Don't rethrow - let Modal close so user can try again
+      return false
+    }
+  }
+
   const filteredDevices = devices.filter(device => {
     // Filter by type
     const matchesType = filterType === 'All' || 
-      (filterType === 'ESP32' && device.type === 'ESP32') ||
-      (filterType === 'Arduino' && device.type === 'Arduino') ||
-      (filterType === 'Raspberry Pi' && device.type === 'Raspberry Pi')
+      (filterType === 'RS485' && device.type === 'RS485')
 
     const normalizedStatus = device.status?.toLowerCase() || ''
     const matchesStatus = statusFilter === 'All' ||
@@ -306,9 +313,7 @@ export default function Home() {
   const getTypeMenuItems = (selectedType: string): MenuProps['items'] => {
     const allItems: MenuProps['items'] = [
       { key: 'All', label: 'All Devices' },
-      { key: 'ESP32', label: 'ESP32' },
-      { key: 'Arduino', label: 'Arduino' },
-      { key: 'Raspberry Pi', label: 'Raspberry Pi' },
+      { key: 'RS485', label: 'RS485' },
     ]
 
     return allItems.filter((item) => item?.key !== selectedType)
@@ -348,7 +353,7 @@ export default function Home() {
             prefix={<SearchOutlined />}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: 250, color: '#fff' }}
+            style={{ width: 250 }}
             allowClear
           />
           <Button
@@ -356,7 +361,6 @@ export default function Home() {
             danger
             icon={<LogoutOutlined />}
             onClick={handleLogout}
-            style={{ color: '#fff' }}
           >
             Logout
           </Button>
@@ -448,16 +452,25 @@ export default function Home() {
                         key: 'edit',
                         label: 'Edit Device',
                         icon: <EditOutlined />,
-                        onClick: () => onEditClick(device),
                       },
                       {
                         key: 'delete',
                         label: 'Delete Device',
                         icon: <DeleteOutlined />,
                         danger: true,
-                        onClick: () => onDelete(device.key),
                       },
                     ]
+
+                    const handleCardMenuClick: MenuProps['onClick'] = ({ key, domEvent }) => {
+                      domEvent.stopPropagation()
+                      if (key === 'edit') {
+                        onEditClick(device)
+                        return
+                      }
+                      if (key === 'delete') {
+                        onDelete(device.key)
+                      }
+                    }
 
                     return (
                       <div 
@@ -493,13 +506,18 @@ export default function Home() {
                                   <CloseCircleOutlined style={{ color: '#ef4444', fontSize: 18 }} />
                                 )}
                               </Tooltip>
-                              <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
+                              <Dropdown
+                                menu={{ items: menuItems, onClick: handleCardMenuClick }}
+                                trigger={['click']}
+                                placement="bottomRight"
+                              >
                                 <Button
                                   type="text"
                                   icon={<MoreOutlined />}
                                   size="small"
                                   className="more-menu-button"
                                   onClick={(event) => event.stopPropagation()}
+                                  onMouseDown={(event) => event.stopPropagation()}
                                 />
                               </Dropdown>
                             </div>
@@ -584,9 +602,7 @@ export default function Home() {
 
           <Form.Item name="type" label="Device Type" rules={[{ required: true, message: 'Please select device type' }]}>
             <Select placeholder="Select device type">
-              <Select.Option value="ESP32">ESP32</Select.Option>
-              <Select.Option value="Raspberry Pi">Raspberry Pi (Raspi)</Select.Option>
-              <Select.Option value="Arduino">Arduino</Select.Option>
+              <Select.Option value="RS485">RS485</Select.Option>
             </Select>
           </Form.Item>
 
@@ -603,3 +619,5 @@ export default function Home() {
     </Layout>
   )
 }
+
+
