@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
@@ -27,6 +27,12 @@ class Device(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Device status and verification fields
+    is_online = Column(Boolean, default=False, nullable=False)
+    last_heartbeat = Column(DateTime(timezone=True), nullable=True)
+    device_key = Column(String, unique=True, index=True, nullable=True)  # UUID for device authentication
+    mac_address = Column(String, nullable=True)  # MAC address for additional verification
     
     # Relationship to user
     owner = relationship("User", back_populates="devices")

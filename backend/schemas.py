@@ -23,7 +23,25 @@ class Device(DeviceBase):
     date_installed: datetime
     created_at: datetime
     updated_at: Optional[datetime] = None
+    is_online: bool = False
+    last_heartbeat: Optional[datetime] = None
+    device_key: Optional[str] = None
+    mac_address: Optional[str] = None
 
+    class Config:
+        from_attributes = True
+
+
+class DeviceStatus(BaseModel):
+    """Device status with computed status field"""
+    id: int
+    device_name: str
+    ip_address: str
+    type: Optional[str] = None
+    is_online: bool
+    last_heartbeat: Optional[datetime] = None
+    status: str  # "Online", "Warning", "Offline"
+    
     class Config:
         from_attributes = True
 

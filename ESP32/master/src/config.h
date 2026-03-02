@@ -1,0 +1,61 @@
+/*
+ * Configuration Header for ESP32 Master WebSocket
+ * Set these values based on your network and server setup
+ */
+
+#ifndef CONFIG_H
+#define CONFIG_H
+
+// WiFi Configuration
+#define WIFI_SSID "GlobeAtHome_89CB4"
+#define WIFI_PASSWORD "7NNYHN9JHND"
+
+// Static IP Configuration
+// Router IP: 192.168.254.254
+#define STATIC_IP_0 192
+#define STATIC_IP_1 168
+#define STATIC_IP_2 254
+#define STATIC_IP_3 50      // Change last octet as needed for multiple devices
+
+#define GATEWAY_0 192
+#define GATEWAY_1 168
+#define GATEWAY_2 254
+#define GATEWAY_3 254       // Router IP
+
+#define SUBNET_0 255
+#define SUBNET_1 255
+#define SUBNET_2 255
+#define SUBNET_3 0
+
+#define PRIMARY_DNS_0 8
+#define PRIMARY_DNS_1 8
+#define PRIMARY_DNS_2 8
+#define PRIMARY_DNS_3 8
+
+#define SECONDARY_DNS_0 8
+#define SECONDARY_DNS_1 8
+#define SECONDARY_DNS_2 4
+#define SECONDARY_DNS_3 4
+
+// Server Configuration
+#define SERVER_IP "192.168.254.110"   // Your computer's static IP on network
+#define SERVER_PORT 8000
+#define SERVER_PATH "/ws/esp32/connect"
+
+// Device Configuration
+#define DEVICE_ID 1                    // Device ID from server
+#define DEVICE_KEY "your-device-key-here"  // Generated from server - update this!
+#define POLL_INTERVAL_MS 5000         // Send sensor data every 5 seconds
+#define HEARTBEAT_INTERVAL_MS 30000   // Send heartbeat every 30 seconds
+
+// UART Configuration
+#define RX_PIN 15
+#define TX_PIN 13
+#define UART_BAUD 9600
+#define UART_NUM 2  // Serial2
+
+// Logging
+#define DEBUG_ENABLED 1
+#define LOG_LEVEL_VERBOSE 1
+
+#endif // CONFIG_H

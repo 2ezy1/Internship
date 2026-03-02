@@ -16,6 +16,8 @@ type Device = {
   ipAddress: string
   type: string
   status: string
+  isOnline?: boolean
+  lastHeartbeat?: string
   dateInstalled: string
 }
 
@@ -82,20 +84,43 @@ export default function Home() {
       console.log('✅ Fetch successful, received:', res.data.length, 'devices')
       console.log('📊 Devices data:', res.data)
       
-      const fetchedDevices = res.data.map((device: any) => ({
-        key: String(device.id),
-        deviceName: device.device_name,
-        ipAddress: device.ip_address,
-        type: device.type || 'Generic',
-        status: 'Active',
-        dateInstalled: device.date_installed || device.created_at,
-      }))
+      // Fetch status for each device
+      const devicesWithStatus = await Promise.all(
+        res.data.map(async (device: any) => {
+          try {
+            const statusRes = await axios.get(`${apiBase}/devices/${device.id}/status`)
+            return {
+              key: String(device.id),
+              deviceName: device.device_name,
+              ipAddress: device.ip_address,
+              type: device.type || 'Generic',
+              status: statusRes.data.status || 'Offline',  // Online, Warning, or Offline
+              isOnline: statusRes.data.is_online,
+              lastHeartbeat: statusRes.data.last_heartbeat,
+              dateInstalled: device.date_installed || device.created_at,
+            }
+          } catch (err) {
+            // If status fetch fails, default to offline
+            console.warn(`⚠️ Failed to fetch status for device ${device.id}`)
+            return {
+              key: String(device.id),
+              deviceName: device.device_name,
+              ipAddress: device.ip_address,
+              type: device.type || 'Generic',
+              status: 'Offline',
+              isOnline: false,
+              lastHeartbeat: null,
+              dateInstalled: device.date_installed || device.created_at,
+            }
+          }
+        })
+      )
       
-      setDevices(fetchedDevices)
-      console.log('🔄 State updated with', fetchedDevices.length, 'devices')
+      setDevices(devicesWithStatus)
+      console.log('🔄 State updated with', devicesWithStatus.length, 'devices')
       
-      if (fetchedDevices.length > 0) {
-        message.success(`Loaded ${fetchedDevices.length} device(s)`)
+      if (devicesWithStatus.length > 0) {
+        message.success(`Loaded ${devicesWithStatus.length} device(s)`)
       }
     } catch (err: any) {
       console.error('❌ Failed to fetch devices:', err)
@@ -297,11 +322,11 @@ export default function Home() {
     const matchesType = filterType === 'All' || 
       (filterType === 'RS485' && device.type === 'RS485')
 
-    const normalizedStatus = device.status?.toLowerCase() || ''
+    const normalizedStatus = device.status?.toLowerCase() || 'offline'
     const matchesStatus = statusFilter === 'All' ||
-      (statusFilter === 'Online' && normalizedStatus === 'active') ||
+      (statusFilter === 'Online' && normalizedStatus === 'online') ||
       (statusFilter === 'Warning' && normalizedStatus === 'warning') ||
-      (statusFilter === 'Offline' && (normalizedStatus === 'inactive' || normalizedStatus === 'offline'))
+      (statusFilter === 'Offline' && normalizedStatus === 'offline')
     
     // Filter by search query
     const matchesSearch = searchQuery === '' || 
@@ -335,7 +360,7 @@ export default function Home() {
   }
 
   const totalDevices = devices.length
-  const activeDevices = devices.filter((device) => device.status === 'Active').length
+  const activeDevices = devices.filter((device) => device.status === 'Online').length
   const installsThisMonth = devices.filter((device) => {
     if (!device.dateInstalled) return false
     return dayjs(device.dateInstalled).isSame(dayjs(), 'month')
@@ -485,7 +510,7 @@ export default function Home() {
                             <div className="device-hover-title">{device.deviceName}</div>
                             <div className="device-hover-row">IP: {device.ipAddress}</div>
                             <div className="device-hover-row">
-                              Status: <Badge status={device.status === 'Active' ? 'success' : 'error'} text={device.status} />
+                              Status: <Badge status={device.status === 'Online' ? 'success' : device.status === 'Warning' ? 'warning' : 'error'} text={device.status} />
                             </div>
                             <div className="device-hover-row">
                               Installed: {device.dateInstalled ? dayjs(device.dateInstalled).format('MMM D, YYYY') : 'Unknown'}
@@ -499,9 +524,11 @@ export default function Home() {
                               <div className="device-subtitle">{device.type}</div>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <Tooltip title={device.status === 'Active' ? 'Online' : 'Offline'}>
-                                {device.status === 'Active' ? (
+                              <Tooltip title={device.status}>
+                                {device.status === 'Online' ? (
                                   <CheckCircleOutlined style={{ color: '#10b981', fontSize: 18 }} />
+                                ) : device.status === 'Warning' ? (
+                                  <ExclamationCircleOutlined style={{ color: '#f59e0b', fontSize: 18 }} />
                                 ) : (
                                   <CloseCircleOutlined style={{ color: '#ef4444', fontSize: 18 }} />
                                 )}

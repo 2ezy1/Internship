@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from database import engine, get_db, Base
 from models import Device as DeviceModel, User as UserModel, SensorReading as SensorReadingModel
 from schemas import (
-    Device, DeviceCreate, DeviceUpdate, HealthCheck, 
+    Device, DeviceCreate, DeviceUpdate, HealthCheck, DeviceStatus,
     UserLogin, LoginResponse, UserBase, UserWithDevices,
     SensorReading, SensorReadingCreate
 )
@@ -16,6 +16,7 @@ import jwt
 from datetime import datetime, timedelta
 import json
 import asyncio
+import uuid
 from modbus_polling import ModbusPoller
 
 # Create tables
@@ -195,6 +196,48 @@ def stop_modbus_poller():
     if poller:
         poller.stop()
 
+
+async def check_device_heartbeats():
+    """Background task to mark devices as offline if heartbeat is missing"""
+    while True:
+        try:
+            await asyncio.sleep(30)  # Check every 30 seconds
+            
+            db = next(get_db())
+            devices = db.query(DeviceModel).filter(DeviceModel.is_online == True).all()
+            
+            for device in devices:
+                if device.last_heartbeat is None:
+                    continue
+                
+                seconds_since_heartbeat = (datetime.utcnow() - device.last_heartbeat).total_seconds()
+                
+                # Mark as offline if no heartbeat for 5 minutes
+                if seconds_since_heartbeat > 300:
+                    device.is_online = False
+                    db.commit()
+                    print(f"⚠️ Device {device.id} marked offline (no heartbeat for {seconds_since_heartbeat:.0f}s)")
+            
+            db.close()
+        except Exception as e:
+            print(f"❌ Error in heartbeat check task: {e}")
+            await asyncio.sleep(30)
+
+
+# Start background heartbeat checker when app starts
+@asyncio.get_running_loop()
+def start_background_tasks():
+    """Start background tasks on app startup"""
+    asyncio.create_task(check_device_heartbeats())
+
+
+# Alternative: Create task on startup event
+@app.on_event("startup")
+async def startup_background_tasks():
+    """Create background task for device heartbeat monitoring"""
+    asyncio.create_task(check_device_heartbeats())
+
+
 # Health check endpoint
 @app.get("/health", response_model=HealthCheck)
 def health_check():
@@ -251,10 +294,20 @@ def create_device(
         device_data = device.dict()
         # Assign device to current user
         device_data['user_id'] = current_user.id
+        
+        # If device type is ESP32_Master, auto-generate device_key
+        if device_data.get('type') == 'ESP32_Master':
+            device_data['device_key'] = str(uuid.uuid4())
+            device_data['is_online'] = False
+        
         db_device = DeviceModel(**device_data)
         db.add(db_device)
         db.commit()
         db.refresh(db_device)
+        
+        if db_device.device_key:
+            print(f"✅ ESP32 device created with key: {db_device.device_key}")
+        
         return db_device
     except IntegrityError:
         db.rollback()
@@ -678,3 +731,222 @@ async def websocket_rs485_sender(websocket: WebSocket, device_id: int):
         print(f"⚠️ RS485 WebSocket error: {e}")
     finally:
         db.close()
+
+
+# ==================== Helper Functions ====================
+
+def compute_device_status(device: DeviceModel) -> str:
+    """Compute device status based on online flag and last heartbeat"""
+    if not device.is_online:
+        return "Offline"
+    
+    if device.last_heartbeat is None:
+        return "Warning"
+    
+    seconds_since_heartbeat = (datetime.utcnow() - device.last_heartbeat).total_seconds()
+    
+    if seconds_since_heartbeat < 60:  # Less than 1 minute
+        return "Online"
+    elif seconds_since_heartbeat < 300:  # Less than 5 minutes
+        return "Warning"
+    else:
+        return "Offline"
+
+
+# ==================== WebSocket Endpoint: ESP32 Master ====================
+
+@app.websocket("/ws/esp32/connect")
+async def websocket_esp32_handler(websocket: WebSocket, device_id: int, device_key: str, db: Session = Depends(get_db)):
+    """
+    WebSocket endpoint for ESP32 Master devices to send sensor data.
+    Validates device_key and IP address before accepting connection.
+    Stores sensor readings and broadcasts to connected clients.
+    """
+    
+    # 1. VERIFY DEVICE EXISTS AND KEY MATCHES
+    device = db.query(DeviceModel).filter(
+        DeviceModel.id == device_id,
+        DeviceModel.device_key == device_key
+    ).first()
+    
+    if not device:
+        print(f"❌ ESP32 auth failed: Invalid device ID {device_id} or key")
+        await websocket.close(code=4000, reason="Invalid device or key")
+        return
+    
+    # 2. VERIFY IP ADDRESS MATCHES (security check)
+    client_ip = websocket.client.host
+    if client_ip != device.ip_address:
+        print(f"⚠️ IP mismatch for device {device_id}: {client_ip} vs {device.ip_address}")
+        await websocket.close(code=4001, reason="IP address mismatch")
+        return
+    
+    # 3. ACCEPT CONNECTION & SET ONLINE
+    await websocket.accept()
+    device.is_online = True
+    device.last_heartbeat = datetime.utcnow()
+    db.commit()
+    print(f"✅ ESP32 device {device_id} connected from {client_ip}")
+    
+    # 4. LISTEN FOR MESSAGES
+    try:
+        while True:
+            message = await websocket.receive_json()
+            message_type = message.get("type")
+            
+            if message_type == "heartbeat":
+                # Update last heartbeat timestamp
+                device.last_heartbeat = datetime.utcnow()
+                db.commit()
+                print(f"💖 Heartbeat from device {device_id}: RSSI={message.get('rssi', 'N/A')}")
+                
+                # Send acknowledgment
+                await websocket.send_json({"status": "ok", "type": "heartbeat_ack"})
+                
+            elif message_type == "sensor_data":
+                # Process sensor data from ESP32
+                try:
+                    sensor_data = message.get("data", {})
+                    
+                    # Create sensor reading record
+                    db_reading = SensorReadingModel(
+                        device_id=device_id,
+                        temperature=str(sensor_data.get("temperature")),
+                        humidity=str(sensor_data.get("humidity")),
+                        pressure=str(sensor_data.get("pressure")),
+                        light=str(sensor_data.get("light")),
+                        motion=str(sensor_data.get("motion")),
+                        distance=str(sensor_data.get("distance")),
+                        custom_data=json.dumps({
+                            "rssi": message.get("rssi"),
+                            "uptime": message.get("uptime"),
+                            "verified": True
+                        })
+                    )
+                    db.add(db_reading)
+                    db.commit()
+                    db.refresh(db_reading)
+                    
+                    print(f"📡 Sensor data from device {device_id}: {sensor_data}")
+                    
+                    # Broadcast to all connected frontend clients watching this device
+                    broadcast_message = {
+                        "type": "sensor_update",
+                        "device_id": device_id,
+                        "data": {
+                            "id": db_reading.id,
+                            "temperature": db_reading.temperature,
+                            "humidity": db_reading.humidity,
+                            "pressure": db_reading.pressure,
+                            "light": db_reading.light,
+                            "motion": db_reading.motion,
+                            "distance": db_reading.distance,
+                            "custom_data": db_reading.custom_data,
+                            "timestamp": db_reading.timestamp.isoformat()
+                        }
+                    }
+                    await manager.broadcast_to_device(device_id, broadcast_message)
+                    
+                    # Acknowledge to ESP32
+                    await websocket.send_json({"status": "ok", "reading_id": db_reading.id})
+                    
+                except Exception as e:
+                    print(f"❌ Error processing sensor data: {e}")
+                    await websocket.send_json({"error": str(e)})
+            
+            else:
+                print(f"⚠️ Unknown message type: {message_type}")
+                await websocket.send_json({"error": "Unknown message type"})
+    
+    except WebSocketDisconnect:
+        device.is_online = False
+        db.commit()
+        print(f"🔌 ESP32 device {device_id} disconnected")
+    except Exception as e:
+        print(f"⚠️ ESP32 WebSocket error: {e}")
+        device.is_online = False
+        db.commit()
+
+
+# ==================== New API Endpoints ====================
+
+@app.post("/devices/{device_id}/regenerate-key", tags=["Devices"])
+def regenerate_device_key(
+    device_id: int,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_admin_user)
+):
+    """Regenerate device key for security purposes (admin only)"""
+    device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    new_key = str(uuid.uuid4())
+    device.device_key = new_key
+    db.commit()
+    db.refresh(device)
+    
+    return {
+        "message": "Device key regenerated",
+        "device_id": device_id,
+        "device_key": new_key
+    }
+
+
+@app.get("/devices/{device_id}/status", response_model=DeviceStatus, tags=["Devices"])
+def get_device_status(device_id: int, db: Session = Depends(get_db)):
+    """Get device status including online/offline and last heartbeat"""
+    device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    status = compute_device_status(device)
+    
+    return DeviceStatus(
+        id=device.id,
+        device_name=device.device_name,
+        ip_address=device.ip_address,
+        type=device.type,
+        is_online=device.is_online,
+        last_heartbeat=device.last_heartbeat,
+        status=status
+    )
+
+
+@app.post("/devices/{device_id}/initialize-esp32", tags=["Devices"])
+def initialize_esp32_device(
+    device_id: int,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_admin_user)
+):
+    """
+    Initialize ESP32 device with a device key.
+    Called when device is first registered.
+    Returns the device key for programming into ESP32.
+    """
+    device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    if device.device_key:
+        raise HTTPException(status_code=400, detail="Device already initialized")
+    
+    # Generate unique device key
+    device_key = str(uuid.uuid4())
+    device.device_key = device_key
+    db.commit()
+    db.refresh(device)
+    
+    print(f"✅ Device {device_id} initialized with key: {device_key}")
+    
+    return {
+        "message": "Device initialized successfully",
+        "device_id": device_id,
+        "device_key": device_key,
+        "setup_instructions": {
+            "step1": "Copy the device_key above",
+            "step2": "Upload ESP32 firmware with this device_key in config",
+            "step3": "Set static IP to match ip_address field",
+            "step4": "Device will auto-connect to server via WebSocket"
+        }
+    }
