@@ -1,0 +1,450 @@
+{
+  "chziri": [
+    {
+      "address": 0,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 101,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 12291,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 12290,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 12288,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "danahe": [
+    {
+      "address": 0,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 65065,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 65040,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 65032,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 64786,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "frenic_ace": [
+    {
+      "address": 0,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 0,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 12291,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 12290,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 12288,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "frenic_eco": [
+    {
+      "address": 0,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 0,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 12291,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 12290,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 12288,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "frenic_mega": [
+    {
+      "address": 0,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 0,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 12291,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 12290,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 12288,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "hitachi_sh1_p1": [
+    {
+      "address": 600,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 8205,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 8201,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 8194,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 8193,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "hitachi_sj700": [
+    {
+      "address": 600,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 8205,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 8201,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 8194,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 8193,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "hitachi_sj700n": [
+    {
+      "address": 600,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 8205,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 8201,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 8194,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 8193,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "schneider_altivar_atv320": [
+    {
+      "address": 0,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 3211,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 3207,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 3204,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 3202,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "teco": [
+    {
+      "address": 1000,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 1001,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 1002,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 1003,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 1004,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "tek_drive_tds_f8": [
+    {
+      "address": 1100,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 1101,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 1102,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 1103,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 1104,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "tek_drive_tds_v8": [
+    {
+      "address": 1200,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 1201,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 1202,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 1203,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 1204,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "vacon_100": [
+    {
+      "address": 1300,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 1301,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 1302,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 1303,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 1304,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ],
+  "yaskawa_a1000": [
+    {
+      "address": 1400,
+      "name": "Energy",
+      "unit": "kWh",
+      "divisor": 1
+    },
+    {
+      "address": 1401,
+      "name": "Power",
+      "unit": "kW",
+      "divisor": 0.1
+    },
+    {
+      "address": 1402,
+      "name": "Voltage",
+      "unit": "V",
+      "divisor": 0.1
+    },
+    {
+      "address": 1403,
+      "name": "Current",
+      "unit": "A",
+      "divisor": 0.1
+    },
+    {
+      "address": 1404,
+      "name": "Frequency",
+      "unit": "Hz",
+      "divisor": 0.1
+    }
+  ]
+}

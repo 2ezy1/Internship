@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modbus RTU Master - Configurable Slave ID</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%);
+      color: #eee;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #90ee90;
+    }
+    
+    .header h1 {
+      color: #90ee90;
+      font-size: 2.5em;
+      margin: 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .controls {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .serial-config {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .serial-config label {
+      color: #ccc;
+      font-weight: 500;
+    }
+    
+    .serial-config select, .serial-config input {
+      background: #444;
+      color: #fff;
+      border: 1px solid #666;
+      padding: 8px 12px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    
+    .serial-config input {
+      width: 60px;
+    }
+    
+    button {
+      background: linear-gradient(135deg, #444 0%, #666 100%);
+      color: #fff;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    button:hover {
+      background: linear-gradient(135deg, #666 0%, #888 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+    
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .download-btn {
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    }
+    
+    .download-btn:hover {
+      background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    }
+    
+    .clear-btn {
+      background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    }
+    
+    .clear-btn:hover {
+      background: linear-gradient(135deg, #e0a800 0%, #c69500 100%);
+    }
+    
+    .status {
+      text-align: center;
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 18px;
+      background: rgba(255, 165, 0, 0.2);
+      border: 1px solid #ffa500;
+      color: #ffa500;
+    }
+    
+    .status.connected {
+      background: rgba(144, 238, 144, 0.2);
+      border-color: #90ee90;
+      color: #90ee90;
+    }
+    
+    .status.error {
+      background: rgba(255, 99, 132, 0.2);
+      border-color: #ff6384;
+      color: #ff6384;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .stat-label {
+      color: #ccc;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    
+    .stat-value {
+      color: #90ee90;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    th {
+      background: rgba(144, 238, 144, 0.2);
+      color: #90ee90;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    td {
+      font-size: 15px;
+    }
+    
+    .value-cell {
+      font-weight: bold;
+      font-size: 18px;
+      color: #90ee90;
+    }
+    
+    .error-value {
+      color: #ff6384;
+    }
+    
+    .address-cell {
+      font-family: 'Courier New', monospace;
+      color: #ffa500;
+    }
+    
+    .log-container {
+      margin-top: 30px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .log-entry {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      margin-bottom: 5px;
+      padding: 3px 0;
+    }
+    
+    .log-timestamp {
+      color: #ffa500;
+    }
+    
+    .log-error {
+      color: #ff6384;
+    }
+    
+    .log-success {
+      color: #90ee90;
+    }
+    
+    .log-info {
+      color: #87ceeb;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ffa500;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal.show {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #2d2d44 0%, #1e1e2f 100%);
+      padding: 30px;
+      border-radius: 15px;
+      border: 2px solid #90ee90;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      animation: slideIn 0.3s ease;
+    }
+
+    .modal-header {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffa500;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .modal-body {
+      font-size: 16px;
+      color: #ccc;
+      margin-bottom: 25px;
+      line-height: 1.6;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 10px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .modal-btn-primary {
+      background: linear-gradient(135deg, #90ee90 0%, #76dd76 100%);
+      color: #000;
+    }
+
+    .modal-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(144, 238, 144, 0.3);
+    }
+
+    .modal-btn-secondary {
+      background: linear-gradient(135deg, #666 0%, #444 100%);
+      color: #fff;
+    }
+
+    .modal-btn-secondary:hover {
+      background: linear-gradient(135deg, #888 0%, #666 100%);
+      transform: translateY(-2px);
+    }
+
+    .connect-info {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+      text-align: left;
+      border-left: 3px solid #90ee90;
+    }
+
+    .connect-info-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .connect-info-label {
+      color: #ccc;
+      font-weight: 500;
+    }
+
+    .connect-info-value {
+      color: #90ee90;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(144, 238, 144, 0.3);
+      border-top: 2px solid #90ee90;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔌 Modbus RTU Master</h1>
+      <p>Reading Holding Registers from Configurable Slave ID</p>
+    </div>
+    
+    <div class="controls">
+      <div class="serial-config">
+        <label>Slave ID:</label>
+        <input type="number" id="slaveId" value="1" min="1" max="247">
+        
+        <label>Baud Rate:</label>
+        <select id="baudRate">
+          <option value="9600" selected>9600</option>
+          <option value="19200">19200</option>
+          <option value="38400">38400</option>
+          <option value="57600">57600</option>
+          <option value="115200">115200</option>
+        </select>
+        
+        <label>Data Bits:</label>
+        <select id="dataBits">
+          <option value="8" selected>8</option>
+          <option value="7">7</option>
+        </select>
+        
+        <label>Stop Bits:</label>
+        <select id="stopBits">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+        </select>
+        
+        <label>Parity:</label>
+        <select id="parity">
+          <option value="none" selected>None</option>
+          <option value="even">Even</option>
+          <option value="odd">Odd</option>
+        </select>
+
+        <label>Brand-Model:</label>
+        <select id="brandModel" onchange="switchBrand()">
+          <option value="">-- Select Brand --</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="controls">
+      <button id="connectBtn" onclick="connectSerial()">🔌 Connect to Serial</button>
+      <button id="disconnectBtn" onclick="disconnectSerial()" disabled>🔌 Disconnect</button>
+      <button id="downloadBtn" onclick="downloadData()" class="download-btn">📊 Download CSV</button>
+    </div>
+    
+    <div class="status" id="status">Disconnected - Configure settings and click Connect to start</div>
+    
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Total Reads</div>
+        <div class="stat-value" id="totalReads">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Successful</div>
+        <div class="stat-value" id="successReads">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Errors</div>
+        <div class="stat-value" id="errorReads">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Data Records</div>
+        <div class="stat-value" id="dataRecords">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Last Read</div>
+        <div class="stat-value" id="lastRead">--:--:--</div>
+      </div>
+    </div>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Register Name</th>
+          <th>Address</th>
+          <th>Raw Value</th>
+          <th>Actual Value</th>
+          <th>Unit</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="dataTable">
+        <!-- Populated dynamically -->
+      </tbody>
+    </table>
+    
+    <div class="log-container">
+      <div class="log-header">
+        <h3>Communication Log</h3>
+        <button onclick="clearLog()" class="clear-btn">Clear Log</button>
+      </div>
+      <div id="logContainer"></div>
+    </div>
+  </div>
+
+  <!-- Modal for Serial Connection -->
+  <div id="connectModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="spinner" id="connectSpinner"></span>
+        <span id="connectModalTitle">🔌 Connecting to Serial Port</span>
+      </div>
+      <div class="modal-body">
+        <div class="connect-info">
+          <div class="connect-info-item">
+            <span class="connect-info-label">Slave ID:</span>
+            <span class="connect-info-value" id="modalSlaveId">--</span>
+          </div>
+          <div class="connect-info-item">
+            <span class="connect-info-label">Baud Rate:</span>
+            <span class="connect-info-value" id="modalBaudRate">--</span>
+          </div>
+          <div class="connect-info-item">
+            <span class="connect-info-label">Data Bits:</span>
+            <span class="connect-info-value" id="modalDataBits">--</span>
+          </div>
+          <div class="connect-info-item">
+            <span class="connect-info-label">Stop Bits:</span>
+            <span class="connect-info-value" id="modalStopBits">--</span>
+          </div>
+          <div class="connect-info-item">
+            <span class="connect-info-label">Parity:</span>
+            <span class="connect-info-value" id="modalParity">--</span>
+          </div>
+          <div class="connect-info-item">
+            <span class="connect-info-label">Brand:</span>
+            <span class="connect-info-value" id="modalBrand">--</span>
+          </div>
+        </div>
+        <div id="connectMessage" style="text-align: center; color: #87ceeb; margin-top: 15px;">
+          Establishing connection...
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-secondary" onclick="cancelConnect()" id="connectCancelBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Brand Selection Alert -->
+  <div id="brandModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        ⚠️ Brand Selection Required
+      </div>
+      <div class="modal-body">
+        Please select a VFD brand model from the dropdown menu before connecting to the serial port.
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-btn-primary" onclick="closeModal()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let registers = [];
+    let brandData = {};
+
+    let port, reader, writer, polling = false;
+    let readTimeout = null;
+    let stats = {
+      totalReads: 0,
+      successReads: 0,
+      errorReads: 0
+    };
+
+    // Data logging array
+    let dataLog = [];
+
+    // Apply divisor to value
+    function applyDivisor(value, divisor) {
+      return (value * divisor).toFixed(1);
+    }
+
+    // Initialize the table
+    function initializeTable() {
+      const table = document.getElementById('dataTable');
+      if (!table) {
+        logMessage('Error: dataTable element not found', 'error');
+        return;
+      }
+      
+      table.innerHTML = '';
+      
+      if (!registers || registers.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="6" style="text-align: center; color: #ffa500;">Select a brand to load registers</td>';
+        table.appendChild(row);
+        return;
+      }
+      
+      registers.forEach(reg => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${reg.name}</td>
+          <td class="address-cell">${reg.address}</td>
+          <td class="value-cell" id="raw-${reg.address}">--</td>
+          <td class="value-cell" id="val-${reg.address}">--</td>
+          <td>${reg.unit}</td>
+          <td id="status-${reg.address}">Waiting</td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    // Logging function with line limit (latest at top)
+    function logMessage(message, type = 'info') {
+      const logContainer = document.getElementById('logContainer');
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      entry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${message}`;
+      
+      // Insert at the top instead of appending
+      logContainer.insertBefore(entry, logContainer.firstChild);
+      
+      // Keep only last 2000 entries (remove from bottom)
+      const entries = logContainer.querySelectorAll('.log-entry');
+      if (entries.length > 2000) {
+        entries[entries.length - 1].remove();
+      }
+    }
+
+    // Clear log function
+    function clearLog() {
+      document.getElementById('logContainer').innerHTML = '';
+      logMessage('Log cleared', 'info');
+    }
+
+    // Update statistics
+    function updateStats() {
+      document.getElementById('totalReads').textContent = stats.totalReads;
+      document.getElementById('successReads').textContent = stats.successReads;
+      document.getElementById('errorReads').textContent = stats.errorReads;
+      document.getElementById('dataRecords').textContent = dataLog.length;
+      document.getElementById('lastRead').textContent = new Date().toLocaleTimeString();
+    }
+
+    // Format timestamp for data logging
+    function formatTimestamp() {
+      const now = new Date();
+      const options = { 
+        weekday: 'short', 
+        year: 'numeric', 
+        month: 'short', 
+        day: '2-digit', 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true
+      };
+      return now.toLocaleDateString('en-US', options);
+    }
+
+    // Save data to log
+    function saveDataToLog(values) {
+      const timestamp = formatTimestamp();
+      const registerNames = registers.map(r => r.name);
+      const dataPoint = {
+        timestamp: timestamp,
+        registerNames: registerNames,
+        values: values
+      };
+      dataLog.push(dataPoint);
+      updateStats();
+    }
+
+    // Convert array to CSV format
+    function arrayToCSV(data) {
+        if (!data || data.length === 0) return '';
+
+        const headers = ['Timestamp', ...registers.map(r => r.name)];
+        const csvRows = [headers.map(val => `"${val}"`).join(',')];
+
+        data.slice().reverse().forEach(entry => {
+            const row = [entry.timestamp, ...entry.values];
+            const quotedRow = row.map(val => `"${String(val).replace(/"/g, '""')}"`);
+            csvRows.push(quotedRow.join(','));
+        });
+
+        return csvRows.join('\n');
+    }
+
+    // Download data as CSV file
+    
+    function downloadData() {
+      if (dataLog.length === 0) {
+        alert('No data to download. Start collecting data first.');
+        return;
+      }
+
+      const csvContent = arrayToCSV(dataLog);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      
+      // Create download link
+      const link = document.createElement('a');
+      const filename = `modbus_data_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
+      
+      if (link.download !== undefined) {
+        // Feature detection for download attribute
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } else {
+        // Fallback for browsers that don't support download attribute
+        const url = URL.createObjectURL(blob);
+        window.open(url);
+        URL.revokeObjectURL(url);
+      }
+      
+      logMessage(`Data exported to ${filename} (${dataLog.length} records)`, 'success');
+    }
+
+    // Connect to serial port
+    async function connectSerial() {
+      try {
+        if (!canConnect()) {
+          return;
+        }
+
+        if (!('serial' in navigator)) {
+          throw new Error('Web Serial API not supported in this browser');
+        }
+
+        const slaveId = parseInt(document.getElementById('slaveId').value);
+        const baudRate = parseInt(document.getElementById('baudRate').value);
+        const dataBits = parseInt(document.getElementById('dataBits').value);
+        const stopBits = parseInt(document.getElementById('stopBits').value);
+        const parity = document.getElementById('parity').value;
+        const brand = document.getElementById('brandModel').value;
+
+        if (slaveId < 1 || slaveId > 247) {
+          throw new Error('Slave ID must be between 1 and 247');
+        }
+
+        // Show connection modal with configuration
+        showConnectModal(slaveId, baudRate, dataBits, stopBits, parity, brand);
+
+        port = await navigator.serial.requestPort();
+        await port.open({ 
+          baudRate: baudRate,
+          dataBits: dataBits,
+          stopBits: stopBits,
+          parity: parity,
+          flowControl: 'none'
+        });
+
+        writer = port.writable.getWriter();
+        reader = port.readable.getReader();
+
+        updateConnectModal('success', '✅ Connected Successfully!');
+
+        document.getElementById('status').textContent = `✅ Connected - Reading from Slave ID ${slaveId}...`;
+        document.getElementById('status').className = 'status connected pulse';
+        document.getElementById('connectBtn').disabled = true;
+        document.getElementById('disconnectBtn').disabled = false;
+
+        logMessage(`Serial port connected successfully to Slave ID ${slaveId}`, 'success');
+        logMessage(`Config: ${baudRate} baud, ${dataBits}${parity.charAt(0).toUpperCase()}${stopBits}`, 'info');
+
+        setTimeout(() => closeConnectModal(), 1500);
+
+        await startPolling();
+      } catch (err) {
+        document.getElementById('status').textContent = '❌ Connection failed: ' + err.message;
+        document.getElementById('status').className = 'status error';
+        logMessage('Connection failed: ' + err.message, 'error');
+        updateConnectModal('error', '❌ Connection Failed: ' + err.message);
+        console.error('Serial connection error:', err);
+      }
+    }
+
+    // Disconnect from serial port
+    async function disconnectSerial() {
+      polling = false;
+      
+      if (readTimeout) {
+        clearTimeout(readTimeout);
+        readTimeout = null;
+      }
+
+      try {
+        if (reader) {
+          await reader.cancel();
+          await reader.releaseLock();
+        }
+        if (writer) {
+          await writer.releaseLock();
+        }
+        if (port) {
+          await port.close();
+        }
+      } catch (err) {
+        logMessage('Disconnect error: ' + err.message, 'error');
+      }
+
+      document.getElementById('status').textContent = 'Disconnected';
+      document.getElementById('status').className = 'status';
+      document.getElementById('connectBtn').disabled = false;
+      document.getElementById('disconnectBtn').disabled = true;
+      
+      logMessage('Serial port disconnected', 'info');
+    }
+
+    // Build Modbus RTU request
+    function buildRequest(slaveId, functionCode, address, quantity) {
+      const buffer = new Uint8Array(8);
+      buffer[0] = slaveId;
+      buffer[1] = functionCode;
+      buffer[2] = (address >> 8) & 0xFF;
+      buffer[3] = address & 0xFF;
+      buffer[4] = (quantity >> 8) & 0xFF;
+      buffer[5] = quantity & 0xFF;
+      
+      const crc = calculateCRC(buffer.slice(0, 6));
+      buffer[6] = crc & 0xFF;
+      buffer[7] = (crc >> 8) & 0xFF;
+      
+      return buffer;
+    }
+
+    // Calculate CRC16 for Modbus RTU
+    function calculateCRC(buffer) {
+      let crc = 0xFFFF;
+      for (let b of buffer) {
+        crc ^= b;
+        for (let i = 0; i < 8; i++) {
+          if (crc & 1) {
+            crc = (crc >> 1) ^ 0xA001;
+          } else {
+            crc >>= 1;
+          }
+        }
+      }
+      return crc;
+    }
+
+    // Send Modbus request
+    async function sendRequest(request) {
+      if (!writer) throw new Error('Writer not available');
+      await writer.write(request);
+    }
+
+    // Read Modbus response with timeout
+    async function readResponse(timeout = 2000) {
+      return new Promise(async (resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          reject(new Error('Response timeout'));
+        }, timeout);
+
+        try {
+          const chunks = [];
+          let totalLength = 0;
+          let expectedLength = 0;
+          
+          while (true) {
+            const { value, done } = await reader.read();
+            
+            if (done) {
+              clearTimeout(timeoutId);
+              resolve(chunks.length > 0 ? new Uint8Array(chunks.flat()) : null);
+              return;
+            }
+            
+            if (value && value.length > 0) {
+              chunks.push(Array.from(value));
+              totalLength += value.length;
+              
+              if (totalLength >= 3 && expectedLength === 0) {
+                const flatChunks = chunks.flat();
+                if (flatChunks[1] === 3) {
+                  expectedLength = 3 + flatChunks[2] + 2;
+                } else if (flatChunks[1] & 0x80) {
+                  expectedLength = 5;
+                }
+              }
+              
+              if (expectedLength > 0 && totalLength >= expectedLength) {
+                clearTimeout(timeoutId);
+                resolve(new Uint8Array(chunks.flat().slice(0, expectedLength)));
+                return;
+              }
+            }
+            
+            if (totalLength > 256) {
+              clearTimeout(timeoutId);
+              resolve(new Uint8Array(chunks.flat()));
+              return;
+            }
+          }
+        } catch (err) {
+          clearTimeout(timeoutId);
+          reject(err);
+        }
+      });
+    }
+
+    // Parse Modbus response
+    function parseResponse(response, address) {
+      if (!response || response.length < 5) {
+        return null;
+      }
+      
+      const expectedSlaveId = parseInt(document.getElementById('slaveId').value);
+      if (response[0] !== expectedSlaveId) {
+        return null;
+      }
+      
+      if (response[1] & 0x80) {
+        return null;
+      }
+      
+      if (response[1] !== 3) {
+        return null;
+      }
+      
+      const dataLength = response[2];
+      
+      if (response.length < 3 + dataLength + 2) {
+        return null;
+      }
+      
+      // Verify CRC
+      const receivedCRC = response[response.length - 2] | (response[response.length - 1] << 8);
+      const calculatedCRC = calculateCRC(response.slice(0, response.length - 2));
+      if (receivedCRC !== calculatedCRC) {
+        return null;
+      }
+      
+      // Extract 16-bit value
+      const high = response[3];
+      const low = response[4];
+      const value = (high << 8) + low;
+      
+      return value;
+    }
+
+    // Start polling registers
+    async function startPolling() {
+      polling = true;
+      const slaveId = parseInt(document.getElementById('slaveId').value);
+      
+      while (polling) {
+        const cycleValues = [];
+        
+        for (let reg of registers) {
+          if (!polling) break;
+          
+          try {
+            stats.totalReads++;
+            
+            const request = buildRequest(slaveId, 3, reg.address, 1);
+            await sendRequest(request);
+            
+            const response = await readResponse(2000);
+            console.log("request : ", request);
+            console.log("response : ", response);
+            if (response) {
+              const rawValue = parseResponse(response, reg.address);
+              if (rawValue !== null) {
+                const actualValue = applyDivisor(rawValue, reg.divisor);
+                stats.successReads++;
+                
+                const rawElem = document.getElementById(`raw-${reg.address}`);
+                const valElem = document.getElementById(`val-${reg.address}`);
+                const statusElem = document.getElementById(`status-${reg.address}`);
+                
+                if (rawElem) rawElem.textContent = rawValue;
+                if (valElem) valElem.textContent = actualValue;
+                if (rawElem) rawElem.className = 'value-cell';
+                if (valElem) valElem.className = 'value-cell';
+                if (statusElem) statusElem.textContent = 'OK';
+                
+                logMessage(`Read ${reg.name} (${reg.address}): Raw=${rawValue}, Actual=${actualValue} ${reg.unit}`, 'success');
+                cycleValues.push(actualValue);
+              } else {
+                throw new Error('Invalid response format');
+              }
+            } else {
+              throw new Error('No response received');
+            }
+            
+          } catch (err) {
+            stats.errorReads++;
+            const rawElem = document.getElementById(`raw-${reg.address}`);
+            const valElem = document.getElementById(`val-${reg.address}`);
+            const statusElem = document.getElementById(`status-${reg.address}`);
+            
+            if (rawElem) {
+              rawElem.textContent = '⚠ Error';
+              rawElem.className = 'value-cell error-value';
+            }
+            if (valElem) {
+              valElem.textContent = '⚠ Error';
+              valElem.className = 'value-cell error-value';
+            }
+            if (statusElem) statusElem.textContent = 'Error';
+            logMessage(`Error reading ${reg.name} (${reg.address}): ${err.message}`, 'error');
+            cycleValues.push('ERROR');
+          }
+          
+          updateStats();
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        
+        // Save data after each complete cycle (even with errors)
+        if (cycleValues.length === registers.length) {
+          saveDataToLog(cycleValues);
+        }
+        
+        if (polling) {
+          await new Promise(resolve => {
+            readTimeout = setTimeout(resolve, 1000);
+          });
+        }
+      }
+    }
+
+    // Load brand data from JSON file
+    async function loadBrandData() {
+      try {
+        const response = await fetch('vfd_brand_model_registers.json');
+        brandData = await response.json();
+        populateBrandDropdown();
+        logMessage('Brand data loaded successfully', 'success');
+      } catch (err) {
+        logMessage('Error loading brand data: ' + err.message, 'error');
+      }
+    }
+
+    // Populate brand-model dropdown
+    function populateBrandDropdown() {
+      const dropdown = document.getElementById('brandModel');
+      dropdown.innerHTML = '<option value="">-- Select Brand --</option>';
+      
+      for (let brand in brandData) {
+        const option = document.createElement('option');
+        option.value = brand;
+        option.textContent = brand.charAt(0).toUpperCase() + brand.slice(1);
+        dropdown.appendChild(option);
+      }
+    }
+
+    // Switch registers based on selected brand
+    function switchBrand() {
+      const selectedBrand = document.getElementById('brandModel').value;
+      
+      if (!selectedBrand || !brandData[selectedBrand]) {
+        registers = [];
+        initializeTable();
+        logMessage('No brand selected', 'info');
+        return;
+      }
+      
+      registers = brandData[selectedBrand];
+      initializeTable();
+      logMessage(`Switched to ${selectedBrand.toUpperCase()} - ${registers.length} registers loaded`, 'success');
+    }
+
+    // Validate that a brand is selected before connecting
+    function canConnect() {
+      if (!registers || registers.length === 0) {
+        openModal();
+        return false;
+      }
+      return true;
+    }
+
+    // Modal functions
+    function openModal() {
+      const modal = document.getElementById('brandModal');
+      modal.classList.add('show');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('brandModal');
+      modal.classList.remove('show');
+    }
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+      const modal = document.getElementById('brandModal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Connect Modal functions
+    function showConnectModal(slaveId, baudRate, dataBits, stopBits, parity, brand) {
+      const modal = document.getElementById('connectModal');
+      document.getElementById('modalSlaveId').textContent = slaveId;
+      document.getElementById('modalBaudRate').textContent = baudRate;
+      document.getElementById('modalDataBits').textContent = dataBits;
+      document.getElementById('modalStopBits').textContent = stopBits;
+      document.getElementById('modalParity').textContent = parity;
+      document.getElementById('modalBrand').textContent = brand.toUpperCase() || 'N/A';
+      document.getElementById('connectMessage').innerHTML = 'Establishing connection...';
+      document.getElementById('connectCancelBtn').style.display = 'block';
+      document.getElementById('connectModalTitle').textContent = '🔌 Connecting to Serial Port';
+      document.getElementById('connectSpinner').style.display = 'inline-block';
+      modal.classList.add('show');
+    }
+
+    function updateConnectModal(status, message) {
+      const connectMessage = document.getElementById('connectMessage');
+      const spinner = document.getElementById('connectSpinner');
+      const title = document.getElementById('connectModalTitle');
+      
+      if (status === 'success') {
+        spinner.style.display = 'none';
+        title.textContent = '✅ Connected Successfully!';
+        connectMessage.innerHTML = message;
+        connectMessage.style.color = '#90ee90';
+        document.getElementById('connectCancelBtn').style.display = 'none';
+      } else if (status === 'error') {
+        spinner.style.display = 'none';
+        title.textContent = '❌ Connection Failed';
+        connectMessage.innerHTML = message;
+        connectMessage.style.color = '#ff6384';
+        document.getElementById('connectCancelBtn').textContent = 'Close';
+      }
+    }
+
+    function closeConnectModal() {
+      const modal = document.getElementById('connectModal');
+      modal.classList.remove('show');
+    }
+
+    function cancelConnect() {
+      closeConnectModal();
+      polling = false;
+      if (port) {
+        port.close().catch(err => console.error('Error closing port:', err));
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadBrandData();
+      logMessage('Modbus RTU Master initialized', 'info');
+      logMessage('Select a brand and configure serial settings including Slave ID and click Connect', 'info');
+      
+      if (!('serial' in navigator)) {
+        logMessage('Web Serial API not supported in this browser', 'error');
+        document.getElementById('connectBtn').disabled = true;
+        document.getElementById('status').textContent = '❌ Web Serial API not supported';
+        document.getElementById('status').className = 'status error';
+      }
+    });
+
+    // Handle page unload
+    window.addEventListener('beforeunload', function() {
+      if (polling) {
+        disconnectSerial();
+      }
+    });
+  </script>
+</body>
+</html>
