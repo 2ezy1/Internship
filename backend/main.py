@@ -3,11 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from database import engine, get_db, Base
-from models import Device as DeviceModel, User as UserModel, SensorReading as SensorReadingModel
+from models import Device as DeviceModel, User as UserModel, SensorReading as SensorReadingModel, VFDReading as VFDReadingModel
 from schemas import (
     Device, DeviceCreate, DeviceUpdate, HealthCheck, DeviceStatus,
     UserLogin, LoginResponse, UserBase, UserWithDevices,
-    SensorReading, SensorReadingCreate
+    SensorReading, SensorReadingCreate,
+    VFDReading, VFDReadingCreate
 )
 from typing import List, Optional
 import hashlib
@@ -225,13 +226,6 @@ async def check_device_heartbeats():
 
 
 # Start background heartbeat checker when app starts
-@asyncio.get_running_loop()
-def start_background_tasks():
-    """Start background tasks on app startup"""
-    asyncio.create_task(check_device_heartbeats())
-
-
-# Alternative: Create task on startup event
 @app.on_event("startup")
 async def startup_background_tasks():
     """Create background task for device heartbeat monitoring"""
@@ -774,12 +768,12 @@ async def websocket_esp32_handler(websocket: WebSocket, device_id: int, device_k
         await websocket.close(code=4000, reason="Invalid device or key")
         return
     
-    # 2. VERIFY IP ADDRESS MATCHES (security check)
+    # 2. VERIFY/UPDATE DEVICE IP ADDRESS
     client_ip = websocket.client.host
     if client_ip != device.ip_address:
-        print(f"⚠️ IP mismatch for device {device_id}: {client_ip} vs {device.ip_address}")
-        await websocket.close(code=4001, reason="IP address mismatch")
-        return
+        print(f"⚠️ IP mismatch for device {device_id}: {client_ip} vs {device.ip_address} - updating stored IP")
+        device.ip_address = client_ip
+        db.commit()
     
     # 3. ACCEPT CONNECTION & SET ONLINE
     await websocket.accept()
@@ -808,50 +802,102 @@ async def websocket_esp32_handler(websocket: WebSocket, device_id: int, device_k
                 try:
                     sensor_data = message.get("data", {})
                     
-                    # Create sensor reading record
-                    db_reading = SensorReadingModel(
-                        device_id=device_id,
-                        temperature=str(sensor_data.get("temperature")),
-                        humidity=str(sensor_data.get("humidity")),
-                        pressure=str(sensor_data.get("pressure")),
-                        light=str(sensor_data.get("light")),
-                        motion=str(sensor_data.get("motion")),
-                        distance=str(sensor_data.get("distance")),
-                        custom_data=json.dumps({
-                            "rssi": message.get("rssi"),
-                            "uptime": message.get("uptime"),
-                            "verified": True
-                        })
-                    )
-                    db.add(db_reading)
-                    db.commit()
-                    db.refresh(db_reading)
+                    # Check if this is VFD data (contains frequency, speed, etc.)
+                    is_vfd_data = any(key in sensor_data for key in ["frequency", "speed", "current", "voltage", "power", "torque"])
                     
-                    print(f"📡 Sensor data from device {device_id}: {sensor_data}")
-                    
-                    # Broadcast to all connected frontend clients watching this device
-                    broadcast_message = {
-                        "type": "sensor_update",
-                        "device_id": device_id,
-                        "data": {
-                            "id": db_reading.id,
-                            "temperature": db_reading.temperature,
-                            "humidity": db_reading.humidity,
-                            "pressure": db_reading.pressure,
-                            "light": db_reading.light,
-                            "motion": db_reading.motion,
-                            "distance": db_reading.distance,
-                            "custom_data": db_reading.custom_data,
-                            "timestamp": db_reading.timestamp.isoformat()
+                    if is_vfd_data:
+                        # Create VFD reading record
+                        db_reading = VFDReadingModel(
+                            device_id=device_id,
+                            frequency=str(sensor_data.get("frequency")) if sensor_data.get("frequency") is not None else None,
+                            speed=str(sensor_data.get("speed")) if sensor_data.get("speed") is not None else None,
+                            current=str(sensor_data.get("current")) if sensor_data.get("current") is not None else None,
+                            voltage=str(sensor_data.get("voltage")) if sensor_data.get("voltage") is not None else None,
+                            power=str(sensor_data.get("power")) if sensor_data.get("power") is not None else None,
+                            torque=str(sensor_data.get("torque")) if sensor_data.get("torque") is not None else None,
+                            status=sensor_data.get("status"),
+                            fault_code=sensor_data.get("faultCode"),
+                            custom_data=json.dumps({
+                                "rssi": message.get("rssi"),
+                                "uptime": message.get("uptime"),
+                                "verified": True
+                            })
+                        )
+                        db.add(db_reading)
+                        db.commit()
+                        db.refresh(db_reading)
+                        
+                        print(f"📡 VFD data from device {device_id}: Freq={sensor_data.get('frequency')}Hz, Speed={sensor_data.get('speed')}RPM, Status={sensor_data.get('status')}")
+                        
+                        # Broadcast to all connected frontend clients watching this device
+                        broadcast_message = {
+                            "type": "vfd_update",
+                            "device_id": device_id,
+                            "data": {
+                                "id": db_reading.id,
+                                "frequency": db_reading.frequency,
+                                "speed": db_reading.speed,
+                                "current": db_reading.current,
+                                "voltage": db_reading.voltage,
+                                "power": db_reading.power,
+                                "torque": db_reading.torque,
+                                "status": db_reading.status,
+                                "fault_code": db_reading.fault_code,
+                                "custom_data": db_reading.custom_data,
+                                "timestamp": db_reading.timestamp.isoformat()
+                            }
                         }
-                    }
-                    await manager.broadcast_to_device(device_id, broadcast_message)
-                    
-                    # Acknowledge to ESP32
-                    await websocket.send_json({"status": "ok", "reading_id": db_reading.id})
+                        await manager.broadcast_to_device(device_id, broadcast_message)
+                        
+                        # Acknowledge to ESP32
+                        await websocket.send_json({"status": "ok", "reading_id": db_reading.id, "type": "vfd"})
+                    else:
+                        # Create sensor reading record (generic sensors)
+                        db_reading = SensorReadingModel(
+                            device_id=device_id,
+                            temperature=str(sensor_data.get("temperature")) if sensor_data.get("temperature") is not None else None,
+                            humidity=str(sensor_data.get("humidity")) if sensor_data.get("humidity") is not None else None,
+                            pressure=str(sensor_data.get("pressure")) if sensor_data.get("pressure") is not None else None,
+                            light=str(sensor_data.get("light")) if sensor_data.get("light") is not None else None,
+                            motion=str(sensor_data.get("motion")) if sensor_data.get("motion") is not None else None,
+                            distance=str(sensor_data.get("distance")) if sensor_data.get("distance") is not None else None,
+                            custom_data=json.dumps({
+                                "rssi": message.get("rssi"),
+                                "uptime": message.get("uptime"),
+                                "verified": True
+                            })
+                        )
+                        db.add(db_reading)
+                        db.commit()
+                        db.refresh(db_reading)
+                        
+                        print(f"📡 Sensor data from device {device_id}: {sensor_data}")
+                        
+                        # Broadcast to all connected frontend clients watching this device
+                        broadcast_message = {
+                            "type": "sensor_update",
+                            "device_id": device_id,
+                            "data": {
+                                "id": db_reading.id,
+                                "temperature": db_reading.temperature,
+                                "humidity": db_reading.humidity,
+                                "pressure": db_reading.pressure,
+                                "light": db_reading.light,
+                                "motion": db_reading.motion,
+                                "distance": db_reading.distance,
+                                "custom_data": db_reading.custom_data,
+                                "timestamp": db_reading.timestamp.isoformat()
+                            }
+                        }
+                        await manager.broadcast_to_device(device_id, broadcast_message)
+                        
+                        # Acknowledge to ESP32
+                        await websocket.send_json({"status": "ok", "reading_id": db_reading.id, "type": "sensor"})
                     
                 except Exception as e:
                     print(f"❌ Error processing sensor data: {e}")
+                    import traceback
+                    traceback.print_exc()
                     await websocket.send_json({"error": str(e)})
             
             else:
@@ -950,3 +996,58 @@ def initialize_esp32_device(
             "step4": "Device will auto-connect to server via WebSocket"
         }
     }
+
+
+# ==================== VFD Readings Endpoints ====================
+
+@app.get("/devices/{device_id}/vfd-readings", response_model=List[VFDReading], tags=["VFD"])
+def get_vfd_readings(
+    device_id: int,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    """Get VFD readings for a specific device (most recent first)"""
+    device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    readings = db.query(VFDReadingModel).filter(
+        VFDReadingModel.device_id == device_id
+    ).order_by(VFDReadingModel.timestamp.desc()).limit(limit).all()
+    
+    return readings
+
+
+@app.get("/devices/{device_id}/vfd-readings/latest", response_model=VFDReading, tags=["VFD"])
+def get_latest_vfd_reading(device_id: int, db: Session = Depends(get_db)):
+    """Get the most recent VFD reading for a device"""
+    device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    reading = db.query(VFDReadingModel).filter(
+        VFDReadingModel.device_id == device_id
+    ).order_by(VFDReadingModel.timestamp.desc()).first()
+    
+    if not reading:
+        raise HTTPException(status_code=404, detail="No VFD readings found for this device")
+    
+    return reading
+
+
+@app.delete("/devices/{device_id}/vfd-readings", tags=["VFD"])
+def delete_vfd_readings(
+    device_id: int,
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_admin_user)
+):
+    """Delete all VFD readings for a device (admin only)"""
+    device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    count = db.query(VFDReadingModel).filter(VFDReadingModel.device_id == device_id).delete()
+    db.commit()
+    
+    return {"message": f"Deleted {count} VFD readings for device {device_id}"}
+

@@ -56,3 +56,27 @@ class SensorReading(Base):
     
     # Relationship to device
     device = relationship("Device", back_populates="sensor_readings")
+
+
+class VFDReading(Base):
+    __tablename__ = "vfd_readings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    device_id = Column(Integer, ForeignKey("devices.id"), nullable=False)
+    frequency = Column(String, nullable=True)    # Frequency in Hz
+    speed = Column(String, nullable=True)        # Speed in RPM
+    current = Column(String, nullable=True)      # Current in A
+    voltage = Column(String, nullable=True)      # Voltage in V
+    power = Column(String, nullable=True)        # Power in kW
+    torque = Column(String, nullable=True)       # Torque in Nm
+    status = Column(Integer, nullable=True)      # 0=Stop, 1=Run, 2=Fault, 3=Ready
+    fault_code = Column(Integer, nullable=True)  # Fault code number
+    custom_data = Column(String, nullable=True)  # JSON string for additional data (rssi, uptime, etc.)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    
+    # Relationship to device
+    device = relationship("Device", back_populates="vfd_readings")
+
+
+# Update Device model to include vfd_readings relationship
+Device.vfd_readings = relationship("VFDReading", back_populates="device", cascade="all, delete-orphan")

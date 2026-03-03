@@ -70,7 +70,7 @@ uint8_t rxIndex = 0;
 unsigned long lastRxTime = 0;
 const unsigned long RX_TIMEOUT = 50; // 50ms timeout between frames
 unsigned long lastSensorSendTime = 0;
-const unsigned long SENSOR_SEND_INTERVAL = 3000; // Send sensor data every 3 seconds
+const unsigned long SENSOR_SEND_INTERVAL = 1000; // Send sensor data every 1 second
 
 void processModbusRequest(uint8_t* request, uint8_t length);
 void sendReadResponse(uint8_t slaveId, uint8_t functionCode, uint16_t address, uint16_t quantity);

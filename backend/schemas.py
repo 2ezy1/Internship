@@ -99,3 +99,30 @@ class SensorReading(SensorReadingBase):
 
     class Config:
         from_attributes = True
+
+
+# VFD (Variable Frequency Drive) Reading Schemas
+class VFDReadingBase(BaseModel):
+    device_id: int
+    frequency: Optional[str] = None     # Hz
+    speed: Optional[str] = None         # RPM
+    current: Optional[str] = None       # A
+    voltage: Optional[str] = None       # V
+    power: Optional[str] = None         # kW
+    torque: Optional[str] = None        # Nm
+    status: Optional[int] = None        # 0=Stop, 1=Run, 2=Fault, 3=Ready
+    fault_code: Optional[int] = None    # Fault code number
+    custom_data: Optional[str] = None   # JSON string for additional data
+
+
+class VFDReadingCreate(VFDReadingBase):
+    pass
+
+
+class VFDReading(VFDReadingBase):
+    id: int
+    timestamp: datetime
+
+    class Config:
+        from_attributes = True
+

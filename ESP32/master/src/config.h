@@ -15,7 +15,7 @@
 #define STATIC_IP_0 192
 #define STATIC_IP_1 168
 #define STATIC_IP_2 254
-#define STATIC_IP_3 50      // Change last octet as needed for multiple devices
+#define STATIC_IP_3 111      // Change last octet as needed for multiple devices
 
 #define GATEWAY_0 192
 #define GATEWAY_1 168
@@ -44,8 +44,8 @@
 
 // Device Configuration
 #define DEVICE_ID 1                    // Device ID from server
-#define DEVICE_KEY "your-device-key-here"  // Generated from server - update this!
-#define POLL_INTERVAL_MS 5000         // Send sensor data every 5 seconds
+#define DEVICE_KEY "69ced61b-5521-4ef7-ab17-19a2cdf14af8"  // Generated from server - update this!
+#define POLL_INTERVAL_MS 1000         // Send sensor data every 1 second
 #define HEARTBEAT_INTERVAL_MS 30000   // Send heartbeat every 30 seconds
 
 // UART Configuration

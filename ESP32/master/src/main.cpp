@@ -325,7 +325,7 @@ void sendSensorData() {
 
 void readSensorDataFromSerial2() {
   // Read incoming data from Serial2
-  String buffer = "";
+  static String buffer = "";
   
   while (Serial2.available()) {
     char c = Serial2.read();
@@ -348,12 +348,36 @@ void readSensorDataFromSerial2() {
         vfdData.status = doc["status"] | 0;
         vfdData.faultCode = doc["faultCode"] | 0;
         
+        // Always display received data in a clear format
+        Serial.println("\n┌─────────────────────────────────────────┐");
+        Serial.println("│  📥 RECEIVED DATA FROM SLAVE           │");
+        Serial.println("├─────────────────────────────────────────┤");
+        Serial.printf("│  Frequency:  %6.1f Hz                  │\n", vfdData.frequency);
+        Serial.printf("│  Speed:      %7.1f RPM                │\n", vfdData.speed);
+        Serial.printf("│  Current:    %6.1f A                   │\n", vfdData.current);
+        Serial.printf("│  Voltage:    %6.1f V                   │\n", vfdData.voltage);
+        Serial.printf("│  Power:      %6.1f kW                  │\n", vfdData.power);
+        Serial.printf("│  Torque:     %6.1f Nm                  │\n", vfdData.torque);
+        Serial.print("│  Status:     ");
+        switch(vfdData.status) {
+          case 0: Serial.println("STOP                      │"); break;
+          case 1: Serial.println("RUN                       │"); break;
+          case 2: Serial.println("FAULT                     │"); break;
+          case 3: Serial.println("READY                     │"); break;
+          default: Serial.printf("UNKNOWN (%d)              │\n", vfdData.status); break;
+        }
+        if (vfdData.status == 2) {
+          Serial.printf("│  Fault Code: %d                          │\n", vfdData.faultCode);
+        }
+        Serial.println("└─────────────────────────────────────────┘");
+        
         if (DEBUG_ENABLED) {
-          Serial.print("📥 Received from slave: ");
+          Serial.print("📄 Raw JSON: ");
           Serial.println(buffer);
         }
-      } else if (DEBUG_ENABLED) {
-        Serial.print("⚠️  Invalid JSON from slave: ");
+      } else {
+        Serial.println("\n⚠️  ERROR: Invalid JSON received from slave");
+        Serial.print("Raw data: ");
         Serial.println(buffer);
       }
       

@@ -91,11 +91,13 @@ export default function DeviceDetails() {
   const [parity, setParity] = useState('none')
   const [brandModel, setBrandModel] = useState('')
 
-  // WebSocket configuration
-  const [serverHost, setServerHost] = useState('localhost')
+  // WebSocket configuration (auto-detect server from current host or use default)
+  const [serverHost, setServerHost] = useState(
+    window.location.hostname === 'localhost' ? '192.168.254.110' : window.location.hostname
+  )
   const [serverPort, setServerPort] = useState(8000)
   const [deviceId, setDeviceId] = useState(1)
-  const [useWebSocket, setUseWebSocket] = useState(false)
+  const [useWebSocket] = useState(true) // Always use WebSocket
 
   const [registers, setRegisters] = useState<Register[]>([])
   const [brandData, setBrandData] = useState<Record<string, Register[]>>({})
@@ -106,7 +108,7 @@ export default function DeviceDetails() {
   const [logs, setLogs] = useState<LogEntry[]>([])
 
   const [statusText, setStatusText] = useState(
-    'Disconnected - Configure settings and click Connect to start'
+    'Ready - Select a VFD brand and click Connect'
   )
   const [statusType, setStatusType] = useState<'info' | 'success' | 'error'>('info')
 
@@ -515,45 +517,21 @@ export default function DeviceDetails() {
   const connectSerial = async () => {
     try {
       if (!canConnect()) return
-      if (slaveId < 1 || slaveId > 247) throw new Error('Slave ID must be between 1 and 247')
 
       setConnectInProgress(true)
       setConnectModalState('connecting')
-      setConnectMessage('Establishing connection...')
+      setConnectMessage('Connecting to ESP32 via WebSocket...')
       setConnectModalOpen(true)
 
-      // Try WebSocket connection if enabled
-      if (useWebSocket) {
-        setConnectMessage('Connecting to WebSocket server...')
-        await connectWebSocket()
-        setConnectMessage('WebSocket connected. Starting polling...')
-      } else {
-        // Use Web Serial API
-        if (!serialSupported) throw new Error('Web Serial API not supported in this browser')
-
-        const serial = (navigator as unknown as { serial: SerialLike }).serial
-        const port = await serial.requestPort()
-        await port.open({
-          baudRate,
-          dataBits,
-          stopBits,
-          parity,
-          flowControl: 'none',
-        })
-
-        portRef.current = port
-        writerRef.current = port.writable.getWriter()
-        readerRef.current = port.readable.getReader()
-
-        addLog(`Serial port connected successfully to Slave ID ${slaveId}`, 'success')
-        addLog(`Config: ${baudRate} baud, ${dataBits}${parity.charAt(0).toUpperCase()}${stopBits}`, 'info')
-      }
+      // Connect via WebSocket
+      setConnectMessage(`Connecting to ${serverHost}:${serverPort}...`)
+      await connectWebSocket()
+      setConnectMessage('WebSocket connected. Starting data stream...')
 
       setConnected(true)
       setStatusType('success')
-      const connType = useWebSocket ? `WebSocket (${serverHost}:${serverPort})` : `Serial - Slave ${slaveId}`
-      setStatusText(`Connected - Reading via ${connType}...`)
-      addLog(`Connection type: ${connType}`, 'success')
+      setStatusText(`Connected to ESP32 (Device ${deviceId}) via ${serverHost}:${serverPort}`)
+      addLog(`Connected to WebSocket server at ${serverHost}:${serverPort}`, 'success')
 
       setConnectModalState('success')
       setConnectMessage('Connected successfully.')
@@ -639,14 +617,9 @@ export default function DeviceDetails() {
     }
 
     loadBrandData()
-    addLog('Modbus RTU Master initialized', 'info')
-    addLog('Select a brand and configure serial settings including Slave ID and click Connect', 'info')
-
-    if (!serialSupported) {
-      setStatusType('error')
-      setStatusText('Web Serial API not supported')
-      addLog('Web Serial API not supported in this browser', 'error')
-    }
+    addLog('WebSocket Modbus System initialized', 'info')
+    addLog(`Server: ${serverHost}:${serverPort} | Device ID: ${deviceId}`, 'info')
+    addLog('Select a VFD brand and click Connect to start', 'info')
 
     return () => {
       if (pollingRef.current) {
@@ -755,46 +728,7 @@ export default function DeviceDetails() {
           <div className="modbus-divider" />
 
           <Form layout="inline" className="modbus-form">
-            <Form.Item label="Slave ID">
-              <InputNumber min={1} max={247} value={slaveId} onChange={(value) => setSlaveId(value ?? 1)} />
-            </Form.Item>
-            <Form.Item label="Baud Rate">
-              <Select value={baudRate} onChange={setBaudRate} style={{ minWidth: 120 }}>
-                {[9600, 19200, 38400, 57600, 115200].map((rate) => (
-                  <Select.Option key={rate} value={rate}>
-                    {rate}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item label="Data Bits">
-              <Select value={dataBits} onChange={setDataBits} style={{ width: 90 }}>
-                {[8, 7].map((bits) => (
-                  <Select.Option key={bits} value={bits}>
-                    {bits}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item label="Stop Bits">
-              <Select value={stopBits} onChange={setStopBits} style={{ width: 90 }}>
-                {[1, 2].map((bits) => (
-                  <Select.Option key={bits} value={bits}>
-                    {bits}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item label="Parity">
-              <Select value={parity} onChange={setParity} style={{ width: 110 }}>
-                {['none', 'even', 'odd'].map((item) => (
-                  <Select.Option key={item} value={item}>
-                    {item}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item label="Brand-Model">
+            <Form.Item label="VFD Brand-Model">
               <Select
                 value={brandModel}
                 onChange={setBrandModel}
@@ -808,55 +742,41 @@ export default function DeviceDetails() {
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item label="Connection">
-              <Select
-                value={useWebSocket ? 'ws' : 'serial'}
-                onChange={(val) => setUseWebSocket(val === 'ws')}
-                style={{ minWidth: 120 }}
-              >
-                <Select.Option value="serial">Serial (Web)</Select.Option>
-                <Select.Option value="ws">WebSocket</Select.Option>
-              </Select>
+            <Form.Item label="Server Host">
+              <input
+                className="modbus-text-input"
+                type="text"
+                value={serverHost}
+                onChange={(e) => setServerHost(e.target.value)}
+                placeholder="Server IP Address"
+              />
             </Form.Item>
-            {useWebSocket && (
-              <>
-                <Form.Item label="Server Host">
-                  <input
-                    className="modbus-text-input"
-                    type="text"
-                    value={serverHost}
-                    onChange={(e) => setServerHost(e.target.value)}
-                    placeholder="localhost or IP"
-                  />
-                </Form.Item>
-                <Form.Item label="Port">
-                  <InputNumber
-                    min={1}
-                    max={65535}
-                    value={serverPort}
-                    onChange={(val) => setServerPort(val ?? 8000)}
-                    style={{ minWidth: '80px' }}
-                  />
-                </Form.Item>
-                <Form.Item label="Device ID">
-                  <InputNumber
-                    min={1}
-                    value={deviceId}
-                    onChange={(val) => setDeviceId(val ?? 1)}
-                    style={{ minWidth: '80px' }}
-                  />
-                </Form.Item>
-              </>
-            )}
+            <Form.Item label="Port">
+              <InputNumber
+                min={1}
+                max={65535}
+                value={serverPort}
+                onChange={(val) => setServerPort(val ?? 8000)}
+                style={{ minWidth: '80px' }}
+              />
+            </Form.Item>
+            <Form.Item label="Device ID">
+              <InputNumber
+                min={1}
+                value={deviceId}
+                onChange={(val) => setDeviceId(val ?? 1)}
+                style={{ minWidth: '80px' }}
+              />
+            </Form.Item>
           </Form>
 
           <div className="modbus-actions">
             <Button
               className="modbus-btn modbus-btn-connect"
               onClick={connectSerial}
-              disabled={(useWebSocket && !serverHost) || (useWebSocket && !serverPort) || connected || connectInProgress}
+              disabled={!serverHost || !serverPort || connected || connectInProgress}
             >
-              🔌 {useWebSocket ? 'Connect to Server' : 'Connect to Serial'}
+              🔌 Connect to ESP32
             </Button>
             <Button
               className="modbus-btn modbus-btn-disconnect"
@@ -954,7 +874,7 @@ export default function DeviceDetails() {
             ? 'Connected Successfully'
             : connectModalState === 'error'
               ? 'Connection Failed'
-              : 'Connecting to Serial Port'
+              : 'Connecting to ESP32'
         }
         open={connectModalOpen}
         footer={
@@ -975,22 +895,13 @@ export default function DeviceDetails() {
       >
         <div className="modbus-connect-details">
           <div>
-            <Text type="secondary">Slave ID:</Text> <Text strong>{slaveId}</Text>
+            <Text type="secondary">Server:</Text> <Text strong>{serverHost}:{serverPort}</Text>
           </div>
           <div>
-            <Text type="secondary">Baud Rate:</Text> <Text strong>{baudRate}</Text>
+            <Text type="secondary">Device ID:</Text> <Text strong>{deviceId}</Text>
           </div>
           <div>
-            <Text type="secondary">Data Bits:</Text> <Text strong>{dataBits}</Text>
-          </div>
-          <div>
-            <Text type="secondary">Stop Bits:</Text> <Text strong>{stopBits}</Text>
-          </div>
-          <div>
-            <Text type="secondary">Parity:</Text> <Text strong>{parity}</Text>
-          </div>
-          <div>
-            <Text type="secondary">Brand:</Text> <Text strong>{brandModel || 'N/A'}</Text>
+            <Text type="secondary">VFD Brand:</Text> <Text strong>{brandModel || 'N/A'}</Text>
           </div>
         </div>
         <Alert
