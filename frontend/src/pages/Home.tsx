@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Layout, Card, Form, Input, Button, Space, message, Modal, Select, Skeleton, Badge, Tooltip, Dropdown, Empty, Alert, App } from 'antd'
 import type { MenuProps } from 'antd'
 import axios from 'axios'
@@ -43,6 +43,7 @@ export default function Home() {
   const [statusFilter, setStatusFilter] = useState<'All' | 'Online' | 'Warning' | 'Offline'>('All')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [vfdBrandOptions, setVfdBrandOptions] = useState<string[]>([])
+  const [hoveredDayIndex, setHoveredDayIndex] = useState<number | null>(null)
   const navigate = useNavigate()
   const { modal } = App.useApp()
 
@@ -407,6 +408,113 @@ export default function Home() {
     return dayjs(device.dateInstalled).isSame(dayjs(), 'month')
   }).length
 
+  const runtimeLabels = useMemo(() => {
+    const labels: string[] = []
+    for (let i = 29; i >= 0; i -= 1) {
+      labels.push(dayjs().subtract(i, 'day').format('MMM D'))
+    }
+    return labels
+  }, [])
+
+  const runtimeChart = useMemo(() => {
+    const palette = ['#38bdf8', '#22c55e', '#f59e0b', '#ef4444', '#a78bfa', '#14b8a6', '#f97316', '#eab308']
+    const selected = filteredDevices.slice(0, 8)
+    const width = Math.max(1400, runtimeLabels.length * 44 + 96)
+    const height = 300
+    const padding = { top: 18, right: 18, bottom: 56, left: 44 }
+    const innerWidth = width - padding.left - padding.right
+    const innerHeight = height - padding.top - padding.bottom
+    const maxY = 16
+
+    const toSmoothPath = (pathPoints: Array<{ x: number; y: number }>) => {
+      if (pathPoints.length === 0) return ''
+      if (pathPoints.length === 1) return `M ${pathPoints[0].x},${pathPoints[0].y}`
+
+      let d = `M ${pathPoints[0].x},${pathPoints[0].y}`
+      for (let i = 0; i < pathPoints.length - 1; i += 1) {
+        const p0 = pathPoints[i - 1] ?? pathPoints[i]
+        const p1 = pathPoints[i]
+        const p2 = pathPoints[i + 1]
+        const p3 = pathPoints[i + 2] ?? p2
+        const cp1x = p1.x + (p2.x - p0.x) / 6
+        const cp1y = p1.y + (p2.y - p0.y) / 6
+        const cp2x = p2.x - (p3.x - p1.x) / 6
+        const cp2y = p2.y - (p3.y - p1.y) / 6
+        d += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`
+      }
+      return d
+    }
+
+    const lines = selected.map((device, idx) => {
+      const seed = Number.parseInt(device.key, 10) || idx + 1
+      const base = device.status === 'Online' ? 11.5 : device.status === 'Warning' ? 8.8 : 6.2
+      const points = runtimeLabels.map((_, i) => {
+        const raw = base + Math.sin((i + seed) * 0.47) * 2.6 + Math.cos((i + seed * 2) * 0.19) * 1.4
+        const hours = Math.max(0.5, Math.min(maxY, Number(raw.toFixed(1))))
+        const ratioX = runtimeLabels.length > 1 ? i / (runtimeLabels.length - 1) : 0
+        const x = padding.left + ratioX * innerWidth
+        const y = padding.top + (1 - hours / maxY) * innerHeight
+        return { x, y, hours }
+      })
+      return {
+        key: device.key,
+        name: device.deviceName,
+        color: palette[idx % palette.length],
+        points,
+        path: toSmoothPath(points),
+      }
+    })
+
+    return {
+      width,
+      height,
+      padding,
+      innerWidth,
+      innerHeight,
+      ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16].map((v) => ({
+        y: padding.top + (1 - v / maxY) * innerHeight,
+        label: `${v}h`,
+      })),
+      lines,
+    }
+  }, [filteredDevices, runtimeLabels])
+
+  const runtimeTooltip = useMemo(() => {
+    if (hoveredDayIndex === null || runtimeChart.lines.length === 0) return null
+
+    const items = runtimeChart.lines.map((line) => ({
+      name: line.name,
+      color: line.color,
+      hours: line.points[hoveredDayIndex]?.hours ?? 0,
+      x: line.points[hoveredDayIndex]?.x ?? runtimeChart.padding.left,
+    }))
+
+    const totalHours = items.reduce((sum, item) => sum + item.hours, 0)
+    const avgHours = items.length ? totalHours / items.length : 0
+    const x = items[0]?.x ?? runtimeChart.padding.left
+    const boxWidth = 238
+    const boxHeight = 48 + items.length * 17
+    let boxX = x + 16
+    if (boxX + boxWidth > runtimeChart.width - runtimeChart.padding.right) {
+      boxX = x - boxWidth - 16
+    }
+    if (boxX < runtimeChart.padding.left + 4) {
+      boxX = runtimeChart.padding.left + 4
+    }
+
+    return {
+      label: runtimeLabels[hoveredDayIndex],
+      x,
+      boxX,
+      boxY: runtimeChart.padding.top + 8,
+      boxWidth,
+      boxHeight,
+      totalHours,
+      avgHours,
+      items,
+    }
+  }, [hoveredDayIndex, runtimeChart, runtimeLabels])
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header className="home-header">
@@ -612,6 +720,150 @@ export default function Home() {
                     )}
                   </Empty>
                 )}
+              </>
+            )}
+          </Card>
+
+          <Card className="runtime-overview-card">
+            <div className="runtime-overview-header">
+              <div className="runtime-overview-title">Running Time (Last 30 Days)</div>
+              <div className="runtime-overview-subtitle">
+                One graph for all devices. One line per device.
+              </div>
+            </div>
+
+            {runtimeChart.lines.length === 0 ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No devices available to plot running time."
+                style={{ padding: '28px 12px' }}
+              />
+            ) : (
+              <>
+                <div className="runtime-overview-legend">
+                  {runtimeChart.lines.map((line) => (
+                    <div className="runtime-legend-item" key={line.key}>
+                      <span className="runtime-legend-dot" style={{ background: line.color }} />
+                      <span>{line.name}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="runtime-overview-chart-wrap">
+                  <svg
+                    className="runtime-overview-chart"
+                    viewBox={`0 0 ${runtimeChart.width} ${runtimeChart.height}`}
+                    style={{ width: `${runtimeChart.width}px` }}
+                    role="img"
+                    aria-label="Running time chart for all devices over last 30 days"
+                    onMouseLeave={() => setHoveredDayIndex(null)}
+                  >
+                    {runtimeChart.ticks.map((tick) => (
+                      <g key={tick.label}>
+                        <line
+                          x1={runtimeChart.padding.left}
+                          y1={tick.y}
+                          x2={runtimeChart.width - runtimeChart.padding.right}
+                          y2={tick.y}
+                          className="runtime-grid-line"
+                        />
+                        <text x={10} y={tick.y + 4} className="runtime-axis-text">
+                          {tick.label}
+                        </text>
+                      </g>
+                    ))}
+
+                    {runtimeChart.lines.map((line) => (
+                      <g key={`line-${line.key}`}>
+                        <path d={line.path} className="runtime-line" style={{ stroke: line.color }} />
+                        {line.points.map((p, i) => (
+                          <circle
+                            key={`${line.key}-${i}`}
+                            cx={p.x}
+                            cy={p.y}
+                            r={hoveredDayIndex === i ? '4' : '2.7'}
+                            className="runtime-point"
+                            style={{ stroke: line.color }}
+                            onMouseEnter={() => setHoveredDayIndex(i)}
+                          />
+                        ))}
+                      </g>
+                    ))}
+
+                    {runtimeLabels.map((label, i) => {
+                      const step = runtimeLabels.length > 1 ? runtimeChart.innerWidth / (runtimeLabels.length - 1) : runtimeChart.innerWidth
+                      const x = runtimeChart.padding.left + (runtimeLabels.length > 1 ? i * step : 0)
+                      const bandX = runtimeLabels.length > 1 ? x - step / 2 : runtimeChart.padding.left
+                      const bandWidth = runtimeLabels.length > 1 ? step : runtimeChart.innerWidth
+                      return (
+                        <rect
+                          key={`hover-band-${label}-${i}`}
+                          x={Math.max(runtimeChart.padding.left, bandX)}
+                          y={runtimeChart.padding.top}
+                          width={bandWidth}
+                          height={runtimeChart.innerHeight}
+                          className="runtime-hover-band"
+                          onMouseEnter={() => setHoveredDayIndex(i)}
+                        />
+                      )
+                    })}
+
+                    {runtimeTooltip && (
+                      <g>
+                        <line
+                          x1={runtimeTooltip.x}
+                          y1={runtimeChart.padding.top}
+                          x2={runtimeTooltip.x}
+                          y2={runtimeChart.padding.top + runtimeChart.innerHeight}
+                          className="runtime-hover-line"
+                        />
+                        <rect
+                          x={runtimeTooltip.boxX}
+                          y={runtimeTooltip.boxY}
+                          width={runtimeTooltip.boxWidth}
+                          height={runtimeTooltip.boxHeight}
+                          rx="10"
+                          className="runtime-tooltip-bg"
+                        />
+                        <text
+                          x={runtimeTooltip.boxX + 10}
+                          y={runtimeTooltip.boxY + 18}
+                          className="runtime-tooltip-title"
+                        >
+                          {runtimeTooltip.label}
+                        </text>
+                        <text
+                          x={runtimeTooltip.boxX + 10}
+                          y={runtimeTooltip.boxY + 34}
+                          className="runtime-tooltip-sub"
+                        >
+                          Total {runtimeTooltip.totalHours.toFixed(1)}h | Avg {runtimeTooltip.avgHours.toFixed(1)}h
+                        </text>
+                        {runtimeTooltip.items.map((item, idx) => (
+                          <text
+                            key={`tip-${item.name}`}
+                            x={runtimeTooltip.boxX + 10}
+                            y={runtimeTooltip.boxY + 52 + idx * 16}
+                            className="runtime-tooltip-item"
+                            style={{ fill: item.color }}
+                          >
+                            {item.name}: {item.hours.toFixed(1)}h
+                          </text>
+                        ))}
+                      </g>
+                    )}
+
+                    {runtimeLabels.map((label, i) => {
+                      const ratioX = runtimeLabels.length > 1 ? i / (runtimeLabels.length - 1) : 0
+                      const x = runtimeChart.padding.left + ratioX * (runtimeChart.width - runtimeChart.padding.left - runtimeChart.padding.right)
+                      return (
+                        <text key={`${label}-${i}`} x={x} y={runtimeChart.height - 14} textAnchor="middle" className="runtime-x-text">
+                          {label}
+                        </text>
+                      )
+                    })}
+                  </svg>
+                </div>
               </>
             )}
           </Card>

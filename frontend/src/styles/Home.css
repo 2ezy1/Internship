@@ -70,6 +70,7 @@
   border-radius: 16px;
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.45);
   border: 1px solid var(--border-color);
+  margin-bottom: 20px;
 }
 
 .devices-card .ant-card-head {
@@ -453,6 +454,131 @@
   box-shadow: 0 8px 18px rgba(239, 68, 68, 0.25);
 }
 
+.runtime-overview-card {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--border-color);
+}
+
+.runtime-overview-card .ant-card-body {
+  padding: 18px 22px;
+}
+
+.runtime-overview-header {
+  margin-bottom: 10px;
+}
+
+.runtime-overview-title {
+  color: var(--text-primary);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.runtime-overview-subtitle {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.runtime-overview-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.runtime-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.runtime-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(2, 6, 23, 0.5);
+}
+
+.runtime-overview-chart-wrap {
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(2, 6, 23, 0.65));
+  padding: 8px 6px 2px;
+}
+
+.runtime-overview-chart {
+  min-width: 100%;
+  height: 300px;
+  display: block;
+}
+
+.runtime-grid-line {
+  stroke: rgba(148, 163, 184, 0.18);
+  stroke-width: 1;
+}
+
+.runtime-axis-text {
+  fill: #94a3b8;
+  font-size: 11px;
+}
+
+.runtime-line {
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.runtime-point {
+  fill: #0b1220;
+  stroke-width: 1.8;
+}
+
+.runtime-x-text {
+  fill: #cbd5e1;
+  font-size: 10px;
+}
+
+.runtime-hover-band {
+  fill: transparent;
+  cursor: crosshair;
+}
+
+.runtime-hover-line {
+  stroke: rgba(56, 189, 248, 0.45);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.runtime-tooltip-bg {
+  fill: rgba(2, 6, 23, 0.94);
+  stroke: rgba(56, 189, 248, 0.34);
+  stroke-width: 1;
+}
+
+.runtime-tooltip-title {
+  fill: #e2e8f0;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.runtime-tooltip-sub {
+  fill: #94a3b8;
+  font-size: 10px;
+}
+
+.runtime-tooltip-item {
+  font-size: 11px;
+  font-weight: 600;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .home-header {
@@ -487,6 +613,14 @@
   .device-grid {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 12px;
+  }
+
+  .runtime-overview-title {
+    font-size: 18px;
+  }
+
+  .runtime-overview-chart {
+    height: 250px;
   }
 
 
@@ -554,6 +688,40 @@
 
 [data-theme='light'] .devices-card {
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme='light'] .runtime-overview-card {
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme='light'] .runtime-overview-chart-wrap {
+  background: linear-gradient(180deg, #f8fbff, #eff6ff);
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+[data-theme='light'] .runtime-legend-dot {
+  box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.18);
+}
+
+[data-theme='light'] .runtime-x-text {
+  fill: #334155;
+}
+
+[data-theme='light'] .runtime-hover-line {
+  stroke: rgba(2, 132, 199, 0.4);
+}
+
+[data-theme='light'] .runtime-tooltip-bg {
+  fill: rgba(255, 255, 255, 0.96);
+  stroke: rgba(148, 163, 184, 0.55);
+}
+
+[data-theme='light'] .runtime-tooltip-title {
+  fill: #0f172a;
+}
+
+[data-theme='light'] .runtime-tooltip-sub {
+  fill: #475569;
 }
 
 [data-theme='light'] .device-card {
