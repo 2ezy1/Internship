@@ -10,13 +10,11 @@ import {
   Row,
   Select,
   Statistic,
-  Table,
-  Tag,
   Typography,
 } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import '../styles/DeviceDetails.css'
 
 const { Content } = Layout
@@ -74,6 +72,19 @@ type DataPoint = {
   values: (string | number)[]
 }
 
+type RuntimePoint = {
+  key: string
+  label: string
+  hours: number
+  seconds: number
+}
+
+type DeviceRouteState = {
+  device?: {
+    vfdBrandModel?: string
+  }
+}
+
 const defaultStats: Stats = {
   totalReads: 0,
   successReads: 0,
@@ -83,13 +94,23 @@ const defaultStats: Stats = {
 }
 
 export default function DeviceDetails() {
+  const runtimeStorageKey = 'modbus_runtime_history_v1'
+  const { id: routeDeviceId } = useParams()
+  const location = useLocation()
   const navigate = useNavigate()
+  const selectedBrandFromDevice = (
+    ((location.state as DeviceRouteState | null)?.device?.vfdBrandModel ?? '') || ''
+  ).trim()
+  const selectedBrandFromStorage = (
+    routeDeviceId ? localStorage.getItem(`device_brand_${routeDeviceId}`) ?? '' : ''
+  ).trim()
+  const resolvedSavedBrand = selectedBrandFromDevice || selectedBrandFromStorage
   const [slaveId, setSlaveId] = useState(1)
   const [baudRate, setBaudRate] = useState(9600)
   const [dataBits, setDataBits] = useState(8)
   const [stopBits, setStopBits] = useState(1)
   const [parity, setParity] = useState('none')
-  const [brandModel, setBrandModel] = useState('')
+  const [brandModel, setBrandModel] = useState(resolvedSavedBrand)
 
   // WebSocket configuration (auto-detect server from current host or use default)
   const [serverHost, setServerHost] = useState(
@@ -107,9 +128,7 @@ export default function DeviceDetails() {
   const [, setDataLog] = useState<DataPoint[]>([])
   const [logs, setLogs] = useState<LogEntry[]>([])
 
-  const [statusText, setStatusText] = useState(
-    'Ready - Select a VFD brand and click Connect'
-  )
+  const [statusText, setStatusText] = useState('Ready - Configure connection and click Connect')
   const [statusType, setStatusType] = useState<'info' | 'success' | 'error'>('info')
 
   const [brandModalOpen, setBrandModalOpen] = useState(false)
@@ -130,6 +149,83 @@ export default function DeviceDetails() {
   const statsRef = useRef<Stats>(defaultStats)
   const dataLogRef = useRef<DataPoint[]>([])
   const logIdRef = useRef(0)
+  const runtimeSessionStartRef = useRef<number | null>(null)
+  const runtimeTickRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [runtimeHistory, setRuntimeHistory] = useState<RuntimePoint[]>([])
+
+  const toDateKey = (date: Date) => {
+    const y = date.getFullYear()
+    const m = `${date.getMonth() + 1}`.padStart(2, '0')
+    const d = `${date.getDate()}`.padStart(2, '0')
+    return `${y}-${m}-${d}`
+  }
+
+  const readRuntimeMap = () => {
+    try {
+      const raw = localStorage.getItem(runtimeStorageKey)
+      if (!raw) return {} as Record<string, number>
+      const parsed = JSON.parse(raw) as Record<string, number>
+      return parsed && typeof parsed === 'object' ? parsed : {}
+    } catch {
+      return {} as Record<string, number>
+    }
+  }
+
+  const writeRuntimeMap = (map: Record<string, number>) => {
+    localStorage.setItem(runtimeStorageKey, JSON.stringify(map))
+  }
+
+  const buildLast30Days = (map: Record<string, number>) => {
+    const points: RuntimePoint[] = []
+    for (let i = 29; i >= 0; i -= 1) {
+      const day = new Date()
+      day.setHours(0, 0, 0, 0)
+      day.setDate(day.getDate() - i)
+      const key = toDateKey(day)
+      const seconds = Number(map[key] ?? 0)
+      const label = day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      points.push({
+        key,
+        label,
+        seconds,
+        hours: Number((seconds / 3600).toFixed(1)),
+      })
+    }
+    return points
+  }
+
+  const refreshRuntimeHistory = () => {
+    const runtimeMap = readRuntimeMap()
+    setRuntimeHistory(buildLast30Days(runtimeMap))
+  }
+
+  const addRuntimeSeconds = (secondsToAdd: number) => {
+    if (secondsToAdd <= 0) return
+    const runtimeMap = readRuntimeMap()
+    const todayKey = toDateKey(new Date())
+    runtimeMap[todayKey] = Math.max(0, Math.floor((runtimeMap[todayKey] ?? 0) + secondsToAdd))
+
+    const cutoff = new Date()
+    cutoff.setHours(0, 0, 0, 0)
+    cutoff.setDate(cutoff.getDate() - 14)
+    const cutoffKey = toDateKey(cutoff)
+
+    Object.keys(runtimeMap).forEach((key) => {
+      if (key < cutoffKey) delete runtimeMap[key]
+    })
+
+    writeRuntimeMap(runtimeMap)
+  }
+
+  const commitRuntimeChunk = (resetStart = true) => {
+    if (!runtimeSessionStartRef.current) return
+    const elapsed = Math.floor((Date.now() - runtimeSessionStartRef.current) / 1000)
+    if (elapsed > 0) {
+      addRuntimeSeconds(elapsed)
+      refreshRuntimeHistory()
+    }
+    runtimeSessionStartRef.current = resetStart ? Date.now() : null
+  }
 
   const serialSupported = useMemo(() => {
     return typeof navigator !== 'undefined' && 'serial' in navigator
@@ -551,6 +647,7 @@ export default function DeviceDetails() {
   }
 
   const disconnectSerial = async () => {
+    commitRuntimeChunk(false)
     pollingRef.current = false
     if (readTimeoutRef.current) {
       clearTimeout(readTimeoutRef.current)
@@ -604,6 +701,8 @@ export default function DeviceDetails() {
   }
 
   useEffect(() => {
+    refreshRuntimeHistory()
+
     const loadBrandData = async () => {
       try {
         const response = await fetch('/vfd_brand_model_registers.json')
@@ -619,7 +718,11 @@ export default function DeviceDetails() {
     loadBrandData()
     addLog('WebSocket Modbus System initialized', 'info')
     addLog(`Server: ${serverHost}:${serverPort} | Device ID: ${deviceId}`, 'info')
-    addLog('Select a VFD brand and click Connect to start', 'info')
+    if (resolvedSavedBrand) {
+      addLog(`Loaded saved VFD brand/model: ${resolvedSavedBrand}`, 'success')
+    } else {
+      addLog('No saved VFD brand/model found on this device', 'info')
+    }
 
     return () => {
       if (pollingRef.current) {
@@ -628,6 +731,41 @@ export default function DeviceDetails() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (!brandModel || Object.keys(brandData).length === 0) return
+    if (brandData[brandModel]) return
+
+    const resolvedKey = Object.keys(brandData).find(
+      (key) => key.toLowerCase() === brandModel.toLowerCase()
+    )
+    if (resolvedKey && resolvedKey !== brandModel) {
+      setBrandModel(resolvedKey)
+      addLog(`Matched saved VFD brand/model to ${resolvedKey}`, 'success')
+    }
+  }, [brandModel, brandData])
+
+  useEffect(() => {
+    if (connected) {
+      runtimeSessionStartRef.current = Date.now()
+      runtimeTickRef.current = setInterval(() => {
+        commitRuntimeChunk(true)
+      }, 30000)
+      return () => {
+        if (runtimeTickRef.current) {
+          clearInterval(runtimeTickRef.current)
+          runtimeTickRef.current = null
+        }
+      }
+    }
+
+    if (runtimeTickRef.current) {
+      clearInterval(runtimeTickRef.current)
+      runtimeTickRef.current = null
+    }
+    return undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected])
 
   useEffect(() => {
     if (!brandModel || !brandData[brandModel]) {
@@ -658,52 +796,146 @@ export default function DeviceDetails() {
     })
   }, [registers, registerState])
 
-  const columns = [
-    {
-      title: 'Register Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
-      render: (value: number) => <span className="modbus-address">{value}</span>,
-    },
-    {
-      title: 'Raw Value',
-      dataIndex: 'raw',
-      key: 'raw',
-      render: (value: string, record: { hasError: boolean }) => (
-        <span className={record.hasError ? 'modbus-table-error' : 'modbus-table-value'}>
-          {value}
-        </span>
-      ),
-    },
-    {
-      title: 'Actual Value',
-      dataIndex: 'value',
-      key: 'value',
-      render: (value: string, record: { hasError: boolean }) => (
-        <span className={record.hasError ? 'modbus-table-error' : 'modbus-table-value'}>
-          {value}
-        </span>
-      ),
-    },
-    {
-      title: 'Unit',
-      dataIndex: 'unit',
-      key: 'unit',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (value: string, record: { hasError: boolean }) => (
-        <Tag color={record.hasError ? 'red' : value === 'OK' ? 'green' : 'default'}>{value}</Tag>
-      ),
-    },
-  ]
+  const registerSnapshots = useMemo(() => {
+    const fallback = [
+      { name: 'Voltage', address: 1002, raw: '2304', value: '230.4', unit: 'V', status: 'OK', hasError: false },
+      { name: 'Current', address: 1003, raw: '178', value: '17.8', unit: 'A', status: 'OK', hasError: false },
+      { name: 'Power', address: 1001, raw: '42', value: '4.2', unit: 'kW', status: 'OK', hasError: false },
+      { name: 'Frequency', address: 1004, raw: '599', value: '59.9', unit: 'Hz', status: 'OK', hasError: false },
+      { name: 'Energy', address: 1000, raw: '1286', value: '128.6', unit: 'kWh', status: 'OK', hasError: false },
+    ]
+
+    const source = tableData.length > 0 ? tableData : fallback
+    return source.slice(0, 12).map((row) => {
+      const isOk = !row.hasError && String(row.status).toLowerCase() === 'ok'
+      return {
+        key: row.name,
+        name: row.name,
+        address: row.address,
+        rawDisplay: `${row.raw}${row.unit ? ` ${row.unit}` : ''}`,
+        actualDisplay: `${row.value}${row.unit ? ` ${row.unit}` : ''}`,
+        isOk,
+      }
+    })
+  }, [tableData])
+
+  const statusSummary = useMemo(() => {
+    const total = tableData.length
+    const error = tableData.filter((row) => row.hasError || row.status.toLowerCase() === 'error').length
+    const ok = tableData.filter((row) => !row.hasError && row.status.toLowerCase() === 'ok').length
+    const waiting = Math.max(0, total - ok - error)
+
+    const okPct = total ? Math.round((ok / total) * 100) : 0
+    const waitPct = total ? Math.round((waiting / total) * 100) : 0
+    const errorPct = total ? 100 - okPct - waitPct : 0
+
+    return {
+      total,
+      ok,
+      waiting,
+      error,
+      okPct,
+      waitPct,
+      errorPct,
+      healthScore: total ? Math.round((ok / total) * 100) : 0,
+    }
+  }, [tableData])
+
+  const hasRuntimeData = useMemo(
+    () => runtimeHistory.some((point) => point.seconds > 0),
+    [runtimeHistory]
+  )
+
+  const runtimeSeries = useMemo(() => {
+    if (hasRuntimeData) return runtimeHistory
+
+    return runtimeHistory.map((point, idx) => {
+      const demoHours = Number(
+        (5 + Math.abs(Math.sin((idx + 1) * 0.52)) * 8 + (idx % 6 === 0 ? 1.2 : 0)).toFixed(1)
+      )
+      return {
+        ...point,
+        hours: demoHours,
+        seconds: Math.round(demoHours * 3600),
+      }
+    })
+  }, [runtimeHistory, hasRuntimeData])
+
+  const isUsingDemoRuntime = !hasRuntimeData && runtimeHistory.length > 0
+
+  const runtimeAnalytics = useMemo(() => {
+    const totalHours = runtimeSeries.reduce((sum, point) => sum + point.hours, 0)
+    const maxHours = Math.max(...runtimeSeries.map((point) => point.hours), 1)
+    const activeDays = runtimeSeries.filter((point) => point.seconds > 0).length
+    const avgHours = runtimeSeries.length ? totalHours / runtimeSeries.length : 0
+
+    return {
+      totalHours,
+      maxHours,
+      activeDays,
+      avgHours,
+    }
+  }, [runtimeSeries])
+
+  const runtimeLineChart = useMemo(() => {
+    const pointSpacing = 52
+    const width = Math.max(1500, runtimeSeries.length * pointSpacing + 120)
+    const height = 250
+    const padding = { top: 16, right: 14, bottom: 54, left: 42 }
+    const innerWidth = width - padding.left - padding.right
+    const innerHeight = height - padding.top - padding.bottom
+    const maxHours = 16
+
+    const points = runtimeSeries.map((point, idx) => {
+      const ratioX = runtimeSeries.length > 1 ? idx / (runtimeSeries.length - 1) : 0
+      const x = padding.left + ratioX * innerWidth
+      const boundedHours = Math.max(0, Math.min(point.hours, maxHours))
+      const y = padding.top + (1 - boundedHours / maxHours) * innerHeight
+      return { ...point, x, y }
+    })
+
+    const toSmoothPath = (pathPoints: Array<{ x: number; y: number }>) => {
+      if (pathPoints.length === 0) return ''
+      if (pathPoints.length === 1) return `M ${pathPoints[0].x},${pathPoints[0].y}`
+
+      let d = `M ${pathPoints[0].x},${pathPoints[0].y}`
+      for (let i = 0; i < pathPoints.length - 1; i += 1) {
+        const p0 = pathPoints[i - 1] ?? pathPoints[i]
+        const p1 = pathPoints[i]
+        const p2 = pathPoints[i + 1]
+        const p3 = pathPoints[i + 2] ?? p2
+
+        const cp1x = p1.x + (p2.x - p0.x) / 6
+        const cp1y = p1.y + (p2.y - p0.y) / 6
+        const cp2x = p2.x - (p3.x - p1.x) / 6
+        const cp2y = p2.y - (p3.y - p1.y) / 6
+
+        d += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`
+      }
+      return d
+    }
+
+    const baselineY = padding.top + innerHeight
+    const smoothLinePath = toSmoothPath(points)
+    const smoothAreaPath =
+      points.length > 0
+        ? `${smoothLinePath} L ${points[points.length - 1].x},${baselineY} L ${points[0].x},${baselineY} Z`
+        : ''
+
+    return {
+      width,
+      height,
+      padding,
+      maxHours,
+      points,
+      linePath: smoothLinePath,
+      areaPath: smoothAreaPath,
+      ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16].map((t) => ({
+        y: padding.top + (1 - t / maxHours) * innerHeight,
+        value: `${t}h`,
+      })),
+    }
+  }, [runtimeSeries])
 
   return (
     <Layout className="device-details-layout">
@@ -720,7 +952,7 @@ export default function DeviceDetails() {
           <div className="modbus-header">
             <div className="modbus-title">
               <span className="modbus-title-icon">🔌</span>
-              <span>Modbus RTU Master</span>
+              <span>Live Performance Data</span>
             </div>
             <div className="modbus-subtitle">Reading Holding Registers from Configurable Slave ID</div>
           </div>
@@ -790,13 +1022,6 @@ export default function DeviceDetails() {
             </Button>
           </div>
 
-          <Alert
-            className="modbus-status"
-            type={statusType}
-            message={statusText}
-            showIcon={false}
-          />
-
           <Row gutter={[16, 16]} className="modbus-stats">
             <Col xs={12} sm={8} md={6} lg={4}>
               <Card className="modbus-stat-card">
@@ -825,18 +1050,126 @@ export default function DeviceDetails() {
             </Col>
           </Row>
 
-          <div className="modbus-table-card">
-            <Table
-              className="modbus-table"
-              columns={columns}
-              dataSource={tableData}
-              pagination={false}
-              locale={{
-                emptyText: 'Select a brand to load registers',
-              }}
-              scroll={{ x: true }}
-            />
-          </div>
+          <Card className="modbus-runtime-card">
+            <div className="modbus-chart-header">
+              <div className="modbus-chart-title">Running Time (Last 30 Days)</div>
+              <div className="modbus-chart-subtitle">
+                {isUsingDemoRuntime ? 'Demo preview | ' : ''}
+                Total {runtimeAnalytics.totalHours.toFixed(1)}h | Avg {runtimeAnalytics.avgHours.toFixed(1)}h/day
+                | Active days {runtimeAnalytics.activeDays}/30
+              </div>
+            </div>
+
+            <div className="modbus-runtime-line-wrap">
+              <svg
+                className="modbus-runtime-line-chart"
+                viewBox={`0 0 ${runtimeLineChart.width} ${runtimeLineChart.height}`}
+                style={{ width: `${runtimeLineChart.width}px` }}
+                role="img"
+                aria-label="Running time trend for the last 30 days"
+              >
+                {runtimeLineChart.ticks.map((tick) => (
+                  <g key={tick.value}>
+                    <line
+                      x1={runtimeLineChart.padding.left}
+                      y1={tick.y}
+                      x2={runtimeLineChart.width - runtimeLineChart.padding.right}
+                      y2={tick.y}
+                      className="modbus-runtime-grid-line"
+                    />
+                    <text x={8} y={tick.y + 4} className="modbus-runtime-axis-text">
+                      {tick.value}
+                    </text>
+                  </g>
+                ))}
+
+                <path d={runtimeLineChart.areaPath} className="modbus-runtime-area" />
+                <path d={runtimeLineChart.linePath} className="modbus-runtime-line" />
+
+                {runtimeLineChart.points.map((point) => (
+                  <g key={point.key}>
+                    <circle cx={point.x} cy={point.y} r="4" className="modbus-runtime-dot" />
+                    <text x={point.x} y={point.y - 10} textAnchor="middle" className="modbus-runtime-point-text">
+                      {point.hours.toFixed(1)}h
+                    </text>
+                    <text
+                      x={point.x}
+                      y={runtimeLineChart.height - 14}
+                      textAnchor="middle"
+                      className="modbus-runtime-x-text"
+                    >
+                      {point.label}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+            </div>
+          </Card>
+
+          <Row gutter={[16, 16]} className="modbus-visuals">
+            <Col xs={24} lg={9}>
+              <Card className="modbus-chart-card">
+                <div className="modbus-chart-header">
+                  <div className="modbus-chart-title">Register Status Overview</div>
+                  <div className="modbus-chart-subtitle">Real-time health snapshot</div>
+                </div>
+                <div className="modbus-pie-wrap">
+                  <div
+                    className="modbus-pie-chart"
+                    style={{
+                      background: `conic-gradient(#22c55e 0% ${statusSummary.okPct}%, #f59e0b ${statusSummary.okPct}% ${statusSummary.okPct + statusSummary.waitPct}%, #ef4444 ${statusSummary.okPct + statusSummary.waitPct}% 100%)`,
+                    }}
+                    role="img"
+                    aria-label={`Status distribution: ${statusSummary.ok} ok, ${statusSummary.waiting} waiting, ${statusSummary.error} error`}
+                  >
+                    <div className="modbus-pie-center">
+                      <span className="modbus-pie-score">{statusSummary.healthScore}%</span>
+                      <span className="modbus-pie-label">Healthy</span>
+                    </div>
+                  </div>
+                  <div className="modbus-pie-legend">
+                    <div className="modbus-legend-item">
+                      <span className="modbus-legend-dot is-ok" />
+                      <span>OK</span>
+                      <strong>{statusSummary.ok}</strong>
+                    </div>
+                    <div className="modbus-legend-item">
+                      <span className="modbus-legend-dot is-waiting" />
+                      <span>Waiting</span>
+                      <strong>{statusSummary.waiting}</strong>
+                    </div>
+                    <div className="modbus-legend-item">
+                      <span className="modbus-legend-dot is-error" />
+                      <span>Error</span>
+                      <strong>{statusSummary.error}</strong>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </Col>
+            <Col xs={24} lg={15}>
+              <Card className="modbus-chart-card">
+                <div className="modbus-chart-header">
+                  <div className="modbus-chart-title">Live Register Values</div>
+                  <div className="modbus-chart-subtitle">Raw values and actual converted values</div>
+                </div>
+                <div className="modbus-register-section-title">Actual Values</div>
+                <div className="modbus-register-grid">
+                  {registerSnapshots.map((item) => (
+                    <div className={`modbus-register-card ${item.isOk ? 'is-ok' : 'is-error'}`} key={`actual-${item.key}`}>
+                      <div className="modbus-register-meta">
+                        <div>
+                          <div className="modbus-register-name">{item.name}</div>
+                          <div className="modbus-register-address">Address: {item.address}</div>
+                        </div>
+                        <div className="modbus-register-value">{item.actualDisplay}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </Col>
+          </Row>
 
           <div className="modbus-log-card">
             <div className="modbus-log-header">

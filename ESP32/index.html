@@ -10,37 +10,44 @@
       background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%);
       color: #eee;
       margin: 0;
-      padding: 20px;
+      padding: 15px;
       min-height: 100vh;
     }
     
     .container {
-      max-width: 1200px;
+      width: 95%;
+      max-width: 2400px;
       margin: 0 auto;
       background: rgba(255, 255, 255, 0.05);
       border-radius: 20px;
-      padding: 30px;
+      padding: 50px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(10px);
     }
     
     .header {
       text-align: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
+      margin-bottom: 35px;
+      padding-bottom: 25px;
       border-bottom: 2px solid #90ee90;
     }
     
     .header h1 {
       color: #90ee90;
-      font-size: 2.5em;
+      font-size: 3em;
       margin: 0;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
     
+    .header p {
+      color: #ccc;
+      font-size: 1.2em;
+      margin: 10px 0 0 0;
+    }
+    
     .controls {
       display: flex;
-      gap: 15px;
+      gap: 20px;
       justify-content: center;
       align-items: center;
       margin-bottom: 30px;
@@ -49,7 +56,7 @@
     
     .serial-config {
       display: flex;
-      gap: 10px;
+      gap: 15px;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -63,23 +70,23 @@
       background: #444;
       color: #fff;
       border: 1px solid #666;
-      padding: 8px 12px;
+      padding: 10px 15px;
       border-radius: 5px;
-      font-size: 14px;
+      font-size: 15px;
     }
     
     .serial-config input {
-      width: 60px;
+      width: 70px;
     }
     
     button {
       background: linear-gradient(135deg, #444 0%, #666 100%);
       color: #fff;
-      padding: 12px 25px;
+      padding: 14px 30px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 600;
       transition: all 0.3s ease;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -116,10 +123,10 @@
     .status {
       text-align: center;
       margin: 20px 0;
-      padding: 15px;
+      padding: 18px;
       border-radius: 10px;
       font-weight: bold;
-      font-size: 18px;
+      font-size: 20px;
       background: rgba(255, 165, 0, 0.2);
       border: 1px solid #ffa500;
       color: #ffa500;
@@ -139,14 +146,14 @@
     
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 25px;
       margin-bottom: 30px;
     }
     
     .stat-card {
       background: rgba(255, 255, 255, 0.1);
-      padding: 15px;
+      padding: 25px;
       border-radius: 10px;
       text-align: center;
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -154,13 +161,13 @@
     
     .stat-label {
       color: #ccc;
-      font-size: 14px;
-      margin-bottom: 5px;
+      font-size: 15px;
+      margin-bottom: 8px;
     }
     
     .stat-value {
       color: #90ee90;
-      font-size: 24px;
+      font-size: 28px;
       font-weight: bold;
     }
     
@@ -174,7 +181,7 @@
     }
     
     th, td {
-      padding: 15px;
+      padding: 20px 25px;
       text-align: left;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
@@ -183,16 +190,16 @@
       background: rgba(144, 238, 144, 0.2);
       color: #90ee90;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 17px;
     }
     
     td {
-      font-size: 15px;
+      font-size: 16px;
     }
     
     .value-cell {
       font-weight: bold;
-      font-size: 18px;
+      font-size: 20px;
       color: #90ee90;
     }
     
@@ -209,8 +216,8 @@
       margin-top: 30px;
       background: rgba(0, 0, 0, 0.5);
       border-radius: 10px;
-      padding: 20px;
-      max-height: 300px;
+      padding: 30px;
+      max-height: 500px;
       overflow-y: auto;
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
@@ -224,9 +231,10 @@
     
     .log-entry {
       font-family: 'Courier New', monospace;
-      font-size: 13px;
-      margin-bottom: 5px;
-      padding: 3px 0;
+      font-size: 14px;
+      margin-bottom: 6px;
+      padding: 4px 0;
+      line-height: 1.5;
     }
     
     .log-timestamp {

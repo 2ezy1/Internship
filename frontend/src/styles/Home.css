@@ -186,6 +186,7 @@
   gap: 8px;
 }
 
+
 .more-menu-button,
 .more-menu-button .anticon {
   color: #ffffff;
@@ -258,6 +259,51 @@
   font-weight: 600;
 }
 
+.device-modal .ant-modal-content {
+  background: linear-gradient(155deg, rgba(15, 23, 42, 0.97), rgba(2, 6, 23, 0.96));
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 16px;
+  box-shadow: 0 22px 48px rgba(2, 6, 23, 0.55);
+}
+
+.device-modal .ant-modal-header {
+  background: transparent;
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+
+.device-modal .ant-modal-title {
+  font-size: 28px;
+}
+
+.device-modal-form .ant-form-item {
+  margin-bottom: 14px;
+}
+
+.device-modal-form .ant-form-item-label > label {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.device-modal-form .ant-input,
+.device-modal-form .ant-select-selector {
+  min-height: 44px !important;
+  border-radius: 10px !important;
+  background: rgba(2, 6, 23, 0.55) !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+}
+
+.device-modal-form .ant-input::placeholder {
+  color: rgba(148, 163, 184, 0.62);
+}
+
+.device-modal-form .ant-input:focus,
+.device-modal-form .ant-input-focused,
+.device-modal-form .ant-select-focused .ant-select-selector {
+  border-color: rgba(56, 189, 248, 0.75) !important;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15) !important;
+}
+
 /* Button Refinements */
 .ant-btn-primary {
   background: var(--primary-color);
@@ -296,6 +342,7 @@
   margin: 0;
   max-width: 520px;
 }
+
 
 .eyebrow {
   font-size: 12px;
@@ -343,6 +390,7 @@
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
+
 
 .filter-dropdown {
   background: rgba(15, 23, 42, 0.9) !important;
@@ -441,6 +489,7 @@
     gap: 12px;
   }
 
+
   .device-card-media {
     height: 140px;
   }
@@ -516,6 +565,7 @@
 [data-theme='light'] .device-card:hover {
   box-shadow: 0 16px 28px rgba(15, 23, 42, 0.14);
 }
+
 
 [data-theme='light'] .device-card-media {
   background: radial-gradient(circle at top, rgba(56, 189, 248, 0.16), transparent 60%);

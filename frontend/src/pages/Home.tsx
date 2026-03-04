@@ -15,6 +15,7 @@ type Device = {
   deviceName: string
   ipAddress: string
   type: string
+  vfdBrandModel?: string
   status: string
   isOnline?: boolean
   lastHeartbeat?: string
@@ -22,6 +23,15 @@ type Device = {
 }
 
 export default function Home() {
+  const getStoredBrandModel = (deviceId: string | number) =>
+    localStorage.getItem(`device_brand_${deviceId}`) || ''
+
+  const persistBrandModel = (deviceId: string | number, brandModel?: string | null) => {
+    const value = (brandModel || '').trim()
+    if (!value) return
+    localStorage.setItem(`device_brand_${deviceId}`, value)
+  }
+
   const [devices, setDevices] = useState<Device[]>([])
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
@@ -32,6 +42,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'All' | 'Online' | 'Warning' | 'Offline'>('All')
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [vfdBrandOptions, setVfdBrandOptions] = useState<string[]>([])
   const navigate = useNavigate()
   const { modal } = App.useApp()
 
@@ -70,7 +81,20 @@ export default function Home() {
       return
     }
     fetchDevices()
+    loadVfdBrandOptions()
   }, [])
+
+  const loadVfdBrandOptions = async () => {
+    try {
+      const response = await fetch('/vfd_brand_model_registers.json')
+      const data = (await response.json()) as Record<string, unknown>
+      const brands = Object.keys(data || {}).sort((a, b) => a.localeCompare(b))
+      setVfdBrandOptions(brands)
+    } catch {
+      // Fallback options if JSON cannot be loaded
+      setVfdBrandOptions(['ABB', 'Delta', 'Fuji', 'Hitachi', 'Mitsubishi', 'Schneider', 'Siemens', 'Yaskawa'])
+    }
+  }
 
   const fetchDevices = async () => {
     setFetchLoading(true)
@@ -94,6 +118,8 @@ export default function Home() {
               deviceName: device.device_name,
               ipAddress: device.ip_address,
               type: device.type || 'Generic',
+              vfdBrandModel:
+                device.vfd_brand_model || device.brand_model || getStoredBrandModel(device.id),
               status: statusRes.data.status || 'Offline',  // Online, Warning, or Offline
               isOnline: statusRes.data.is_online,
               lastHeartbeat: statusRes.data.last_heartbeat,
@@ -107,6 +133,8 @@ export default function Home() {
               deviceName: device.device_name,
               ipAddress: device.ip_address,
               type: device.type || 'Generic',
+              vfdBrandModel:
+                device.vfd_brand_model || device.brand_model || getStoredBrandModel(device.id),
               status: 'Offline',
               isOnline: false,
               lastHeartbeat: null,
@@ -152,6 +180,7 @@ export default function Home() {
       deviceName: device.deviceName,
       ipAddress: device.ipAddress,
       type: device.type,
+      vfdBrandModel: device.vfdBrandModel || undefined,
     })
     console.log('📋 Form populated with device data:', device)
     setIsModalOpen(true)
@@ -167,6 +196,7 @@ export default function Home() {
         device_name: values.deviceName?.trim(),
         ip_address: values.ipAddress?.trim(),
         type: values.type?.trim() || 'Generic',
+        vfd_brand_model: values.vfdBrandModel?.trim() || null,
         date_installed: editingDevice && editingDevice.dateInstalled ? editingDevice.dateInstalled : new Date().toISOString(),
       }
       
@@ -183,6 +213,8 @@ export default function Home() {
           }
         })
         const updated = res.data
+        const savedBrand = values.vfdBrandModel?.trim() || ''
+        persistBrandModel(editingDevice.key, savedBrand || updated.vfd_brand_model || updated.brand_model)
         
         console.log('✅ UPDATE successful, response:', updated)
         
@@ -190,14 +222,16 @@ export default function Home() {
         setDevices((prev) => {
           const updated_devices = prev.map((d) => 
             d.key === editingDevice.key
-              ? {
-                  key: String(updated.id),
-                  deviceName: updated.device_name,
-                  ipAddress: updated.ip_address,
-                  type: updated.type,
-                  status: 'Active',
-                  dateInstalled: updated.date_installed || updated.created_at,
-                }
+                ? {
+                    key: String(updated.id),
+                    deviceName: updated.device_name,
+                    ipAddress: updated.ip_address,
+                    type: updated.type,
+                    vfdBrandModel:
+                      updated.vfd_brand_model || updated.brand_model || savedBrand || getStoredBrandModel(updated.id),
+                    status: 'Active',
+                    dateInstalled: updated.date_installed || updated.created_at,
+                  }
               : d
           )
           console.log('🔄 State updated after PUT request')
@@ -218,6 +252,8 @@ export default function Home() {
           }
         })
         const created = res.data
+        const savedBrand = values.vfdBrandModel?.trim() || ''
+        persistBrandModel(created.id, savedBrand || created.vfd_brand_model || created.brand_model)
         
         console.log('✅ CREATE successful, response:', created)
         
@@ -227,6 +263,8 @@ export default function Home() {
           deviceName: created.device_name,
           ipAddress: created.ip_address,
           type: created.type,
+          vfdBrandModel:
+            created.vfd_brand_model || created.brand_model || savedBrand || getStoredBrandModel(created.id),
           status: 'Active',
           dateInstalled: created.date_installed || created.created_at,
         }
@@ -356,6 +394,9 @@ export default function Home() {
   }
 
   const handleDeviceClick = (device: Device) => {
+    if (device.vfdBrandModel) {
+      localStorage.setItem(`device_brand_${device.key}`, device.vfdBrandModel)
+    }
     navigate(`/devices/${device.key}`, { state: { device } })
   }
 
@@ -398,7 +439,6 @@ export default function Home() {
             <div className="hero-copy">
               <div className="eyebrow">Monitoring</div>
               <h2>Device monitoring.</h2>
-              
             </div>
             <div className="hero-metrics">
               <div className="metric-card">
@@ -583,6 +623,7 @@ export default function Home() {
       <Modal
         title={editingDevice ? "Edit Device" : "Add New Device"}
         open={isModalOpen}
+        className="device-modal"
         onCancel={() => {
           setIsModalOpen(false)
           setEditingDevice(null)
@@ -593,7 +634,7 @@ export default function Home() {
         width={500}
         
       >
-        <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false} className="device-modal-form">
           {submitError && (
             <Alert
               type="error"
@@ -630,6 +671,20 @@ export default function Home() {
           <Form.Item name="type" label="Device Type" rules={[{ required: true, message: 'Please select device type' }]}>
             <Select placeholder="Select device type">
               <Select.Option value="RS485">RS485</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="vfdBrandModel"
+            label="VFD Brand/Model"
+            rules={[{ required: true, message: 'Please select VFD brand/model' }]}
+          >
+            <Select placeholder="Select VFD brand/model" showSearch optionFilterProp="label">
+              {vfdBrandOptions.map((brand) => (
+                <Select.Option key={brand} value={brand} label={brand}>
+                  {brand}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
 

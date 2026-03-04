@@ -26,15 +26,16 @@
 }
 
 .device-details-content {
-  padding: 48px 24px;
-  max-width: 1200px;
+  padding: 24px 8px;
+  width: min(1800px, 98vw);
+  max-width: none;
   margin: 0 auto;
 }
 
 .modbus-shell {
   background: var(--dd-shell-bg);
   border-radius: 18px;
-  padding: 24px 28px;
+  padding: 32px 40px;
   box-shadow: 0 24px 50px rgba(2, 8, 23, 0.42);
   border: 1px solid var(--dd-shell-border);
 }
@@ -79,7 +80,7 @@
 }
 
 .modbus-form {
-  display: flex;
+  display: none;
   flex-wrap: wrap;
   gap: 12px 14px;
   justify-content: center;
@@ -148,9 +149,9 @@
 }
 
 .modbus-actions {
+  display: none;
   margin-top: 14px;
   margin-bottom: 14px;
-  display: flex;
   gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
@@ -217,6 +218,261 @@
   column-gap: 12px;
 }
 
+.modbus-runtime-card {
+  margin-bottom: 16px;
+  background: var(--dd-card-bg) !important;
+  border: 1px solid var(--dd-field-border) !important;
+  border-radius: 12px !important;
+}
+
+.modbus-runtime-line-wrap {
+  width: 100%;
+  margin-top: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+}
+
+.modbus-runtime-line-chart {
+  min-width: 100%;
+  height: 250px;
+  display: block;
+}
+
+.modbus-runtime-grid-line {
+  stroke: rgba(148, 163, 184, 0.2);
+  stroke-width: 1;
+}
+
+.modbus-runtime-axis-text {
+  fill: #94a3b8;
+  font-size: 11px;
+}
+
+.modbus-runtime-area {
+  fill: rgba(14, 165, 233, 0.16);
+}
+
+.modbus-runtime-line {
+  fill: none;
+  stroke: #38bdf8;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.modbus-runtime-dot {
+  fill: #0f172a;
+  stroke: #22c55e;
+  stroke-width: 2;
+}
+
+.modbus-runtime-point-text {
+  fill: #38bdf8;
+  font-size: 11px;
+  font-family: Consolas, 'Courier New', monospace;
+}
+
+.modbus-runtime-x-text {
+  color: #cbd5e1;
+  fill: #cbd5e1;
+  font-size: 10px;
+}
+
+.modbus-visuals {
+  margin-bottom: 16px;
+  align-items: stretch;
+}
+
+.modbus-visuals .ant-col {
+  min-width: 0;
+  display: flex;
+}
+
+.modbus-chart-card {
+  background: var(--dd-card-bg) !important;
+  border: 1px solid var(--dd-field-border) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.modbus-chart-card .ant-card-body {
+  height: 100%;
+  min-height: 224px;
+  padding: 16px 18px;
+}
+
+.modbus-chart-header {
+  margin-bottom: 12px;
+  min-height: 40px;
+}
+
+.modbus-chart-title {
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.modbus-chart-subtitle {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.modbus-pie-wrap {
+  display: grid;
+  grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+}
+
+.modbus-pie-chart {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.22);
+}
+
+.modbus-pie-center {
+  width: 94px;
+  height: 94px;
+  border-radius: 50%;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.modbus-pie-score {
+  color: #38bdf8;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.modbus-pie-label {
+  color: #94a3b8;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.modbus-pie-legend {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+}
+
+.modbus-legend-item {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  color: #cbd5e1;
+  font-size: 13px;
+}
+
+.modbus-legend-item strong {
+  color: #f8fafc;
+  min-width: 20px;
+  text-align: right;
+}
+
+.modbus-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.modbus-legend-dot.is-ok {
+  background: #22c55e;
+}
+
+.modbus-legend-dot.is-waiting {
+  background: #f59e0b;
+}
+
+.modbus-legend-dot.is-error {
+  background: #ef4444;
+}
+
+.modbus-register-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.modbus-register-section-title {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.modbus-register-card {
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  padding: 10px 12px;
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+}
+
+.modbus-register-card.is-ok {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.modbus-register-card.is-error {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.modbus-register-name {
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.modbus-register-meta {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.modbus-register-address {
+  color: #94a3b8;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.modbus-register-value {
+  color: #f8fafc;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-align: right;
+}
+
+@media (max-width: 1280px) {
+  .modbus-pie-wrap {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
 .modbus-stat-card {
   background: var(--dd-card-bg) !important;
   border: 1px solid var(--dd-field-border) !important;
@@ -270,6 +526,10 @@
   background: #111f35 !important;
 }
 
+.modbus-table .ant-table-tbody > tr:nth-child(odd) > td {
+  background: rgba(15, 23, 42, 0.96) !important;
+}
+
 .modbus-table-value {
   font-weight: 600;
   color: #22c55e;
@@ -283,6 +543,28 @@
 .modbus-table-error {
   color: #fca5a5;
   font-weight: 600;
+}
+
+.modbus-status-tag {
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 10px !important;
+}
+
+.modbus-status-tag.is-ok {
+  color: #bbf7d0 !important;
+  background: rgba(34, 197, 94, 0.16) !important;
+}
+
+.modbus-status-tag.is-waiting {
+  color: #fde68a !important;
+  background: rgba(245, 158, 11, 0.16) !important;
+}
+
+.modbus-status-tag.is-error {
+  color: #fecaca !important;
+  background: rgba(239, 68, 68, 0.18) !important;
 }
 
 .modbus-log-card {
@@ -354,6 +636,15 @@
   .modbus-actions {
     justify-content: center;
   }
+
+  .modbus-pie-wrap {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .modbus-runtime-line-chart {
+    height: 220px;
+  }
 }
 
 [data-theme='light'] .device-details-layout {
@@ -408,6 +699,55 @@
   background: #f1f5f9 !important;
 }
 
+[data-theme='light'] .modbus-table .ant-table-tbody > tr:nth-child(odd) > td {
+  background: #f8fbff !important;
+}
+
 [data-theme='light'] .modbus-log-header {
   color: #0f172a;
+}
+
+[data-theme='light'] .modbus-chart-title {
+  color: #0f172a;
+}
+
+[data-theme='light'] .modbus-pie-center {
+  background: #ffffff;
+}
+
+[data-theme='light'] .modbus-legend-item {
+  color: #334155;
+}
+
+[data-theme='light'] .modbus-legend-item strong {
+  color: #0f172a;
+}
+
+[data-theme='light'] .modbus-register-name {
+  color: #334155;
+}
+
+[data-theme='light'] .modbus-register-address {
+  color: #64748b;
+}
+
+[data-theme='light'] .modbus-register-value {
+  color: #0f172a;
+}
+
+[data-theme='light'] .modbus-register-section-title {
+  color: #475569;
+}
+
+[data-theme='light'] .modbus-runtime-x-text {
+  color: #334155;
+  fill: #334155;
+}
+
+[data-theme='light'] .modbus-runtime-area {
+  fill: rgba(14, 165, 233, 0.12);
+}
+
+[data-theme='light'] .modbus-runtime-dot {
+  fill: #ffffff;
 }
