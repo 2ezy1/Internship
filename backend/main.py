@@ -134,9 +134,7 @@ def get_current_user(authorization: Optional[str] = Header(None), db: Session = 
     return user
 
 def get_admin_user(current_user: UserModel = Depends(get_current_user)) -> UserModel:
-    """Verify that current user is an admin"""
-    if current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Admin access required")
+    """Compatibility dependency: all authenticated users are allowed."""
     return current_user
 
 @app.on_event("startup")
@@ -246,15 +244,7 @@ def read_root():
 
 @app.post("/auth/login", tags=["Auth"])
 def login(payload: UserLogin, db: Session = Depends(get_db)):
-    """Login endpoint - returns JWT token (only user and BITSOJT accounts allowed)"""
-    # Only allow specific accounts to log in
-    allowed_accounts = ["user", "BITSOJT"]
-    if payload.username not in allowed_accounts:
-        raise HTTPException(
-            status_code=403, 
-            detail="Access denied. Only authorized accounts can log into this system."
-        )
-    
+    """Login endpoint - returns JWT token for any valid account."""
     user = db.query(UserModel).filter(UserModel.username == payload.username).first()
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Wrong credentials")
@@ -320,15 +310,8 @@ def get_devices(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user)
 ):
-    """Get devices (all devices for admin, own devices for regular users)"""
-    if current_user.role == "admin":
-        # Admins can see all devices
-        devices = db.query(DeviceModel).offset(skip).limit(limit).all()
-    else:
-        # Regular users can only see their own devices
-        devices = db.query(DeviceModel).filter(
-            DeviceModel.user_id == current_user.id
-        ).offset(skip).limit(limit).all()
+    """Get all devices for any authenticated user."""
+    devices = db.query(DeviceModel).offset(skip).limit(limit).all()
     return devices
 
 @app.get("/devices/{device_id}", response_model=Device, tags=["Devices"])
@@ -346,14 +329,10 @@ def update_device(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user)
 ):
-    """Update a device (requires authentication and ownership)"""
+    """Update a device (requires authentication)."""
     db_device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
     if not db_device:
         raise HTTPException(status_code=404, detail="Device not found")
-    
-    # Check if user owns the device or is an admin
-    if db_device.user_id != current_user.id and current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="You do not have permission to update this device")
     
     try:
         update_data = device.dict(exclude_unset=True)
@@ -379,14 +358,10 @@ def delete_device(
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user)
 ):
-    """Delete a device (requires authentication and ownership)"""
+    """Delete a device (requires authentication)."""
     db_device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
     if not db_device:
         raise HTTPException(status_code=404, detail="Device not found")
-    
-    # Check if user owns the device or is an admin
-    if db_device.user_id != current_user.id and current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="You do not have permission to delete this device")
     
     db.delete(db_device)
     db.commit()
@@ -565,14 +540,10 @@ def get_sensor_readings(
     current_user: UserModel = Depends(get_current_user)
 ):
     """Get recent sensor readings for a specific device"""
-    # Verify device exists and user has access
+    # Verify device exists
     device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
     if not device:
         raise HTTPException(status_code=404, detail="Device not found")
-    
-    # Check if user owns this device (or is admin)
-    if device.user_id != current_user.id and current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Access denied")
     
     # Get recent readings
     readings = db.query(SensorReadingModel).filter(
@@ -591,14 +562,10 @@ def get_latest_sensor_reading(
     current_user: UserModel = Depends(get_current_user)
 ):
     """Get the most recent sensor reading for a device"""
-    # Verify device exists and user has access
+    # Verify device exists
     device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
     if not device:
         raise HTTPException(status_code=404, detail="Device not found")
-    
-    # Check if user owns this device (or is admin)
-    if device.user_id != current_user.id and current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Access denied")
     
     # Get latest reading
     reading = db.query(SensorReadingModel).filter(

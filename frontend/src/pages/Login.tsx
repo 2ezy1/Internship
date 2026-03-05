@@ -40,7 +40,7 @@ export default function Login() {
       if (error?.response?.data?.detail) {
         errorMessage = error.response.data.detail
       } else if (error?.response?.status === 403) {
-        errorMessage = 'Access denied. Only authorized accounts can log in.'
+        errorMessage = 'Access denied. Please check your account permissions.'
       } else if (error?.response?.status === 401) {
         errorMessage = 'Wrong credentials. Please check your username and password.'
       }
