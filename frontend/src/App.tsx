@@ -29,6 +29,7 @@ function AppShell() {
             <Route path="/home" element={<Home />} />
             <Route path="/devices/:id" element={<DeviceDetails />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </BrowserRouter>
       </AntApp>
