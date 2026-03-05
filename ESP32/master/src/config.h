@@ -7,44 +7,44 @@
 #define CONFIG_H
 
 // WiFi Configuration
-#define WIFI_SSID "GlobeAtHome_89CB4"
-#define WIFI_PASSWORD "7NNYHN9JHND"
+#define WIFI_SSID "iPhone"
+#define WIFI_PASSWORD "12345678"
 
 // Static IP Configuration
-// Router IP: 192.168.254.254
-#define STATIC_IP_0 192
-#define STATIC_IP_1 168
-#define STATIC_IP_2 254
-#define STATIC_IP_3 111      // Change last octet as needed for multiple devices
+// Server IP: 172.20.10.4
+#define STATIC_IP_0 172
+#define STATIC_IP_1 20
+#define STATIC_IP_2 10
+#define STATIC_IP_3 111      // ESP32 device IP (different from server)
 
-#define GATEWAY_0 192
-#define GATEWAY_1 168
-#define GATEWAY_2 254
-#define GATEWAY_3 254       // Router IP
+#define GATEWAY_0 172
+#define GATEWAY_1 20
+#define GATEWAY_2 10
+#define GATEWAY_3 1          // Gateway/DNS for this subnet
 
 #define SUBNET_0 255
 #define SUBNET_1 255
 #define SUBNET_2 255
 #define SUBNET_3 0
 
-#define PRIMARY_DNS_0 8
-#define PRIMARY_DNS_1 8
-#define PRIMARY_DNS_2 8
-#define PRIMARY_DNS_3 8
+#define PRIMARY_DNS_0 172
+#define PRIMARY_DNS_1 20
+#define PRIMARY_DNS_2 10
+#define PRIMARY_DNS_3 1
 
 #define SECONDARY_DNS_0 8
 #define SECONDARY_DNS_1 8
-#define SECONDARY_DNS_2 4
-#define SECONDARY_DNS_3 4
+#define SECONDARY_DNS_2 8
+#define SECONDARY_DNS_3 8
 
 // Server Configuration
-#define SERVER_IP "192.168.254.110"   // Your computer's static IP on network
+#define SERVER_IP "172.20.10.4"   // Backend server IP on network
 #define SERVER_PORT 8000
 #define SERVER_PATH "/ws/esp32/connect"
 
 // Device Configuration
-#define DEVICE_ID 1                    // Device ID from server
-#define DEVICE_KEY "69ced61b-5521-4ef7-ab17-19a2cdf14af8"  // Generated from server - update this!
+#define DEVICE_ID 1                    // Must match device ID registered in database
+#define DEVICE_KEY "69ced61b-5521-4ef7-ab17-19a2cdf14af8"  // Must match device_key in database
 #define POLL_INTERVAL_MS 1000         // Send sensor data every 1 second
 #define HEARTBEAT_INTERVAL_MS 30000   // Send heartbeat every 30 seconds
 

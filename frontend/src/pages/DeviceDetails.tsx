@@ -16,6 +16,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import '../styles/DeviceDetails.css'
+import { useDeviceRealtime } from '../hooks/useDeviceRealtime'
 
 const { Content } = Layout
 const { Text } = Typography
