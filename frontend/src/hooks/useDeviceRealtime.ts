@@ -14,32 +14,20 @@ export type VFDUpdate = {
   timestamp: string
 }
 
-export type SensorUpdate = {
-  id: number
-  temperature: string | null
-  humidity: string | null
-  pressure: string | null
-  light: string | null
-  motion: string | null
-  distance: string | null
-  custom_data: string | null
-  timestamp: string
-}
-
 export type RealtimeMessage = {
-  type: 'vfd_update' | 'sensor_update' | 'error'
+  type: 'vfd_update'
   device_id: number
-  data?: VFDUpdate | SensorUpdate
+  data?: VFDUpdate
   error?: string
 }
 
 /**
- * Hook to listen for real-time device data updates via WebSocket
+ * Hook to listen for real-time VFD data updates via WebSocket
  * Connects to /ws/device/{deviceId} endpoint on backend
  */
 export function useDeviceRealtime(deviceId: number | string) {
   const [isConnected, setIsConnected] = useState(false)
-  const [lastUpdate, setLastUpdate] = useState<VFDUpdate | SensorUpdate | null>(null)
+  const [lastUpdate, setLastUpdate] = useState<VFDUpdate | null>(null)
   const [error, setError] = useState<string | null>(null)
   const wsRef = useRef<WebSocket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -64,12 +52,12 @@ export function useDeviceRealtime(deviceId: number | string) {
 
     try {
       const wsUrl = getWebSocketUrl()
-      console.log(`🔌 Connecting to device WebSocket: ${wsUrl}`)
+      console.log(`🔌 Connecting to VFD WebSocket: ${wsUrl}`)
       
       wsRef.current = new WebSocket(wsUrl)
 
       wsRef.current.onopen = () => {
-        console.log(`✅ Device WebSocket connected for device ${deviceId}`)
+        console.log(`✅ VFD WebSocket connected for device ${deviceId}`)
         setIsConnected(true)
         setError(null)
         reconnectAttemptsRef.current = 0
@@ -78,9 +66,9 @@ export function useDeviceRealtime(deviceId: number | string) {
       wsRef.current.onmessage = (event) => {
         try {
           const message: RealtimeMessage = JSON.parse(event.data)
-          console.log('📨 Real-time update received:', message)
+          console.log('📨 VFD update received:', message)
           
-          if (message.data) {
+          if (message.type === 'vfd_update' && message.data) {
             setLastUpdate(message.data)
           }
           
@@ -98,7 +86,7 @@ export function useDeviceRealtime(deviceId: number | string) {
       }
 
       wsRef.current.onclose = () => {
-        console.log(`🔌 Device WebSocket closed for device ${deviceId}`)
+        console.log(`🔌 VFD WebSocket closed for device ${deviceId}`)
         setIsConnected(false)
         
         // Attempt to reconnect with exponential backoff

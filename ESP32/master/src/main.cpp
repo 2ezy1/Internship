@@ -11,8 +11,10 @@ bool isConnected = false;
 uint32_t lastDataSendTime = 0;
 uint32_t lastHeartbeatTime = 0;
 uint32_t lastWiFiCheckTime = 0;
+uint32_t lastWebSocketAttemptTime = 0;
 uint16_t reconnectAttempts = 0;
 const uint16_t MAX_RECONNECT_ATTEMPTS = 10;
+const uint32_t WEBSOCKET_RETRY_INTERVAL_MS = 5000;
 
 // VFD data structure
 struct VFDData {
@@ -33,10 +35,12 @@ VFDData vfdData;
 void connectToWiFi();
 void checkWiFiConnection();
 void connectWebSocket();
+bool canReachServer();
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length);
 void sendSensorData();
 void sendHeartbeat();
 void readSensorDataFromSerial2();
+void processVFDJson(const String& jsonPayload);
 void printStatus();
 
 // ==================== Setup ====================
@@ -83,6 +87,11 @@ void loop() {
   
   // WebSocket event handling
   webSocket.loop();
+
+  // If WiFi is connected but WebSocket is down, retry periodically
+  if (WiFi.status() == WL_CONNECTED && !isConnected && (millis() - lastWebSocketAttemptTime > WEBSOCKET_RETRY_INTERVAL_MS)) {
+    connectWebSocket();
+  }
   
   // Read data from Serial2 (slave device)
   if (Serial2.available()) {
@@ -107,6 +116,14 @@ void loop() {
 // ==================== WiFi Functions ====================
 
 void connectToWiFi() {
+  // Reset WiFi state before reconnecting
+  WiFi.mode(WIFI_STA);
+  WiFi.persistent(false);
+  WiFi.setSleep(false);
+  WiFi.setAutoReconnect(true);
+  WiFi.disconnect(true, true);
+  delay(200);
+
   Serial.println("\n📡 Configuring static IP...");
   
   IPAddress local_ip(STATIC_IP_0, STATIC_IP_1, STATIC_IP_2, STATIC_IP_3);
@@ -129,7 +146,6 @@ void connectToWiFi() {
   Serial.printf("  SSID: %s\n", WIFI_SSID);
   
   // Start WiFi connection
-  WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   
   // Wait for connection (max 20 seconds)
@@ -146,9 +162,17 @@ void connectToWiFi() {
     Serial.println("✅ WiFi connected!");
     Serial.print("  Local IP: ");
     Serial.println(WiFi.localIP());
+    Serial.print("  Gateway: ");
+    Serial.println(WiFi.gatewayIP());
+    Serial.print("  DNS: ");
+    Serial.println(WiFi.dnsIP());
     Serial.print("  RSSI: ");
     Serial.print(WiFi.RSSI());
     Serial.println(" dBm");
+
+    if (WiFi.RSSI() <= -85) {
+      Serial.println("⚠️ Very weak WiFi signal detected. Connection may drop frequently.");
+    }
   } else {
     Serial.println("❌ Failed to connect to WiFi");
   }
@@ -156,6 +180,8 @@ void connectToWiFi() {
 
 void checkWiFiConnection() {
   if (WiFi.status() != WL_CONNECTED) {
+    isConnected = false;
+    webSocket.disconnect();
     Serial.println("⚠️  WiFi disconnected - reconnecting...");
     connectToWiFi();
     
@@ -173,6 +199,13 @@ void connectWebSocket() {
     Serial.println("❌ Cannot connect to WebSocket - WiFi not connected");
     return;
   }
+
+  if (!canReachServer()) {
+    Serial.println("❌ Server not reachable from ESP32 static IP (TCP check failed)");
+    return;
+  }
+
+  lastWebSocketAttemptTime = millis();
   
   Serial.println("\n🔌 Connecting to WebSocket...");
   Serial.printf("  Server: %s:%d\n", SERVER_IP, SERVER_PORT);
@@ -184,8 +217,31 @@ void connectWebSocket() {
   wsPath += "&device_key=" + String(DEVICE_KEY);
   
   webSocket.begin(SERVER_IP, SERVER_PORT, wsPath);
+  webSocket.setReconnectInterval(5000);
+  webSocket.enableHeartbeat(15000, 3000, 2);
   
   reconnectAttempts = 0;
+}
+
+bool canReachServer() {
+  WiFiClient testClient;
+  IPAddress serverIp;
+
+  if (!serverIp.fromString(SERVER_IP)) {
+    Serial.println("❌ Invalid SERVER_IP format");
+    return false;
+  }
+
+  Serial.printf("🔎 Checking server reachability: %s:%d ...\n", SERVER_IP, SERVER_PORT);
+  bool ok = testClient.connect(serverIp, SERVER_PORT);
+  if (ok) {
+    Serial.println("✅ Server TCP reachable");
+    testClient.stop();
+    return true;
+  }
+
+  Serial.println("⚠️ Server TCP unreachable (route/firewall/server bind issue)");
+  return false;
 }
 
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
@@ -198,12 +254,10 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
       
       if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
         uint32_t delayMs = min(30000UL, 1000UL * (1 << reconnectAttempts)); // Exponential backoff, max 30s
-        Serial.printf("⏳ Reconnecting in %lu ms (attempt %u/%u)...\n", delayMs, reconnectAttempts, MAX_RECONNECT_ATTEMPTS);
-        delay(delayMs);
-        connectWebSocket();
+        Serial.printf("⏳ Reconnect scheduled by WebSocket client (attempt %u/%u, interval=%lums)...\n", reconnectAttempts, MAX_RECONNECT_ATTEMPTS, delayMs);
       } else {
         Serial.println("❌ Max reconnection attempts reached - will retry later");
-        delay(300000);  // Wait 5 minutes before retrying
+        webSocket.setReconnectInterval(30000);
         reconnectAttempts = 0;
       }
       break;
@@ -212,6 +266,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
     case WStype_CONNECTED: {
       isConnected = true;
       reconnectAttempts = 0;
+      lastWebSocketAttemptTime = millis();
       Serial.println("✅ WebSocket connected!");
       
       // Send initial heartbeat to confirm connection
@@ -330,59 +385,78 @@ void readSensorDataFromSerial2() {
   while (Serial2.available()) {
     char c = Serial2.read();
     buffer += c;
-    
-    // Look for complete JSON message (ends with newline)
-    if (c == '\n') {
-      // Try to parse as JSON
-      StaticJsonDocument<256> doc;
-      DeserializationError error = deserializeJson(doc, buffer);
-      
-      if (!error) {
-        // Extract VFD values
-        vfdData.frequency = doc["frequency"] | 0.0;
-        vfdData.speed = doc["speed"] | 0.0;
-        vfdData.current = doc["current"] | 0.0;
-        vfdData.voltage = doc["voltage"] | 0.0;
-        vfdData.power = doc["power"] | 0.0;
-        vfdData.torque = doc["torque"] | 0.0;
-        vfdData.status = doc["status"] | 0;
-        vfdData.faultCode = doc["faultCode"] | 0;
-        
-        // Always display received data in a clear format
-        Serial.println("\n┌─────────────────────────────────────────┐");
-        Serial.println("│  📥 RECEIVED DATA FROM SLAVE           │");
-        Serial.println("├─────────────────────────────────────────┤");
-        Serial.printf("│  Frequency:  %6.1f Hz                  │\n", vfdData.frequency);
-        Serial.printf("│  Speed:      %7.1f RPM                │\n", vfdData.speed);
-        Serial.printf("│  Current:    %6.1f A                   │\n", vfdData.current);
-        Serial.printf("│  Voltage:    %6.1f V                   │\n", vfdData.voltage);
-        Serial.printf("│  Power:      %6.1f kW                  │\n", vfdData.power);
-        Serial.printf("│  Torque:     %6.1f Nm                  │\n", vfdData.torque);
-        Serial.print("│  Status:     ");
-        switch(vfdData.status) {
-          case 0: Serial.println("STOP                      │"); break;
-          case 1: Serial.println("RUN                       │"); break;
-          case 2: Serial.println("FAULT                     │"); break;
-          case 3: Serial.println("READY                     │"); break;
-          default: Serial.printf("UNKNOWN (%d)              │\n", vfdData.status); break;
-        }
-        if (vfdData.status == 2) {
-          Serial.printf("│  Fault Code: %d                          │\n", vfdData.faultCode);
-        }
-        Serial.println("└─────────────────────────────────────────┘");
-        
-        if (DEBUG_ENABLED) {
-          Serial.print("📄 Raw JSON: ");
-          Serial.println(buffer);
-        }
-      } else {
-        Serial.println("\n⚠️  ERROR: Invalid JSON received from slave");
-        Serial.print("Raw data: ");
-        Serial.println(buffer);
-      }
-      
+
+    // Prevent unbounded growth from noisy UART traffic
+    if (buffer.length() > 512) {
+      Serial.println("⚠️ UART buffer overflow/noise detected, resetting buffer");
+      buffer = "";
+      continue;
+    }
+
+    // Extract complete JSON objects from noisy stream
+    int startIdx = buffer.indexOf('{');
+    int endIdx = buffer.indexOf('}', startIdx >= 0 ? startIdx : 0);
+
+    while (startIdx >= 0 && endIdx > startIdx) {
+      String jsonPayload = buffer.substring(startIdx, endIdx + 1);
+      processVFDJson(jsonPayload);
+      buffer.remove(0, endIdx + 1);
+      startIdx = buffer.indexOf('{');
+      endIdx = buffer.indexOf('}', startIdx >= 0 ? startIdx : 0);
+    }
+
+    // If no JSON start marker exists, clear garbage
+    if (buffer.indexOf('{') < 0 && buffer.length() > 120) {
       buffer = "";
     }
+  }
+}
+
+void processVFDJson(const String& jsonPayload) {
+  StaticJsonDocument<256> doc;
+  DeserializationError error = deserializeJson(doc, jsonPayload);
+
+  if (error) {
+    Serial.println("\n⚠️  ERROR: Invalid JSON received from slave");
+    Serial.print("Raw data: ");
+    Serial.println(jsonPayload);
+    return;
+  }
+
+  vfdData.frequency = doc["frequency"] | 0.0;
+  vfdData.speed = doc["speed"] | 0.0;
+  vfdData.current = doc["current"] | 0.0;
+  vfdData.voltage = doc["voltage"] | 0.0;
+  vfdData.power = doc["power"] | 0.0;
+  vfdData.torque = doc["torque"] | 0.0;
+  vfdData.status = doc["status"] | 0;
+  vfdData.faultCode = doc["faultCode"] | 0;
+
+  Serial.println("\n┌─────────────────────────────────────────┐");
+  Serial.println("│  📥 RECEIVED DATA FROM SLAVE           │");
+  Serial.println("├─────────────────────────────────────────┤");
+  Serial.printf("│  Frequency:  %6.1f Hz                  │\n", vfdData.frequency);
+  Serial.printf("│  Speed:      %7.1f RPM                │\n", vfdData.speed);
+  Serial.printf("│  Current:    %6.1f A                   │\n", vfdData.current);
+  Serial.printf("│  Voltage:    %6.1f V                   │\n", vfdData.voltage);
+  Serial.printf("│  Power:      %6.1f kW                  │\n", vfdData.power);
+  Serial.printf("│  Torque:     %6.1f Nm                  │\n", vfdData.torque);
+  Serial.print("│  Status:     ");
+  switch(vfdData.status) {
+    case 0: Serial.println("STOP                      │"); break;
+    case 1: Serial.println("RUN                       │"); break;
+    case 2: Serial.println("FAULT                     │"); break;
+    case 3: Serial.println("READY                     │"); break;
+    default: Serial.printf("UNKNOWN (%d)              │\n", vfdData.status); break;
+  }
+  if (vfdData.status == 2) {
+    Serial.printf("│  Fault Code: %d                          │\n", vfdData.faultCode);
+  }
+  Serial.println("└─────────────────────────────────────────┘");
+
+  if (DEBUG_ENABLED) {
+    Serial.print("📄 Raw JSON: ");
+    Serial.println(jsonPayload);
   }
 }
 

@@ -11,11 +11,12 @@
 #define WIFI_PASSWORD "12345678"
 
 // Static IP Configuration
-// Server IP: 172.20.10.4
+// Current host hotspot network: 172.20.10.0/28
+// Current server host IP: 172.20.10.6
 #define STATIC_IP_0 172
 #define STATIC_IP_1 20
 #define STATIC_IP_2 10
-#define STATIC_IP_3 111      // ESP32 device IP (different from server)
+#define STATIC_IP_3 10       // ESP32 static IP (must be in same /28 range)
 
 #define GATEWAY_0 172
 #define GATEWAY_1 20
@@ -25,7 +26,7 @@
 #define SUBNET_0 255
 #define SUBNET_1 255
 #define SUBNET_2 255
-#define SUBNET_3 0
+#define SUBNET_3 240         // /28 mask from iPhone hotspot
 
 #define PRIMARY_DNS_0 172
 #define PRIMARY_DNS_1 20
@@ -38,7 +39,7 @@
 #define SECONDARY_DNS_3 8
 
 // Server Configuration
-#define SERVER_IP "172.20.10.4"   // Backend server IP on network
+#define SERVER_IP "172.20.10.6"   // Backend server IP on network (current PC IP)
 #define SERVER_PORT 8000
 #define SERVER_PATH "/ws/esp32/connect"
 

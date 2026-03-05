@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 import json
 import asyncio
 import uuid
+import uvicorn
 from modbus_polling import ModbusPoller
 
 # Create tables
@@ -769,100 +770,66 @@ async def websocket_esp32_handler(websocket: WebSocket, device_id: int, device_k
                 try:
                     sensor_data = message.get("data", {})
                     
-                    # Check if this is VFD data (contains frequency, speed, etc.)
+                    # Only accept VFD data (must contain frequency, speed, etc.)
                     is_vfd_data = any(key in sensor_data for key in ["frequency", "speed", "current", "voltage", "power", "torque"])
                     
-                    if is_vfd_data:
-                        # Create VFD reading record
-                        db_reading = VFDReadingModel(
-                            device_id=device_id,
-                            frequency=str(sensor_data.get("frequency")) if sensor_data.get("frequency") is not None else None,
-                            speed=str(sensor_data.get("speed")) if sensor_data.get("speed") is not None else None,
-                            current=str(sensor_data.get("current")) if sensor_data.get("current") is not None else None,
-                            voltage=str(sensor_data.get("voltage")) if sensor_data.get("voltage") is not None else None,
-                            power=str(sensor_data.get("power")) if sensor_data.get("power") is not None else None,
-                            torque=str(sensor_data.get("torque")) if sensor_data.get("torque") is not None else None,
-                            status=sensor_data.get("status"),
-                            fault_code=sensor_data.get("faultCode"),
-                            custom_data=json.dumps({
-                                "rssi": message.get("rssi"),
-                                "uptime": message.get("uptime"),
-                                "verified": True
-                            })
-                        )
-                        db.add(db_reading)
-                        db.commit()
-                        db.refresh(db_reading)
-                        
-                        print(f"📡 VFD data from device {device_id}: Freq={sensor_data.get('frequency')}Hz, Speed={sensor_data.get('speed')}RPM, Status={sensor_data.get('status')}")
-                        
-                        # Broadcast to all connected frontend clients watching this device
-                        broadcast_message = {
-                            "type": "vfd_update",
-                            "device_id": device_id,
-                            "data": {
-                                "id": db_reading.id,
-                                "frequency": db_reading.frequency,
-                                "speed": db_reading.speed,
-                                "current": db_reading.current,
-                                "voltage": db_reading.voltage,
-                                "power": db_reading.power,
-                                "torque": db_reading.torque,
-                                "status": db_reading.status,
-                                "fault_code": db_reading.fault_code,
-                                "custom_data": db_reading.custom_data,
-                                "timestamp": db_reading.timestamp.isoformat()
-                            }
+                    if not is_vfd_data:
+                        # Reject non-VFD sensor data
+                        print(f"⚠️ Rejected non-VFD sensor data from device {device_id}")
+                        await websocket.send_json({
+                            "status": "error",
+                            "error": "Only VFD data is accepted. Sensor-only data rejected."
+                        })
+                        continue
+                    
+                    # Create VFD reading record
+                    db_reading = VFDReadingModel(
+                        device_id=device_id,
+                        frequency=str(sensor_data.get("frequency")) if sensor_data.get("frequency") is not None else None,
+                        speed=str(sensor_data.get("speed")) if sensor_data.get("speed") is not None else None,
+                        current=str(sensor_data.get("current")) if sensor_data.get("current") is not None else None,
+                        voltage=str(sensor_data.get("voltage")) if sensor_data.get("voltage") is not None else None,
+                        power=str(sensor_data.get("power")) if sensor_data.get("power") is not None else None,
+                        torque=str(sensor_data.get("torque")) if sensor_data.get("torque") is not None else None,
+                        status=sensor_data.get("status"),
+                        fault_code=sensor_data.get("faultCode"),
+                        custom_data=json.dumps({
+                            "rssi": message.get("rssi"),
+                            "uptime": message.get("uptime"),
+                            "verified": True
+                        })
+                    )
+                    db.add(db_reading)
+                    db.commit()
+                    db.refresh(db_reading)
+                    
+                    print(f"📡 VFD data from device {device_id}: Freq={sensor_data.get('frequency')}Hz, Speed={sensor_data.get('speed')}RPM, Status={sensor_data.get('status')}")
+                    
+                    # Broadcast to all connected frontend clients watching this device
+                    broadcast_message = {
+                        "type": "vfd_update",
+                        "device_id": device_id,
+                        "data": {
+                            "id": db_reading.id,
+                            "frequency": db_reading.frequency,
+                            "speed": db_reading.speed,
+                            "current": db_reading.current,
+                            "voltage": db_reading.voltage,
+                            "power": db_reading.power,
+                            "torque": db_reading.torque,
+                            "status": db_reading.status,
+                            "fault_code": db_reading.fault_code,
+                            "custom_data": db_reading.custom_data,
+                            "timestamp": db_reading.timestamp.isoformat()
                         }
-                        await manager.broadcast_to_device(device_id, broadcast_message)
-                        
-                        # Acknowledge to ESP32
-                        await websocket.send_json({"status": "ok", "reading_id": db_reading.id, "type": "vfd"})
-                    else:
-                        # Create sensor reading record (generic sensors)
-                        db_reading = SensorReadingModel(
-                            device_id=device_id,
-                            temperature=str(sensor_data.get("temperature")) if sensor_data.get("temperature") is not None else None,
-                            humidity=str(sensor_data.get("humidity")) if sensor_data.get("humidity") is not None else None,
-                            pressure=str(sensor_data.get("pressure")) if sensor_data.get("pressure") is not None else None,
-                            light=str(sensor_data.get("light")) if sensor_data.get("light") is not None else None,
-                            motion=str(sensor_data.get("motion")) if sensor_data.get("motion") is not None else None,
-                            distance=str(sensor_data.get("distance")) if sensor_data.get("distance") is not None else None,
-                            custom_data=json.dumps({
-                                "rssi": message.get("rssi"),
-                                "uptime": message.get("uptime"),
-                                "verified": True
-                            })
-                        )
-                        db.add(db_reading)
-                        db.commit()
-                        db.refresh(db_reading)
-                        
-                        print(f"📡 Sensor data from device {device_id}: {sensor_data}")
-                        
-                        # Broadcast to all connected frontend clients watching this device
-                        broadcast_message = {
-                            "type": "sensor_update",
-                            "device_id": device_id,
-                            "data": {
-                                "id": db_reading.id,
-                                "temperature": db_reading.temperature,
-                                "humidity": db_reading.humidity,
-                                "pressure": db_reading.pressure,
-                                "light": db_reading.light,
-                                "motion": db_reading.motion,
-                                "distance": db_reading.distance,
-                                "custom_data": db_reading.custom_data,
-                                "timestamp": db_reading.timestamp.isoformat()
-                            }
-                        }
-                        await manager.broadcast_to_device(device_id, broadcast_message)
-                        
-                        # Acknowledge to ESP32
-                        await websocket.send_json({"status": "ok", "reading_id": db_reading.id, "type": "sensor"})
+                    }
+                    await manager.broadcast_to_device(device_id, broadcast_message)
+                    
+                    # Acknowledge to ESP32
+                    await websocket.send_json({"status": "ok", "reading_id": db_reading.id, "type": "vfd"})
                     
                 except Exception as e:
-                    print(f"❌ Error processing sensor data: {e}")
+                    print(f"❌ Error processing VFD data: {e}")
                     import traceback
                     traceback.print_exc()
                     await websocket.send_json({"error": str(e)})
@@ -1017,4 +984,8 @@ def delete_vfd_readings(
     db.commit()
     
     return {"message": f"Deleted {count} VFD readings for device {device_id}"}
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
 
