@@ -2,10 +2,13 @@
 .env
 .env.local
 .env.*.local
+!backend/.env
+backend/.env\ 
 
 # Dependencies
 node_modules/
 backend/venv/
+backend/.venv/
 *.pyc
 __pycache__/
 *.egg-info/
