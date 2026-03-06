@@ -718,39 +718,122 @@ def compute_device_status(device: DeviceModel) -> str:
 # ==================== WebSocket Endpoint: ESP32 Master ====================
 
 @app.websocket("/ws/esp32/connect")
-async def websocket_esp32_handler(websocket: WebSocket, device_id: int, device_key: str, db: Session = Depends(get_db)):
+async def websocket_esp32_handler(
+    websocket: WebSocket,
+    mac_address: str,
+    device_id: Optional[int] = None,
+    device_key: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
     """
-    WebSocket endpoint for ESP32 Master devices to send sensor data.
-    Validates device_key and IP address before accepting connection.
-    Stores sensor readings and broadcasts to connected clients.
+    WebSocket endpoint for ESP32 Master devices with auto-registration.
+
+    Flow:
+    1. Accept WebSocket immediately (so ESP32 always gets a proper response)
+    2. Lookup device by credentials → MAC address → auto-register if new
+    3. Send registration result (success or error) back to ESP32
+    4. ESP32 stores credentials in flash for future reconnects
+    5. Normal heartbeat / VFD data exchange continues
     """
-    
-    # 1. VERIFY DEVICE EXISTS AND KEY MATCHES
-    device = db.query(DeviceModel).filter(
-        DeviceModel.id == device_id,
-        DeviceModel.device_key == device_key
-    ).first()
-    
-    if not device:
-        print(f"❌ ESP32 auth failed: Invalid device ID {device_id} or key")
-        await websocket.close(code=4000, reason="Invalid device or key")
-        return
-    
-    # 2. VERIFY/UPDATE DEVICE IP ADDRESS
-    client_ip = websocket.client.host
-    if client_ip != device.ip_address:
-        print(f"⚠️ IP mismatch for device {device_id}: {client_ip} vs {device.ip_address} - updating stored IP")
-        device.ip_address = client_ip
-        db.commit()
-    
-    # 3. ACCEPT CONNECTION & SET ONLINE
+
+    # 1. ACCEPT WEBSOCKET FIRST so the ESP32 always receives a clean response
     await websocket.accept()
+
+    client_ip = websocket.client.host
+    device = None
+    is_new_device = False
+
+    # 2. TRY TO FIND DEVICE BY EXISTING CREDENTIALS
+    if device_id and device_key:
+        device = db.query(DeviceModel).filter(
+            DeviceModel.id == device_id,
+            DeviceModel.device_key == device_key
+        ).first()
+
+        if device:
+            # Keep MAC address in sync
+            if device.mac_address != mac_address:
+                print(f"⚠️ MAC updated for device {device_id}: {device.mac_address} -> {mac_address}")
+                device.mac_address = mac_address
+                db.commit()
+
+    # 3. IF NOT FOUND BY CREDENTIALS, TRY BY MAC ADDRESS
+    if not device:
+        device = db.query(DeviceModel).filter(DeviceModel.mac_address == mac_address).first()
+        if device:
+            print(f"ℹ️ Device found by MAC: {mac_address} -> Device ID {device.id}")
+
+    # 4. IF STILL NOT FOUND, AUTO-REGISTER NEW DEVICE
+    if not device:
+        mac_suffix = mac_address.replace(":", "")[-6:].upper()
+        device_name = f"RS485_Master_{mac_suffix}"
+
+        try:
+            device = DeviceModel(
+                device_name=device_name,
+                ip_address=client_ip,
+                type="RS485",
+                mac_address=mac_address,
+                device_key=str(uuid.uuid4()),
+                is_online=False,
+                user_id=None
+            )
+            db.add(device)
+            db.commit()
+            db.refresh(device)
+            is_new_device = True
+            print(f"🆕 Auto-registered new device: name={device_name}, MAC={mac_address}, IP={client_ip}, ID={device.id}")
+
+        except IntegrityError:
+            # IP address already taken by another device — find it and adopt it
+            db.rollback()
+            device = db.query(DeviceModel).filter(DeviceModel.ip_address == client_ip).first()
+            if device:
+                # Assign this MAC to the existing record if it has none
+                if not device.mac_address:
+                    device.mac_address = mac_address
+                if not device.device_key:
+                    device.device_key = str(uuid.uuid4())
+                db.commit()
+                db.refresh(device)
+                print(f"ℹ️ Reused existing device ID {device.id} for IP {client_ip}")
+            else:
+                await websocket.send_json({
+                    "type": "registration",
+                    "status": "error",
+                    "message": "Registration failed: IP address conflict and device not recoverable."
+                })
+                await websocket.close(code=4001)
+                return
+
+    # 5. KEEP IP ADDRESS IN SYNC
+    if device.ip_address != client_ip:
+        print(f"⚠️ IP updated for device {device.id}: {device.ip_address} -> {client_ip}")
+        device.ip_address = client_ip
+
+    # 6. MARK DEVICE ONLINE
     device.is_online = True
     device.last_heartbeat = datetime.utcnow()
     db.commit()
-    print(f"✅ ESP32 device {device_id} connected from {client_ip}")
+
+    # 7. SEND CREDENTIALS BACK TO ESP32
+    registration_response = {
+        "type": "registration",
+        "status": "success",
+        "device_id": device.id,
+        "device_key": device.device_key,
+        "device_name": device.device_name,
+        "is_new_device": is_new_device,
+        "message": "Device registered successfully" if is_new_device else "Device authenticated"
+    }
+    await websocket.send_json(registration_response)
+
+    if is_new_device:
+        print(f"✅ New ESP32 device {device.id} ({device.device_name}) registered from {client_ip}")
+    else:
+        print(f"✅ ESP32 device {device.id} ({device.device_name}) authenticated from {client_ip}")
     
-    # 4. LISTEN FOR MESSAGES
+    # 7. LISTEN FOR MESSAGES
     try:
         while True:
             message = await websocket.receive_json()
@@ -760,7 +843,7 @@ async def websocket_esp32_handler(websocket: WebSocket, device_id: int, device_k
                 # Update last heartbeat timestamp
                 device.last_heartbeat = datetime.utcnow()
                 db.commit()
-                print(f"💖 Heartbeat from device {device_id}: RSSI={message.get('rssi', 'N/A')}")
+                print(f"💖 Heartbeat from device {device.id}: RSSI={message.get('rssi', 'N/A')}")
                 
                 # Send acknowledgment
                 await websocket.send_json({"status": "ok", "type": "heartbeat_ack"})
@@ -775,7 +858,7 @@ async def websocket_esp32_handler(websocket: WebSocket, device_id: int, device_k
                     
                     if not is_vfd_data:
                         # Reject non-VFD sensor data
-                        print(f"⚠️ Rejected non-VFD sensor data from device {device_id}")
+                        print(f"⚠️ Rejected non-VFD sensor data from device {device.id}")
                         await websocket.send_json({
                             "status": "error",
                             "error": "Only VFD data is accepted. Sensor-only data rejected."
@@ -784,7 +867,7 @@ async def websocket_esp32_handler(websocket: WebSocket, device_id: int, device_k
                     
                     # Create VFD reading record
                     db_reading = VFDReadingModel(
-                        device_id=device_id,
+                        device_id=device.id,
                         frequency=str(sensor_data.get("frequency")) if sensor_data.get("frequency") is not None else None,
                         speed=str(sensor_data.get("speed")) if sensor_data.get("speed") is not None else None,
                         current=str(sensor_data.get("current")) if sensor_data.get("current") is not None else None,
@@ -803,12 +886,12 @@ async def websocket_esp32_handler(websocket: WebSocket, device_id: int, device_k
                     db.commit()
                     db.refresh(db_reading)
                     
-                    print(f"📡 VFD data from device {device_id}: Freq={sensor_data.get('frequency')}Hz, Speed={sensor_data.get('speed')}RPM, Status={sensor_data.get('status')}")
+                    print(f"📡 VFD data from device {device.id}: Freq={sensor_data.get('frequency')}Hz, Speed={sensor_data.get('speed')}RPM, Status={sensor_data.get('status')}")
                     
                     # Broadcast to all connected frontend clients watching this device
                     broadcast_message = {
                         "type": "vfd_update",
-                        "device_id": device_id,
+                        "device_id": device.id,
                         "data": {
                             "id": db_reading.id,
                             "frequency": db_reading.frequency,
@@ -823,7 +906,7 @@ async def websocket_esp32_handler(websocket: WebSocket, device_id: int, device_k
                             "timestamp": db_reading.timestamp.isoformat()
                         }
                     }
-                    await manager.broadcast_to_device(device_id, broadcast_message)
+                    await manager.broadcast_to_device(device.id, broadcast_message)
                     
                     # Acknowledge to ESP32
                     await websocket.send_json({"status": "ok", "reading_id": db_reading.id, "type": "vfd"})
@@ -841,7 +924,7 @@ async def websocket_esp32_handler(websocket: WebSocket, device_id: int, device_k
     except WebSocketDisconnect:
         device.is_online = False
         db.commit()
-        print(f"🔌 ESP32 device {device_id} disconnected")
+        print(f"🔌 ESP32 device {device.id} disconnected")
     except Exception as e:
         print(f"⚠️ ESP32 WebSocket error: {e}")
         device.is_online = False

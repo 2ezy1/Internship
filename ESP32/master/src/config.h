@@ -1,6 +1,8 @@
 /*
- * Configuration Header for ESP32 Master WebSocket
+ * Configuration Header for ESP32 Master WebSocket with Auto-Registration
  * Set these values based on your network and server setup
+ * 
+ * NOTE: No device_id or device_key needed - these are auto-generated!
  */
 
 #ifndef CONFIG_H
@@ -39,13 +41,15 @@
 #define SECONDARY_DNS_3 8
 
 // Server Configuration
-#define SERVER_IP "172.20.10.6"   // Backend server IP on network (current PC IP)
+#define SERVER_IP "172.20.10.4"   // Backend server IP on network (current PC IP)
 #define SERVER_PORT 8000
 #define SERVER_PATH "/ws/esp32/connect"
 
 // Device Configuration
-#define DEVICE_ID 1                    // Must match device ID registered in database
-#define DEVICE_KEY "69ced61b-5521-4ef7-ab17-19a2cdf14af8"  // Must match device_key in database
+// NO MANUAL DEVICE_ID OR DEVICE_KEY NEEDED - AUTO-REGISTERED!
+// The server will automatically register this ESP32 using its MAC address
+// and return credentials that will be saved in flash memory (Preferences)
+
 #define POLL_INTERVAL_MS 1000         // Send sensor data every 1 second
 #define HEARTBEAT_INTERVAL_MS 30000   // Send heartbeat every 30 seconds
 

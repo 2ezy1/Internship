@@ -2,12 +2,15 @@
 #include <WiFi.h>
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
+#include <Preferences.h>
 #include "config.h"
 
 // ==================== Global Variables ====================
 
 WebSocketsClient webSocket;
+Preferences preferences;
 bool isConnected = false;
+bool isRegistered = false;
 uint32_t lastDataSendTime = 0;
 uint32_t lastHeartbeatTime = 0;
 uint32_t lastWiFiCheckTime = 0;
@@ -15,6 +18,12 @@ uint32_t lastWebSocketAttemptTime = 0;
 uint16_t reconnectAttempts = 0;
 const uint16_t MAX_RECONNECT_ATTEMPTS = 10;
 const uint32_t WEBSOCKET_RETRY_INTERVAL_MS = 5000;
+
+// Device credentials (loaded from Preferences or received from server)
+String deviceMAC = "";
+int deviceID = 0;
+String deviceKey = "";
+String deviceName = "";
 
 // VFD data structure
 struct VFDData {
@@ -34,14 +43,18 @@ VFDData vfdData;
 
 void connectToWiFi();
 void checkWiFiConnection();
+void loadCredentials();
+void saveCredentials();
 void connectWebSocket();
 bool canReachServer();
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length);
+void handleRegistrationResponse(JsonDocument& doc);
 void sendSensorData();
 void sendHeartbeat();
 void readSensorDataFromSerial2();
 void processVFDJson(const String& jsonPayload);
 void printStatus();
+String getMACAddress();
 
 // ==================== Setup ====================
 
@@ -53,18 +66,36 @@ void setup() {
   Serial.println("\n\n");
   Serial.println("=====================================");
   Serial.println("ESP32 Master WebSocket - Starting");
+  Serial.println("   AUTO-REGISTRATION ENABLED");
   Serial.println("=====================================");
-  Serial.printf("Device ID: %d\n", DEVICE_ID);
-  Serial.printf("Server: %s:%d\n", SERVER_IP, SERVER_PORT);
-  Serial.println();
   
   // Initialize Serial2 for UART communication with slave
   Serial2.begin(UART_BAUD, SERIAL_8N1, RX_PIN, TX_PIN);
   Serial.printf("Serial2 initialized: BAUD=%d, RX=GPIO%d, TX=GPIO%d\n", UART_BAUD, RX_PIN, TX_PIN);
   
-  // Connect to WiFi with static IP
+  // Connect to WiFi with static IP (sets STA mode first)
   connectToWiFi();
+
+  // Get MAC address AFTER WiFi is in STA mode so we read the correct STA MAC
+  deviceMAC = getMACAddress();
+  Serial.printf("MAC Address: %s\n", deviceMAC.c_str());
+
+  // Load stored credentials from Preferences
+  loadCredentials();
   
+  if (deviceID > 0 && deviceKey.length() > 0) {
+    Serial.println("✅ Stored credentials found");
+    Serial.printf("   Device ID: %d\n", deviceID);
+    Serial.printf("   Device Key: %s\n", deviceKey.c_str());
+    isRegistered = true;
+  } else {
+    Serial.println("ℹ️  No stored credentials - will auto-register with server");
+    isRegistered = false;
+  }
+  
+  Serial.printf("Server: %s:%d\n", SERVER_IP, SERVER_PORT);
+  Serial.println();
+
   // Setup WebSocket callbacks
   webSocket.onEvent(webSocketEvent);
   
@@ -209,12 +240,20 @@ void connectWebSocket() {
   
   Serial.println("\n🔌 Connecting to WebSocket...");
   Serial.printf("  Server: %s:%d\n", SERVER_IP, SERVER_PORT);
-  Serial.printf("  Path: %s?device_id=%d&device_key=%s\n", SERVER_PATH, DEVICE_ID, DEVICE_KEY);
   
-  // Build WebSocket URL with device authentication
+  // Build WebSocket URL with MAC address (required) and optional credentials
   String wsPath = String(SERVER_PATH);
-  wsPath += "?device_id=" + String(DEVICE_ID);
-  wsPath += "&device_key=" + String(DEVICE_KEY);
+  wsPath += "?mac_address=" + deviceMAC;
+  
+  if (isRegistered && deviceID > 0 && deviceKey.length() > 0) {
+    // Include stored credentials for authentication
+    wsPath += "&device_id=" + String(deviceID);
+    wsPath += "&device_key=" + deviceKey;
+    Serial.printf("  Authenticating with device_id=%d\n", deviceID);
+  } else {
+    // First time connection - will auto-register
+    Serial.println("  Requesting auto-registration");
+  }
   
   webSocket.begin(SERVER_IP, SERVER_PORT, wsPath);
   webSocket.setReconnectInterval(5000);
@@ -267,11 +306,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
       isConnected = true;
       reconnectAttempts = 0;
       lastWebSocketAttemptTime = millis();
-      Serial.println("✅ WebSocket connected!");
-      
-      // Send initial heartbeat to confirm connection
-      sendHeartbeat();
-      lastHeartbeatTime = millis();
+      Serial.println("✅ WebSocket connected - waiting for registration response...");
       break;
     }
     
@@ -281,12 +316,17 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
       Serial.printf("📨 Server response: %s\n", text.c_str());
       
       // Handle JSON responses
-      StaticJsonDocument<200> doc;
+      StaticJsonDocument<512> doc;
       DeserializationError error = deserializeJson(doc, text);
       
       if (!error) {
+        String msgType = doc["type"] | "";
         String status = doc["status"] | "";
-        if (status == "ok") {
+        
+        if (msgType == "registration") {
+          // Handle registration/authentication response
+          handleRegistrationResponse(doc);
+        } else if (status == "ok") {
           // Data acknowledged by server
           if (DEBUG_ENABLED) {
             Serial.println("✅ Data acknowledged by server");
@@ -310,15 +350,15 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
 // ==================== Data Transmission Functions ====================
 
 void sendHeartbeat() {
-  if (!isConnected) {
+  if (!isConnected || !isRegistered) {
     return;
   }
   
   // Create JSON heartbeat message
   StaticJsonDocument<256> doc;
   doc["type"] = "heartbeat";
-  doc["device_id"] = DEVICE_ID;
-  doc["device_key"] = DEVICE_KEY;
+  doc["device_id"] = deviceID;
+  doc["device_key"] = deviceKey;
   doc["timestamp"] = String(millis());
   doc["rssi"] = WiFi.RSSI();
   doc["uptime"] = millis();
@@ -337,15 +377,15 @@ void sendHeartbeat() {
 }
 
 void sendSensorData() {
-  if (!isConnected) {
+  if (!isConnected || !isRegistered) {
     return;
   }
   
   // Create JSON sensor data message
   StaticJsonDocument<356> doc;
   doc["type"] = "sensor_data";
-  doc["device_id"] = DEVICE_ID;
-  doc["device_key"] = DEVICE_KEY;
+  doc["device_id"] = deviceID;
+  doc["device_key"] = deviceKey;
   doc["timestamp"] = String(millis());
   doc["rssi"] = WiFi.RSSI();
   doc["uptime"] = millis();
@@ -478,6 +518,15 @@ void printStatus() {
   Serial.print("WebSocket: ");
   Serial.println(isConnected ? "Connected" : "Disconnected");
   
+  Serial.print("Registration: ");
+  if (isRegistered) {
+    Serial.print("Registered (ID=");
+    Serial.print(deviceID);
+    Serial.println(")");
+  } else {
+    Serial.println("Not registered");
+  }
+  
   Serial.print("Latest VFD Data: ");
   Serial.print("Freq=");
   Serial.print(vfdData.frequency);
@@ -485,5 +534,102 @@ void printStatus() {
   Serial.print(vfdData.speed);
   Serial.print(" RPM, Status=");
   Serial.println(vfdData.status);
+}
+
+String getMACAddress() {
+  uint8_t mac[6];
+  WiFi.macAddress(mac);
+  
+  char macStr[18];
+  snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X",
+           mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  
+  return String(macStr);
+}
+
+// ==================== Credentials Management ====================
+
+void loadCredentials() {
+  preferences.begin("esp32_device", true); // true = read-only
+
+  deviceID  = preferences.getInt("device_id", 0);
+  deviceKey = preferences.getString("device_key", "");
+  deviceName = preferences.getString("device_name", "");
+  
+  preferences.end();
+  
+  if (DEBUG_ENABLED && deviceID > 0) {
+    Serial.println("📂 Loaded credentials from Preferences");
+  }
+}
+
+void saveCredentials() {
+  preferences.begin("esp32_device", false); // false = read-write
+  
+  preferences.putInt("device_id", deviceID);
+  preferences.putString("device_key", deviceKey);
+  preferences.putString("device_name", deviceName);
+  
+  preferences.end();
+  
+  Serial.println("💾 Credentials saved to Preferences");
+  Serial.printf("   Device ID: %d\n", deviceID);
+  Serial.printf("   Device Name: %s\n", deviceName.c_str());
+}
+
+void handleRegistrationResponse(JsonDocument& doc) {
+  String status = doc["status"] | "";
+  
+  if (status == "success") {
+    // Extract credentials from server response
+    int newDeviceID = doc["device_id"] | 0;
+    String newDeviceKey = doc["device_key"] | "";
+    String newDeviceName = doc["device_name"] | "";
+    bool isNewDevice = doc["is_new_device"] | false;
+    String message = doc["message"] | "";
+    
+    Serial.println("\n┌─────────────────────────────────────────┐");
+    if (isNewDevice) {
+      Serial.println("│  🆕 DEVICE AUTO-REGISTERED             │");
+    } else {
+      Serial.println("│  ✅ DEVICE AUTHENTICATED               │");
+    }
+    Serial.println("├─────────────────────────────────────────┤");
+    Serial.printf("│  Device ID:   %-24d │\n", newDeviceID);
+    Serial.printf("│  Device Name: %-24s │\n", newDeviceName.c_str());
+    Serial.printf("│  MAC Address: %-24s │\n", deviceMAC.c_str());
+    Serial.println("└─────────────────────────────────────────┘\n");
+    
+    // Update stored credentials
+    bool needsSave = false;
+    if (deviceID != newDeviceID || deviceKey != newDeviceKey || deviceName != newDeviceName) {
+      deviceID = newDeviceID;
+      deviceKey = newDeviceKey;
+      deviceName = newDeviceName;
+      needsSave = true;
+    }
+    
+    // Save to Preferences if credentials changed
+    if (needsSave || isNewDevice) {
+      saveCredentials();
+    }
+    
+    isRegistered = true;
+    
+    // Now send initial heartbeat
+    Serial.println("📡 Sending initial heartbeat...");
+    sendHeartbeat();
+    lastHeartbeatTime = millis();
+    
+  } else {
+    Serial.println("❌ Registration failed:");
+    String message = doc["message"] | "Unknown error";
+    Serial.println(message);
+    
+    // Clear invalid credentials
+    deviceID = 0;
+    deviceKey = "";
+    isRegistered = false;
+  }
 }
 
