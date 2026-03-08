@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Form, Input, Button, Card, message, Alert } from 'antd'
+import { Form, Input, Button, message, Alert } from 'antd'
 import {
   UserOutlined,
   LockOutlined,
@@ -54,86 +54,78 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      <div className="login-surface" aria-hidden="true" />
-      <Card className="login-card">
-        <div className="brand-tag">Industrial Monitoring Suite</div>
+      <div className="login-panel">
+        <div className="login-left">
+          <h1 className="login-title">Sign In</h1>
 
-        <div className="login-header">
-          <p className="login-kicker">Secure Access Portal</p>
-          <h1>Device Management System</h1>
-          <p className="login-subtitle">Sign in to continue to your operational dashboard</p>
-        </div>
-
-        {error && (
-          <Alert
-            message={error}
-            type="error"
-            showIcon
-            closable
-            onClose={() => setError(null)}
-            className="login-alert"
-          />
-        )}
-
-        <Form form={form} onFinish={onFinish} layout="vertical" className="login-form">
-          <Form.Item
-            name="username"
-            label={<span className="form-label">Username</span>}
-            rules={[{ required: true, message: 'Please enter username' }]}
-            className="form-item"
-          >
-            <Input
-              prefix={<UserOutlined style={{ color: '#7f93b8' }} />}
-              placeholder="Enter your username"
-              size="large"
-              className="login-input"
-              autoComplete="username"
-              allowClear
+          {error && (
+            <Alert
+              message={error}
+              type="error"
+              showIcon
+              closable
+              onClose={() => setError(null)}
+              className="login-alert"
             />
-          </Form.Item>
+          )}
 
-          <Form.Item
-            name="password"
-            label={<span className="form-label">Password</span>}
-            rules={[{ required: true, message: 'Please enter password' }]}
-            className="form-item"
-          >
-            <Input.Password
-              prefix={<LockOutlined style={{ color: '#7f93b8' }} />}
-              placeholder="Enter your password"
-              size="large"
-              className="login-input"
-              autoComplete="current-password"
-              iconRender={(visible) =>
-                visible ? (
-                  <EyeOutlined style={{ color: '#89a0c8' }} />
-                ) : (
-                  <EyeInvisibleOutlined style={{ color: '#89a0c8' }} />
-                )
-              }
-            />
-          </Form.Item>
-
-          <Form.Item className="button-item">
-            <Button
-              type="primary"
-              htmlType="submit"
-              block
-              size="large"
-              loading={loading}
-              className="login-button"
+          <Form form={form} onFinish={onFinish} className="login-form">
+            <Form.Item
+              name="username"
+              rules={[{ required: true, message: 'Please enter username' }]}
+              className="form-item"
             >
-              Sign In
-            </Button>
-          </Form.Item>
-        </Form>
+              <Input
+                prefix={<UserOutlined />}
+                placeholder="Username"
+                size="large"
+                className="login-input"
+                autoComplete="username"
+                allowClear
+              />
+            </Form.Item>
 
-        <div className="login-meta">
-          <span>Authorized users only</span>
-          <span className="meta-dot" aria-hidden="true" />
-          <span>Encrypted session</span>
+            <Form.Item
+              name="password"
+              rules={[{ required: true, message: 'Please enter password' }]}
+              className="form-item"
+            >
+              <Input.Password
+                placeholder="Password"
+                size="large"
+                className="login-input"
+                autoComplete="current-password"
+                iconRender={(visible) =>
+                  visible ? (
+                    <EyeOutlined />
+                  ) : (
+                    <EyeInvisibleOutlined />
+                  )
+                }
+                prefix={<LockOutlined />}
+              />
+            </Form.Item>
+
+            <Form.Item className="button-item">
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                size="large"
+                loading={loading}
+                className="login-button"
+              >
+                Login
+              </Button>
+            </Form.Item>
+          </Form>
+
         </div>
-      </Card>
+
+        <div className="login-right">
+          <h2>WELCOME</h2>
+        </div>
+      </div>
     </div>
   )
 }

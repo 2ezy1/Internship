@@ -403,13 +403,6 @@ export default function Home() {
     navigate(`/devices/${device.key}`, { state: { device } })
   }
 
-  const totalDevices = devices.length
-  const activeDevices = devices.filter((device) => device.status === 'Online').length
-  const installsThisMonth = devices.filter((device) => {
-    if (!device.dateInstalled) return false
-    return dayjs(device.dateInstalled).isSame(dayjs(), 'month')
-  }).length
-
   const runtimeLabels = useMemo(() => {
     const labels: string[] = []
     for (let i = 29; i >= 0; i -= 1) {
@@ -545,30 +538,6 @@ export default function Home() {
 
       <Content className="home-content">
         <div className="content-container">
-          <div className="dashboard-hero">
-            <div className="hero-copy">
-              <div className="eyebrow">Monitoring</div>
-              <h2>Device monitoring.</h2>
-            </div>
-            <div className="hero-metrics">
-              <div className="metric-card">
-                <div className="metric-title">Total devices</div>
-                <div className="metric-value">{totalDevices}</div>
-                <div className="metric-sub">Active: {activeDevices}</div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-title">Installs this month</div>
-                <div className="metric-value">{installsThisMonth}</div>
-                <div className="metric-sub">New deployments</div>
-              </div>
-              <div className="metric-card">
-                <div className="metric-title">Uptime</div>
-                <div className="metric-value">{totalDevices ? Math.round((activeDevices / totalDevices) * 100) : 0}%</div>
-                <div className="metric-sub">Last 30 days</div>
-              </div>
-            </div>
-          </div>
-
           <Card
             title="Devices"
             extra={

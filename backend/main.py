@@ -37,6 +37,12 @@ MODBUS_REGISTER_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "frontend", "public", "vfd_brand_model_registers.json")
 )
 
+# Static ESP32 test device configuration (kept in sync with ESP32 firmware)
+TEST_ESP32_DEVICE_ID = 1
+TEST_ESP32_DEVICE_NAME = "Testing"
+TEST_ESP32_DEVICE_IP = "172.20.10.10"
+TEST_ESP32_DEVICE_KEY = "69ced61b-5521-4ef7-ab17-19a2cdf14af8"
+
 # JWT Configuration
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
@@ -188,6 +194,61 @@ def ensure_default_user():
     )
     poller.start()
     app.state.modbus_poller = poller
+
+
+@app.on_event("startup")
+def ensure_testing_device():
+    """
+    Ensure a static ESP32 test device exists with a predictable name so it
+    always appears in the frontend as 'Testing' and matches the ESP32 config.
+    """
+    db = next(get_db())
+    try:
+        # Prefer assigning the device to the BITSOJT admin if available
+        owner = db.query(UserModel).filter(UserModel.username == "BITSOJT").first()
+        if not owner:
+            owner = db.query(UserModel).first()
+
+        device = db.query(DeviceModel).filter(DeviceModel.id == TEST_ESP32_DEVICE_ID).first()
+
+        if device:
+            updated = False
+            if device.device_name != TEST_ESP32_DEVICE_NAME:
+                device.device_name = TEST_ESP32_DEVICE_NAME
+                updated = True
+            if device.ip_address != TEST_ESP32_DEVICE_IP:
+                device.ip_address = TEST_ESP32_DEVICE_IP
+                updated = True
+            if device.device_key != TEST_ESP32_DEVICE_KEY:
+                device.device_key = TEST_ESP32_DEVICE_KEY
+                updated = True
+            if owner and device.user_id != owner.id:
+                device.user_id = owner.id
+                updated = True
+
+            if updated:
+                db.commit()
+                print(f"✅ Updated test ESP32 device {TEST_ESP32_DEVICE_ID} -> name='{TEST_ESP32_DEVICE_NAME}'")
+            else:
+                print(f"ℹ️  Test ESP32 device {TEST_ESP32_DEVICE_ID} already up to date")
+        else:
+            # Create the test device if it does not exist
+            new_device = DeviceModel(
+                id=TEST_ESP32_DEVICE_ID,
+                device_name=TEST_ESP32_DEVICE_NAME,
+                ip_address=TEST_ESP32_DEVICE_IP,
+                type="ESP32_Master",
+                user_id=owner.id if owner else None,
+                device_key=TEST_ESP32_DEVICE_KEY,
+                is_online=False,
+            )
+            db.add(new_device)
+            db.commit()
+            print(f"✅ Created test ESP32 device {TEST_ESP32_DEVICE_ID} with name='{TEST_ESP32_DEVICE_NAME}'")
+    except Exception as e:
+        print(f"⚠️ Failed to ensure test ESP32 device: {e}")
+    finally:
+        db.close()
 
 
 @app.on_event("shutdown")

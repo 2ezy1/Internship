@@ -45,10 +45,12 @@ npm run dev
 
 ## 🌐 Step 3: Access the Application
 
-1. Open your browser and go to: **http://localhost:5173**
-2. Login with demo credentials:
-   - **Username:** admin
-   - **Password:** password
+1. Open your browser and go to:
+   - **From the same machine as the server:** http://localhost:5173
+   - **From another machine (e.g. Windows host):** http://172.20.10.4:5173 (use the VM’s IP if different)
+2. Log in with one of these credentials:
+   - **User:** `user` / `user123`
+   - **Admin:** `BITSOJT` / `BITS2026`
 
 ---
 
@@ -176,5 +178,5 @@ Base URL: `http://192.168.1.100:8000`
 
 - The app uses SQLite by default (no database setup required)
 - CORS is enabled to allow frontend requests from localhost
-- Demo credentials: **admin / password**
+- Log in with **user** / **user123** (user) or **BITSOJT** / **BITS2026** (admin). See `backend/ACCOUNTS.md` for details.
 - All data is stored in `server/dev.db`
