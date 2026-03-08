@@ -83,13 +83,25 @@ void setup() {
   // Load stored credentials from Preferences
   loadCredentials();
   
-  if (deviceID > 0 && deviceKey.length() > 0) {
-    Serial.println("✅ Stored credentials found");
-    Serial.printf("   Device ID: %d\n", deviceID);
-    Serial.printf("   Device Key: %s\n", deviceKey.c_str());
+  // If no stored credentials but static credentials are defined in config.h, use them
+  // so this ESP32 connects as the "Testing" device (id=1) and data shows in the frontend
+  #if defined(DEVICE_ID) && defined(DEVICE_KEY) && DEVICE_ID > 0
+  if (deviceID <= 0 || deviceKey.length() == 0) {
+    deviceID = DEVICE_ID;
+    deviceKey = String(DEVICE_KEY);
     isRegistered = true;
+    Serial.println("✅ Using static credentials from config.h (Testing device)");
+    Serial.printf("   Device ID: %d\n", deviceID);
+  }
+  #endif
+  
+  if (deviceID > 0 && deviceKey.length() > 0) {
+    if (!isRegistered) {
+      isRegistered = true;
+    }
+    Serial.printf("   Device ID: %d, Key: %s\n", deviceID, deviceKey.c_str());
   } else {
-    Serial.println("ℹ️  No stored credentials - will auto-register with server");
+    Serial.println("ℹ️  No credentials - will auto-register with server");
     isRegistered = false;
   }
   
