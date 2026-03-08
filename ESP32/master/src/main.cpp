@@ -55,6 +55,7 @@ void readSensorDataFromSerial2();
 void processVFDJson(const String& jsonPayload);
 void printStatus();
 String getMACAddress();
+String urlEncode(const String& value);
 
 // ==================== Setup ====================
 
@@ -253,19 +254,20 @@ void connectWebSocket() {
   Serial.println("\n🔌 Connecting to WebSocket...");
   Serial.printf("  Server: %s:%d\n", SERVER_IP, SERVER_PORT);
   
-  // Build WebSocket URL with MAC address (required) and optional credentials
+  // Build WebSocket path: mac_address must be URL-encoded (colons break some servers)
+  String macEncoded = urlEncode(deviceMAC);
   String wsPath = String(SERVER_PATH);
-  wsPath += "?mac_address=" + deviceMAC;
+  wsPath += "?mac_address=" + macEncoded;
   
   if (isRegistered && deviceID > 0 && deviceKey.length() > 0) {
-    // Include stored credentials for authentication
     wsPath += "&device_id=" + String(deviceID);
     wsPath += "&device_key=" + deviceKey;
     Serial.printf("  Authenticating with device_id=%d\n", deviceID);
   } else {
-    // First time connection - will auto-register
     Serial.println("  Requesting auto-registration");
   }
+  
+  Serial.printf("  Path: %s\n", wsPath.c_str());
   
   webSocket.begin(SERVER_IP, SERVER_PORT, wsPath);
   webSocket.setReconnectInterval(5000);
@@ -559,6 +561,24 @@ String getMACAddress() {
   return String(macStr);
 }
 
+// URL-encode string for query params (colons in MAC break some WebSocket handshakes)
+String urlEncode(const String& value) {
+  String encoded = "";
+  for (unsigned int i = 0; i < value.length(); i++) {
+    char c = value[i];
+    if (c == ':') {
+      encoded += "%3A";
+    } else if (c == '&') {
+      encoded += "%26";
+    } else if (c == '=') {
+      encoded += "%3D";
+    } else {
+      encoded += c;
+    }
+  }
+  return encoded;
+}
+
 // ==================== Credentials Management ====================
 
 void loadCredentials() {
@@ -628,10 +648,13 @@ void handleRegistrationResponse(JsonDocument& doc) {
     
     isRegistered = true;
     
-    // Now send initial heartbeat
+    // Send initial data so server has activity immediately
     Serial.println("📡 Sending initial heartbeat...");
     sendHeartbeat();
     lastHeartbeatTime = millis();
+    Serial.println("📡 Sending initial sensor data...");
+    sendSensorData();
+    lastDataSendTime = millis();
     
   } else {
     Serial.println("❌ Registration failed:");
