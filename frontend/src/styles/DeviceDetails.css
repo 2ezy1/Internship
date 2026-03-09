@@ -403,16 +403,17 @@
 
 .modbus-register-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 10px;
-  margin-top: 6px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px 20px;
+  margin-top: 0;
 }
 
 .modbus-register-section-title {
   color: #94a3b8;
   font-size: 12px;
   font-weight: 700;
-  margin-top: 10px;
+  margin-top: 0;
+  margin-bottom: 14px;
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
@@ -420,8 +421,8 @@
 .modbus-register-card {
   border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.28);
-  padding: 10px 12px;
-  min-height: 82px;
+  padding: 14px 16px;
+  min-height: 88px;
   display: flex;
   align-items: center;
 }
@@ -445,25 +446,27 @@
 .modbus-register-meta {
   width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
 }
 
 .modbus-register-address {
   color: #94a3b8;
   font-size: 11px;
-  margin-top: 2px;
+  margin-top: 0;
 }
 
 .modbus-register-value {
   color: #f8fafc;
   font-family: Consolas, 'Courier New', monospace;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   line-height: 1.2;
   white-space: nowrap;
-  text-align: right;
+  text-align: left;
+  margin-top: 4px;
 }
 
 @media (max-width: 1280px) {

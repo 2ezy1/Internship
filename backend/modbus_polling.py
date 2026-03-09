@@ -1,22 +1,29 @@
 import json
-import os
 import threading
 import time
+from datetime import datetime
 from typing import Dict, List, Optional
 
 import serial
 from sqlalchemy.orm import Session
 
 from database import SessionLocal
-from models import Device as DeviceModel, SensorReading as SensorReadingModel
+from models import Device as DeviceModel, VFDReading as VFDReadingModel
 
 FIELD_MAP = {
-    "temperature": "temperature",
-    "humidity": "humidity",
-    "pressure": "pressure",
-    "light": "light",
-    "motion": "motion",
-    "distance": "distance",
+    "frequency": "frequency",
+    "freq": "frequency",
+    "speed": "speed",
+    "rpm": "speed",
+    "current": "current",
+    "voltage": "voltage",
+    "power": "power",
+    "torque": "torque",
+    "status": "status",
+    "run_status": "status",
+    "fault_code": "fault_code",
+    "faultcode": "fault_code",
+    "fault": "fault_code",
 }
 
 
@@ -172,6 +179,8 @@ class ModbusPoller:
             cycle_values: List[str] = []
             custom_payload: Dict[str, Dict[str, str]] = {}
             mapped_fields: Dict[str, str] = {}
+            status_value: Optional[int] = None
+            fault_code_value: Optional[int] = None
 
             for reg in self._registers:
                 if self._stop_event.is_set():
@@ -200,7 +209,12 @@ class ModbusPoller:
                     }
                     field_key = FIELD_MAP.get(name.strip().lower())
                     if field_key:
-                        mapped_fields[field_key] = str(value)
+                        if field_key == "status":
+                            status_value = int(raw_value)
+                        elif field_key == "fault_code":
+                            fault_code_value = int(raw_value)
+                        else:
+                            mapped_fields[field_key] = str(value)
                 except Exception:
                     cycle_values.append("ERROR")
             if cycle_values and not self._stop_event.is_set():
@@ -210,16 +224,23 @@ class ModbusPoller:
                     if device_id is None:
                         print("Modbus polling skipped: no device available")
                     else:
-                        reading = SensorReadingModel(
+                        reading = VFDReadingModel(
                             device_id=device_id,
-                            temperature=mapped_fields.get("temperature"),
-                            humidity=mapped_fields.get("humidity"),
-                            pressure=mapped_fields.get("pressure"),
-                            light=mapped_fields.get("light"),
-                            motion=mapped_fields.get("motion"),
-                            distance=mapped_fields.get("distance"),
+                            frequency=mapped_fields.get("frequency"),
+                            speed=mapped_fields.get("speed"),
+                            current=mapped_fields.get("current"),
+                            voltage=mapped_fields.get("voltage"),
+                            power=mapped_fields.get("power"),
+                            torque=mapped_fields.get("torque"),
+                            status=status_value,
+                            fault_code=fault_code_value,
                             custom_data=json.dumps(custom_payload),
                         )
+                        # Keep device status aligned with live Modbus telemetry.
+                        device = db.query(DeviceModel).filter(DeviceModel.id == device_id).first()
+                        if device:
+                            device.is_online = True
+                            device.last_heartbeat = datetime.utcnow()
                         db.add(reading)
                         db.commit()
                 except Exception as exc:

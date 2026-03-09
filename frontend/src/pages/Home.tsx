@@ -1,14 +1,15 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useDeferredValue, useRef, useCallback } from 'react'
 import { Layout, Card, Form, Input, Button, Space, message, Modal, Select, Skeleton, Badge, Tooltip, Dropdown, Empty, Alert, App } from 'antd'
 import type { MenuProps } from 'antd'
 import axios from 'axios'
-import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, ExclamationCircleOutlined, SearchOutlined, MoreOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
+import { PlusOutlined, DeleteOutlined, EditOutlined, LogoutOutlined, ExclamationCircleOutlined, SearchOutlined, MoreOutlined, CheckCircleOutlined, CloseCircleOutlined, MenuFoldOutlined, MenuUnfoldOutlined, LineChartOutlined, ToolOutlined, BarChartOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
+import logoImage from '../assets/lo.png'
 import rs485Image from '../assets/rs485.png'
 import '../styles/Home.css'
 
-const { Header, Content, Footer } = Layout
+const { Header, Content } = Layout
 
 type Device = {
   key: string
@@ -39,13 +40,21 @@ export default function Home() {
   const [fetchLoading, setFetchLoading] = useState(true)
   const [editingDevice, setEditingDevice] = useState<Device | null>(null)
   const [filterType, setFilterType] = useState<string>('All')
+  const [searchInput, setSearchInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'All' | 'Online' | 'Warning' | 'Offline'>('All')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [vfdBrandOptions, setVfdBrandOptions] = useState<string[]>([])
   const [hoveredDayIndex, setHoveredDayIndex] = useState<number | null>(null)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarHovered, setSidebarHovered] = useState(false)
+  const [activeSidebarView, setActiveSidebarView] = useState<'overview' | 'equipment' | 'analytics'>('overview')
+  const [hiddenRuntimeDeviceKeys, setHiddenRuntimeDeviceKeys] = useState<string[]>([])
+  const hoverFrameRef = useRef<number | null>(null)
+  const pendingHoverIndexRef = useRef<number | null>(null)
   const navigate = useNavigate()
   const { modal } = App.useApp()
+  const deferredSearchQuery = useDeferredValue(searchQuery)
 
   /** Build a user-friendly error message from an axios error (handles FastAPI detail string or array). */
   const getErrorMessage = (err: any): string => {
@@ -65,7 +74,7 @@ export default function Home() {
     (import.meta.env.VITE_API_BASE as string) ||
     `${window.location.protocol}//${window.location.hostname}:8000`
 
-  const getDeviceImage = (deviceType: string) => {
+  const getDeviceImage = (_deviceType: string) => {
     return rs485Image
   }
 
@@ -99,60 +108,47 @@ export default function Home() {
     }
   }
 
-  const fetchDevices = async () => {
-    setFetchLoading(true)
+  const fetchDevices = async (silent = false) => {
+    if (!silent) {
+      setFetchLoading(true)
+    }
     try {
-      console.log('📥 Fetching devices from:', `${apiBase}/devices/`)
       const res = await axios.get(`${apiBase}/devices/`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+
+      const now = Date.now()
+      const warningMs = 60 * 1000
+      const offlineMs = 120 * 1000
+
+      const devicesWithStatus = res.data.map((device: any) => {
+        const lastHeartbeat = device.last_heartbeat ? new Date(device.last_heartbeat).getTime() : null
+        const deltaMs = lastHeartbeat ? now - lastHeartbeat : Number.POSITIVE_INFINITY
+
+        let status = 'Offline'
+        if (deltaMs < warningMs) {
+          status = 'Online'
+        } else if (deltaMs < offlineMs) {
+          status = 'Warning'
+        }
+
+        return {
+          key: String(device.id),
+          deviceName: device.device_name,
+          ipAddress: device.ip_address,
+          type: device.type || 'Generic',
+          vfdBrandModel:
+            device.vfd_brand_model || device.brand_model || getStoredBrandModel(device.id),
+          status,
+          isOnline: status === 'Online',
+          lastHeartbeat: device.last_heartbeat,
+          dateInstalled: device.date_installed || device.created_at,
         }
       })
-      console.log('✅ Fetch successful, received:', res.data.length, 'devices')
-      console.log('📊 Devices data:', res.data)
-      
-      // Fetch status for each device
-      const devicesWithStatus = await Promise.all(
-        res.data.map(async (device: any) => {
-          try {
-            const statusRes = await axios.get(`${apiBase}/devices/${device.id}/status`)
-            return {
-              key: String(device.id),
-              deviceName: device.device_name,
-              ipAddress: device.ip_address,
-              type: device.type || 'Generic',
-              vfdBrandModel:
-                device.vfd_brand_model || device.brand_model || getStoredBrandModel(device.id),
-              status: statusRes.data.status || 'Offline',  // Online, Warning, or Offline
-              isOnline: statusRes.data.is_online,
-              lastHeartbeat: statusRes.data.last_heartbeat,
-              dateInstalled: device.date_installed || device.created_at,
-            }
-          } catch (err) {
-            // If status fetch fails, default to offline
-            console.warn(`⚠️ Failed to fetch status for device ${device.id}`)
-            return {
-              key: String(device.id),
-              deviceName: device.device_name,
-              ipAddress: device.ip_address,
-              type: device.type || 'Generic',
-              vfdBrandModel:
-                device.vfd_brand_model || device.brand_model || getStoredBrandModel(device.id),
-              status: 'Offline',
-              isOnline: false,
-              lastHeartbeat: null,
-              dateInstalled: device.date_installed || device.created_at,
-            }
-          }
-        })
-      )
-      
+
       setDevices(devicesWithStatus)
-      console.log('🔄 State updated with', devicesWithStatus.length, 'devices')
-      
-      if (devicesWithStatus.length > 0) {
-        message.success(`Loaded ${devicesWithStatus.length} device(s)`)
-      }
     } catch (err: any) {
       console.error('❌ Failed to fetch devices:', err)
       if (err.response?.status === 401) {
@@ -163,7 +159,9 @@ export default function Home() {
       }
       message.error('Failed to load devices: ' + (err.message || 'Unknown error'))
     } finally {
-      setFetchLoading(false)
+      if (!silent) {
+        setFetchLoading(false)
+      }
     }
   }
 
@@ -358,24 +356,71 @@ export default function Home() {
     }
   }
 
-  const filteredDevices = devices.filter(device => {
-    // Filter by type
-    const matchesType = filterType === 'All' || 
-      (filterType === 'RS485' && device.type === 'RS485')
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput)
+    }, 140)
+    return () => clearTimeout(timer)
+  }, [searchInput])
 
-    const normalizedStatus = device.status?.toLowerCase() || 'offline'
-    const matchesStatus = statusFilter === 'All' ||
-      (statusFilter === 'Online' && normalizedStatus === 'online') ||
-      (statusFilter === 'Warning' && normalizedStatus === 'warning') ||
-      (statusFilter === 'Offline' && normalizedStatus === 'offline')
-    
-    // Filter by search query
-    const matchesSearch = searchQuery === '' || 
-      device.deviceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      device.ipAddress.includes(searchQuery)
-    
-    return matchesType && matchesStatus && matchesSearch
-  })
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDevices(true)
+    }, 15000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const scheduleHoveredDayIndex = useCallback((index: number | null) => {
+    pendingHoverIndexRef.current = index
+    if (hoverFrameRef.current !== null) {
+      return
+    }
+    hoverFrameRef.current = window.requestAnimationFrame(() => {
+      hoverFrameRef.current = null
+      setHoveredDayIndex(pendingHoverIndexRef.current)
+    })
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (hoverFrameRef.current !== null) {
+        window.cancelAnimationFrame(hoverFrameRef.current)
+      }
+    }
+  }, [])
+
+  const filteredDevices = useMemo(() => {
+    const normalizedSearchQuery = deferredSearchQuery.trim().toLowerCase()
+    return devices.filter(device => {
+      const matchesType = filterType === 'All' || (filterType === 'RS485' && device.type === 'RS485')
+      const normalizedStatus = device.status?.toLowerCase() || 'offline'
+      const matchesStatus = statusFilter === 'All' ||
+        (statusFilter === 'Online' && normalizedStatus === 'online') ||
+        (statusFilter === 'Warning' && normalizedStatus === 'warning') ||
+        (statusFilter === 'Offline' && normalizedStatus === 'offline')
+      const matchesSearch = normalizedSearchQuery === '' ||
+        device.deviceName.toLowerCase().includes(normalizedSearchQuery) ||
+        device.ipAddress.includes(normalizedSearchQuery)
+      return matchesType && matchesStatus && matchesSearch
+    })
+  }, [devices, filterType, statusFilter, deferredSearchQuery])
+
+  useEffect(() => {
+    setHiddenRuntimeDeviceKeys((prev) =>
+      prev.filter((deviceKey) => filteredDevices.some((device) => device.key === deviceKey))
+    )
+  }, [filteredDevices])
+
+  const vfdSummary = useMemo(() => {
+    const summary = { total: devices.length, online: 0, offline: 0, warning: 0 }
+    devices.forEach((device) => {
+      const normalizedStatus = device.status?.toLowerCase() || 'offline'
+      if (normalizedStatus === 'online') summary.online += 1
+      else if (normalizedStatus === 'warning') summary.warning += 1
+      else summary.offline += 1
+    })
+    return summary
+  }, [devices])
   const getTypeMenuItems = (selectedType: string): MenuProps['items'] => {
     const allItems: MenuProps['items'] = [
       { key: 'All', label: 'All Devices' },
@@ -413,7 +458,9 @@ export default function Home() {
 
   const runtimeChart = useMemo(() => {
     const palette = ['#38bdf8', '#22c55e', '#f59e0b', '#ef4444', '#a78bfa', '#14b8a6', '#f97316', '#eab308']
-    const selected = filteredDevices.slice(0, 8)
+    const chartDevices = filteredDevices.slice(0, 8)
+    const colorByDeviceKey = new Map(chartDevices.map((device, idx) => [device.key, palette[idx % palette.length]]))
+    const selected = chartDevices
     const width = Math.max(1400, runtimeLabels.length * 44 + 96)
     const height = 300
     const padding = { top: 18, right: 18, bottom: 56, left: 44 }
@@ -454,7 +501,8 @@ export default function Home() {
       return {
         key: device.key,
         name: device.deviceName,
-        color: palette[idx % palette.length],
+        color: colorByDeviceKey.get(device.key) || palette[idx % palette.length],
+        visible: !hiddenRuntimeDeviceKeys.includes(device.key),
         points,
         path: toSmoothPath(points),
       }
@@ -472,17 +520,30 @@ export default function Home() {
       })),
       lines,
     }
-  }, [filteredDevices, runtimeLabels])
+  }, [filteredDevices, runtimeLabels, hiddenRuntimeDeviceKeys])
+
+  const runtimeLegendItems = useMemo(() => {
+    const palette = ['#38bdf8', '#22c55e', '#f59e0b', '#ef4444', '#a78bfa', '#14b8a6', '#f97316', '#eab308']
+    return filteredDevices.slice(0, 8).map((device, idx) => ({
+      key: device.key,
+      name: device.deviceName,
+      color: palette[idx % palette.length],
+    }))
+  }, [filteredDevices])
 
   const runtimeTooltip = useMemo(() => {
     if (hoveredDayIndex === null || runtimeChart.lines.length === 0) return null
 
-    const items = runtimeChart.lines.map((line) => ({
+    const items = runtimeChart.lines
+      .filter((line) => line.visible)
+      .map((line) => ({
       name: line.name,
       color: line.color,
       hours: line.points[hoveredDayIndex]?.hours ?? 0,
       x: line.points[hoveredDayIndex]?.x ?? runtimeChart.padding.left,
-    }))
+      }))
+
+    if (items.length === 0) return null
 
     const totalHours = items.reduce((sum, item) => sum + item.hours, 0)
     const avgHours = items.length ? totalHours / items.length : 0
@@ -510,34 +571,200 @@ export default function Home() {
     }
   }, [hoveredDayIndex, runtimeChart, runtimeLabels])
 
+  const analyticsSnapshot = useMemo(() => {
+    const totalDevices = devices.length
+    const onlineDevices = devices.filter((device) => device.status === 'Online').length
+    const warningDevices = devices.filter((device) => device.status === 'Warning').length
+    const offlineDevices = Math.max(0, totalDevices - onlineDevices - warningDevices)
+
+    const uptimeRatio = totalDevices > 0 ? (onlineDevices / totalDevices) * 100 : 0
+    const warningRatio = totalDevices > 0 ? (warningDevices / totalDevices) * 100 : 0
+
+    const deviceRuntimeTotals = runtimeChart.lines.map((line) => {
+      const totalHours = line.points.reduce((sum, point) => sum + point.hours, 0)
+      return {
+        key: line.key,
+        name: line.name,
+        totalHours,
+      }
+    })
+
+    const fleetTotalHours = deviceRuntimeTotals.reduce((sum, device) => sum + device.totalHours, 0)
+    const fleetAvgHoursPerDevice =
+      deviceRuntimeTotals.length > 0 ? fleetTotalHours / deviceRuntimeTotals.length : 0
+
+    const dayTotals = runtimeLabels.map((label, index) => {
+      const totalHours = runtimeChart.lines.reduce((sum, line) => sum + (line.points[index]?.hours ?? 0), 0)
+      return { label, totalHours }
+    })
+
+    const peakDay = dayTotals.reduce(
+      (best, day) => (day.totalHours > best.totalHours ? day : best),
+      { label: runtimeLabels[0] ?? 'N/A', totalHours: 0 }
+    )
+
+    const topRuntimeDevices = [...deviceRuntimeTotals].sort((a, b) => b.totalHours - a.totalHours).slice(0, 3)
+
+    const staleDevices = devices
+      .map((device) => {
+        const heartbeat = device.lastHeartbeat ? dayjs(device.lastHeartbeat) : null
+        const minutesSinceHeartbeat = heartbeat && heartbeat.isValid() ? dayjs().diff(heartbeat, 'minute') : null
+        return {
+          key: device.key,
+          name: device.deviceName,
+          minutesSinceHeartbeat,
+        }
+      })
+      .filter((device) => device.minutesSinceHeartbeat === null || device.minutesSinceHeartbeat >= 5)
+      .sort((a, b) => (b.minutesSinceHeartbeat ?? Number.POSITIVE_INFINITY) - (a.minutesSinceHeartbeat ?? Number.POSITIVE_INFINITY))
+      .slice(0, 5)
+
+    return {
+      totalDevices,
+      onlineDevices,
+      warningDevices,
+      offlineDevices,
+      uptimeRatio,
+      warningRatio,
+      fleetTotalHours,
+      fleetAvgHoursPerDevice,
+      peakDay,
+      topRuntimeDevices,
+      staleDevices,
+    }
+  }, [devices, runtimeChart.lines, runtimeLabels])
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header className="home-header">
-        <div className="header-left">
-          <h1>Device Management System</h1>
+        <div className="home-header-left">
+          <img src={logoImage} alt="DMS logo" className="header-brand-logo" />
+          <span className="header-brand-subtitle">Device Management System</span>
         </div>
         <Space size="middle">
           <Input
             placeholder="Search devices..."
             prefix={<SearchOutlined />}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             style={{ width: 250 }}
             allowClear
           />
-          <Button
-            type="text"
-            danger
-            icon={<LogoutOutlined />}
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
         </Space>
       </Header>
 
-      <Content className="home-content">
-        <div className="content-container">
+      <Layout className="home-main-layout">
+        <Layout.Sider
+          className="scada-sidebar"
+          trigger={null}
+          collapsible
+          width={286}
+          collapsedWidth={78}
+          collapsed={sidebarCollapsed && !sidebarHovered}
+          onMouseEnter={() => setSidebarHovered(true)}
+          onMouseLeave={() => setSidebarHovered(false)}
+        >
+          <Button
+            className="sidebar-collapse-button"
+            type="text"
+            icon={sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setSidebarCollapsed((prev) => !prev)}
+            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          />
+          <div className="scada-nav-list">
+            <button
+              type="button"
+              className={`scada-nav-item ${activeSidebarView === 'overview' ? 'active' : ''}`}
+              onClick={() => setActiveSidebarView('overview')}
+            >
+              <LineChartOutlined />
+              {(!sidebarCollapsed || sidebarHovered) && <span>Overview</span>}
+            </button>
+            <button
+              type="button"
+              className={`scada-nav-item ${activeSidebarView === 'equipment' ? 'active' : ''}`}
+              onClick={() => setActiveSidebarView('equipment')}
+            >
+              <ToolOutlined />
+              {(!sidebarCollapsed || sidebarHovered) && <span>Equipment</span>}
+            </button>
+            <button
+              type="button"
+              className={`scada-nav-item ${activeSidebarView === 'analytics' ? 'active' : ''}`}
+              onClick={() => setActiveSidebarView('analytics')}
+            >
+              <BarChartOutlined />
+              {(!sidebarCollapsed || sidebarHovered) && <span>Analytics</span>}
+            </button>
+          </div>
+          <div className="scada-sidebar-bottom">
+            <Button
+              className="scada-logout-button"
+              type="text"
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+            >
+              {(!sidebarCollapsed || sidebarHovered) && 'Logout'}
+            </Button>
+          </div>
+        </Layout.Sider>
+
+        <Layout>
+          <Content className="home-content">
+            <div className="content-container">
+          {activeSidebarView === 'overview' && (
+            <>
+          <Card className="system-overview-card">
+            <div className="system-overview-heading">
+              <h2>System Overview</h2>
+              <p>Real-time monitoring and analytics of your industrial systems</p>
+            </div>
+          </Card>
+          <div className="vfd-summary-row">
+            <Card className="vfd-summary-card total">
+              <div className="vfd-summary-head">
+                <span className="vfd-summary-icon">
+                  <ToolOutlined />
+                </span>
+                <span className="vfd-summary-label">TOTAL VFDS</span>
+              </div>
+              <div className="vfd-summary-value">{vfdSummary.total}</div>
+              <div className="vfd-summary-subtext">Registered in the system</div>
+            </Card>
+            <Card className="vfd-summary-card online">
+              <div className="vfd-summary-head">
+                <span className="vfd-summary-icon">
+                  <CheckCircleOutlined />
+                </span>
+                <span className="vfd-summary-label">ONLINE</span>
+              </div>
+              <div className="vfd-summary-value">{vfdSummary.online}</div>
+              <div className="vfd-summary-subtext">Currently connected</div>
+            </Card>
+            <Card className="vfd-summary-card offline">
+              <div className="vfd-summary-head">
+                <span className="vfd-summary-icon">
+                  <CloseCircleOutlined />
+                </span>
+                <span className="vfd-summary-label">OFFLINE</span>
+              </div>
+              <div className="vfd-summary-value">{vfdSummary.offline}</div>
+              <div className="vfd-summary-subtext">Connection unavailable</div>
+            </Card>
+            <Card className="vfd-summary-card warning">
+              <div className="vfd-summary-head">
+                <span className="vfd-summary-icon">
+                  <ExclamationCircleOutlined />
+                </span>
+                <span className="vfd-summary-label">WARNING</span>
+              </div>
+              <div className="vfd-summary-value">{vfdSummary.warning}</div>
+              <div className="vfd-summary-subtext">Needs attention</div>
+            </Card>
+          </div>
+            </>
+          )}
+          {activeSidebarView === 'equipment' && (
           <Card
             title="Devices"
             extra={
@@ -678,14 +905,14 @@ export default function Home() {
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
                     description={
-                      searchQuery || filterType !== 'All' 
+                      searchInput || filterType !== 'All' 
                         ? 'No devices match your filters' 
                         : 'No devices yet. Click "Add Device" to get started.'
                     }
                     style={{ padding: '48px 24px' }}
                   >
-                    {(searchQuery || filterType !== 'All') && (
-                      <Button type="primary" onClick={() => { setSearchQuery(''); setFilterType('All'); }}>
+                    {(searchInput || filterType !== 'All') && (
+                      <Button type="primary" onClick={() => { setSearchInput(''); setSearchQuery(''); setFilterType('All'); }}>
                         Clear Filters
                       </Button>
                     )}
@@ -694,7 +921,83 @@ export default function Home() {
               </>
             )}
           </Card>
+          )}
 
+          {activeSidebarView === 'analytics' && (
+            <Card className="analytics-insight-card">
+              <div className="analytics-insight-header">
+                <h2>Analytics Insights</h2>
+                <p>Operational health and 30-day runtime intelligence across your fleet.</p>
+              </div>
+
+              <div className="analytics-kpi-grid">
+                <div className="analytics-kpi-item">
+                  <div className="analytics-kpi-label">Fleet Uptime</div>
+                  <div className="analytics-kpi-value">{analyticsSnapshot.uptimeRatio.toFixed(1)}%</div>
+                  <div className="analytics-kpi-sub">
+                    {analyticsSnapshot.onlineDevices}/{analyticsSnapshot.totalDevices} devices online
+                  </div>
+                </div>
+                <div className="analytics-kpi-item">
+                  <div className="analytics-kpi-label">Warning Rate</div>
+                  <div className="analytics-kpi-value">{analyticsSnapshot.warningRatio.toFixed(1)}%</div>
+                  <div className="analytics-kpi-sub">{analyticsSnapshot.warningDevices} device(s) need attention</div>
+                </div>
+                <div className="analytics-kpi-item">
+                  <div className="analytics-kpi-label">Avg Runtime / Device</div>
+                  <div className="analytics-kpi-value">{analyticsSnapshot.fleetAvgHoursPerDevice.toFixed(1)}h</div>
+                  <div className="analytics-kpi-sub">Based on displayed 30-day trend data</div>
+                </div>
+                <div className="analytics-kpi-item">
+                  <div className="analytics-kpi-label">Peak Runtime Day</div>
+                  <div className="analytics-kpi-value">{analyticsSnapshot.peakDay.label}</div>
+                  <div className="analytics-kpi-sub">{analyticsSnapshot.peakDay.totalHours.toFixed(1)}h total fleet runtime</div>
+                </div>
+              </div>
+
+              <div className="analytics-detail-grid">
+                <div className="analytics-detail-panel">
+                  <div className="analytics-panel-title">Top Runtime Devices</div>
+                  {analyticsSnapshot.topRuntimeDevices.length === 0 ? (
+                    <div className="analytics-empty">No runtime data available.</div>
+                  ) : (
+                    analyticsSnapshot.topRuntimeDevices.map((device, index) => (
+                      <div key={device.key} className="analytics-row">
+                        <span className="analytics-row-rank">#{index + 1}</span>
+                        <span className="analytics-row-name">{device.name}</span>
+                        <span className="analytics-row-value">{device.totalHours.toFixed(1)}h</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="analytics-detail-panel">
+                  <div className="analytics-panel-title">Stale Heartbeat Watchlist</div>
+                  {analyticsSnapshot.staleDevices.length === 0 ? (
+                    <div className="analytics-empty">All tracked devices reported heartbeat recently.</div>
+                  ) : (
+                    analyticsSnapshot.staleDevices.map((device) => (
+                      <div key={device.key} className="analytics-row">
+                        <span className="analytics-row-name">{device.name}</span>
+                        <span className="analytics-row-value">
+                          {device.minutesSinceHeartbeat === null
+                            ? 'No heartbeat yet'
+                            : `${device.minutesSinceHeartbeat} min ago`}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div className="analytics-footnote">
+                Offline devices: {analyticsSnapshot.offlineDevices} | Fleet runtime (last 30 days):{' '}
+                {analyticsSnapshot.fleetTotalHours.toFixed(1)}h
+              </div>
+            </Card>
+          )}
+
+          {(activeSidebarView === 'overview' || activeSidebarView === 'analytics') && (
           <Card className="runtime-overview-card">
             <div className="runtime-overview-header">
               <div className="runtime-overview-title">Running Time (Last 30 Days)</div>
@@ -703,23 +1006,42 @@ export default function Home() {
               </div>
             </div>
 
-            {runtimeChart.lines.length === 0 ? (
+            {runtimeLegendItems.length > 0 && (
+              <div className="runtime-overview-legend">
+                {runtimeLegendItems.map((line) => (
+                  <button
+                    type="button"
+                    className={`runtime-legend-item ${!hiddenRuntimeDeviceKeys.includes(line.key) ? 'active' : 'muted'}`}
+                    key={line.key}
+                    onClick={() =>
+                      setHiddenRuntimeDeviceKeys((prev) =>
+                        prev.includes(line.key)
+                          ? prev.filter((key) => key !== line.key)
+                          : [...prev, line.key]
+                      )
+                    }
+                  >
+                    <span className="runtime-legend-dot" style={{ background: line.color }} />
+                    <span>{line.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {runtimeLegendItems.length === 0 ? (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description="No devices available to plot running time."
                 style={{ padding: '28px 12px' }}
               />
+            ) : runtimeChart.lines.filter((line) => line.visible).length === 0 ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="All lines are hidden. Click a device name above to show its line."
+                style={{ padding: '28px 12px' }}
+              />
             ) : (
               <>
-                <div className="runtime-overview-legend">
-                  {runtimeChart.lines.map((line) => (
-                    <div className="runtime-legend-item" key={line.key}>
-                      <span className="runtime-legend-dot" style={{ background: line.color }} />
-                      <span>{line.name}</span>
-                    </div>
-                  ))}
-                </div>
-
                 <div className="runtime-overview-chart-wrap">
                   <svg
                     className="runtime-overview-chart"
@@ -727,7 +1049,7 @@ export default function Home() {
                     style={{ width: `${runtimeChart.width}px` }}
                     role="img"
                     aria-label="Running time chart for all devices over last 30 days"
-                    onMouseLeave={() => setHoveredDayIndex(null)}
+                    onMouseLeave={() => scheduleHoveredDayIndex(null)}
                   >
                     {runtimeChart.ticks.map((tick) => (
                       <g key={tick.label}>
@@ -746,18 +1068,22 @@ export default function Home() {
 
                     {runtimeChart.lines.map((line) => (
                       <g key={`line-${line.key}`}>
-                        <path d={line.path} className="runtime-line" style={{ stroke: line.color }} />
-                        {line.points.map((p, i) => (
-                          <circle
-                            key={`${line.key}-${i}`}
-                            cx={p.x}
-                            cy={p.y}
-                            r={hoveredDayIndex === i ? '4' : '2.7'}
-                            className="runtime-point"
-                            style={{ stroke: line.color }}
-                            onMouseEnter={() => setHoveredDayIndex(i)}
-                          />
-                        ))}
+                        {line.visible && (
+                          <>
+                            <path d={line.path} className="runtime-line" style={{ stroke: line.color }} />
+                            {line.points.map((p, i) => (
+                              <circle
+                                key={`${line.key}-${i}`}
+                                cx={p.x}
+                                cy={p.y}
+                                r={hoveredDayIndex === i ? '4' : '2.7'}
+                                className="runtime-point"
+                                style={{ stroke: line.color }}
+                                onMouseEnter={() => scheduleHoveredDayIndex(i)}
+                              />
+                            ))}
+                          </>
+                        )}
                       </g>
                     ))}
 
@@ -774,7 +1100,7 @@ export default function Home() {
                           width={bandWidth}
                           height={runtimeChart.innerHeight}
                           className="runtime-hover-band"
-                          onMouseEnter={() => setHoveredDayIndex(i)}
+                          onMouseEnter={() => scheduleHoveredDayIndex(i)}
                         />
                       )
                     })}
@@ -838,10 +1164,11 @@ export default function Home() {
               </>
             )}
           </Card>
-        </div>
-      </Content>
-
-      <Footer className="home-footer">React + Vite + Ant Design ©2026</Footer>
+          )}
+            </div>
+          </Content>
+        </Layout>
+      </Layout>
 
       <Modal
         title={editingDevice ? "Edit Device" : "Add New Device"}

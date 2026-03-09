@@ -94,8 +94,17 @@ const defaultStats: Stats = {
   lastRead: '--:--:--',
 }
 
+// Helper function to format numbers to 2 decimal places
+function formatDecimal(value: string | number | null | undefined): string {
+  if (value == null || value === '') return '–'
+  const num = typeof value === 'string' ? parseFloat(value) : value
+  if (isNaN(num)) return String(value)
+  return num.toFixed(2)
+}
+
 export default function DeviceDetails() {
   const runtimeStorageKey = 'modbus_runtime_history_v1'
+  const statsStorageKey = 'modbus_stats_v1'
   const { id: routeDeviceId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
@@ -141,6 +150,9 @@ export default function DeviceDetails() {
   const [connectInProgress, setConnectInProgress] = useState(false)
   const [connected, setConnected] = useState(false)
 
+  // Live VFD data from server (for static "Testing" / ESP32_Master device)
+  const { isConnected: vfdWsConnected, lastUpdate: vfdLastUpdate, error: vfdError } = useDeviceRealtime(routeDeviceId ?? 0)
+
   const portRef = useRef<SerialPortLike | null>(null)
   const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null)
   const writerRef = useRef<WritableStreamDefaultWriter<Uint8Array> | null>(null)
@@ -150,6 +162,7 @@ export default function DeviceDetails() {
   const statsRef = useRef<Stats>(defaultStats)
   const dataLogRef = useRef<DataPoint[]>([])
   const logIdRef = useRef(0)
+  const lastLogRef = useRef<{ message: string; type: 'info' | 'success' | 'error'; at: number } | null>(null)
   const runtimeSessionStartRef = useRef<number | null>(null)
   const runtimeTickRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [runtimeHistory, setRuntimeHistory] = useState<RuntimePoint[]>([])
@@ -233,6 +246,16 @@ export default function DeviceDetails() {
   }, [])
 
   const addLog = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
+    const now = Date.now()
+    const last = lastLogRef.current
+
+    // Drop repeated noisy entries that usually come from per-message ACK chatter.
+    if (last && last.message === message && last.type === type && now - last.at < 1000) {
+      return
+    }
+
+    lastLogRef.current = { message, type, at: now }
+
     const timestamp = new Date().toLocaleTimeString()
     const entry: LogEntry = {
       id: logIdRef.current + 1,
@@ -243,7 +266,7 @@ export default function DeviceDetails() {
     logIdRef.current += 1
     setLogs((prev) => {
       const updated = [entry, ...prev]
-      if (updated.length > 2000) return updated.slice(0, 2000)
+      if (updated.length > 300) return updated.slice(0, 300)
       return updated
     })
   }
@@ -255,6 +278,14 @@ export default function DeviceDetails() {
       ...updates,
     }
     setStats({ ...statsRef.current })
+      // Persist stats to localStorage
+      if (routeDeviceId) {
+        try {
+          localStorage.setItem(`${statsStorageKey}_${routeDeviceId}`, JSON.stringify(statsRef.current))
+        } catch (error) {
+          console.error('Failed to save stats to localStorage:', error)
+        }
+      }
   }
 
   const formatTimestamp = () => {
@@ -475,10 +506,7 @@ export default function DeviceDetails() {
                 },
               }))
 
-              addLog(
-                `Read ${reg.name} (${reg.address}): Raw=${rawValue}, Actual=${actualValue} ${reg.unit}`,
-                'success'
-              )
+              // Avoid per-register success log spam to keep the UI responsive.
               cycleValues.push(actualValue)
             } else {
               throw new Error('Invalid response format')
@@ -502,13 +530,14 @@ export default function DeviceDetails() {
           cycleValues.push('ERROR')
         }
 
-        updateStats()
         await new Promise((resolve) => setTimeout(resolve, 200))
       }
 
+      updateStats()
+
       if (cycleValues.length === registers.length) {
         saveDataToLog(cycleValues)
-        
+
         // Send data via WebSocket if enabled
         if (useWebSocket && webSocketRef.current?.readyState === WebSocket.OPEN) {
           const registerData: Record<string, number | string> = {}
@@ -545,7 +574,7 @@ export default function DeviceDetails() {
           try {
             const data = JSON.parse(event.data)
             if (data.status === 'ok') {
-              addLog(`Server confirmed data reception (ID: ${data.reading_id})`, 'success')
+              // Intentionally skip ACK success logs to avoid render-heavy log floods.
             } else if (data.error) {
               addLog(`Server error: ${data.error}`, 'error')
             }
@@ -595,7 +624,6 @@ export default function DeviceDetails() {
 
     try {
       webSocketRef.current.send(JSON.stringify(payload))
-      addLog('Data sent via WebSocket', 'info')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'
       addLog(`WebSocket send error: ${message}`, 'error')
@@ -733,6 +761,24 @@ export default function DeviceDetails() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Load stats from localStorage on mount
+  useEffect(() => {
+    if (routeDeviceId) {
+      try {
+        const savedStats = localStorage.getItem(`${statsStorageKey}_${routeDeviceId}`)
+        if (savedStats) {
+          const parsed = JSON.parse(savedStats) as Stats
+          statsRef.current = parsed
+          setStats(parsed)
+          console.log('Loaded stats from localStorage:', parsed)
+        }
+      } catch (error) {
+        console.error('Failed to load stats from localStorage:', error)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeDeviceId])
+
   useEffect(() => {
     if (!brandModel || Object.keys(brandData).length === 0) return
     if (brandData[brandModel]) return
@@ -746,8 +792,11 @@ export default function DeviceDetails() {
     }
   }, [brandModel, brandData])
 
+  // Track runtime based on VFD connection status (connected or receiving VFD data)
   useEffect(() => {
-    if (connected) {
+    const isRunning = connected || (vfdWsConnected && vfdLastUpdate !== null)
+    
+    if (isRunning) {
       runtimeSessionStartRef.current = Date.now()
       runtimeTickRef.current = setInterval(() => {
         commitRuntimeChunk(true)
@@ -766,7 +815,21 @@ export default function DeviceDetails() {
     }
     return undefined
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected])
+  }, [connected, vfdWsConnected, vfdLastUpdate])
+
+  // Update stats when VFD data is received
+  useEffect(() => {
+    if (vfdLastUpdate) {
+      const hasError = vfdLastUpdate.status === 2 // Fault status
+      updateStats({
+        totalReads: statsRef.current.totalReads + 1,
+        successReads: statsRef.current.successReads + (hasError ? 0 : 1),
+        errorReads: statsRef.current.errorReads + (hasError ? 1 : 0),
+        dataRecords: statsRef.current.dataRecords + 1,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vfdLastUpdate])
 
   useEffect(() => {
     if (!brandModel || !brandData[brandModel]) {
@@ -806,6 +869,40 @@ export default function DeviceDetails() {
       { name: 'Energy', address: 1000, raw: '1286', value: '128.6', unit: 'kWh', status: 'OK', hasError: false },
     ]
 
+    // When VFD data is available from server (e.g. Testing device / ESP32 Master), show it in Live Register Values
+    if (vfdLastUpdate) {
+      const statusLabel =
+        vfdLastUpdate.status === 0
+          ? 'Stop'
+          : vfdLastUpdate.status === 1
+            ? 'Run'
+            : vfdLastUpdate.status === 2
+              ? 'Fault'
+              : vfdLastUpdate.status === 3
+                ? 'Ready'
+                : String(vfdLastUpdate.status ?? '–')
+      const vfdRows = [
+        { name: 'Frequency', value: formatDecimal(vfdLastUpdate.frequency), unit: 'Hz', isOk: true },
+        { name: 'Speed', value: formatDecimal(vfdLastUpdate.speed), unit: 'RPM', isOk: true },
+        { name: 'Current', value: formatDecimal(vfdLastUpdate.current), unit: 'A', isOk: true },
+        { name: 'Voltage', value: formatDecimal(vfdLastUpdate.voltage), unit: 'V', isOk: true },
+        { name: 'Power', value: formatDecimal(vfdLastUpdate.power), unit: 'kW', isOk: true },
+        { name: 'Torque', value: formatDecimal(vfdLastUpdate.torque), unit: 'Nm', isOk: true },
+        { name: 'Status', value: statusLabel, unit: '', isOk: vfdLastUpdate.status !== 2 },
+        ...(vfdLastUpdate.status === 2 && vfdLastUpdate.fault_code != null
+          ? [{ name: 'Fault code', value: String(vfdLastUpdate.fault_code), unit: '', isOk: false }]
+          : []),
+      ]
+      return vfdRows.map((row, idx) => ({
+        key: row.name,
+        name: row.name,
+        address: 1000 + idx,
+        rawDisplay: row.value + (row.unit ? ` ${row.unit}` : ''),
+        actualDisplay: row.value + (row.unit ? ` ${row.unit}` : ''),
+        isOk: row.isOk,
+      }))
+    }
+
     const source = tableData.length > 0 ? tableData : fallback
     return source.slice(0, 12).map((row) => {
       const isOk = !row.hasError && String(row.status).toLowerCase() === 'ok'
@@ -818,29 +915,7 @@ export default function DeviceDetails() {
         isOk,
       }
     })
-  }, [tableData])
-
-  const statusSummary = useMemo(() => {
-    const total = tableData.length
-    const error = tableData.filter((row) => row.hasError || row.status.toLowerCase() === 'error').length
-    const ok = tableData.filter((row) => !row.hasError && row.status.toLowerCase() === 'ok').length
-    const waiting = Math.max(0, total - ok - error)
-
-    const okPct = total ? Math.round((ok / total) * 100) : 0
-    const waitPct = total ? Math.round((waiting / total) * 100) : 0
-    const errorPct = total ? 100 - okPct - waitPct : 0
-
-    return {
-      total,
-      ok,
-      waiting,
-      error,
-      okPct,
-      waitPct,
-      errorPct,
-      healthScore: total ? Math.round((ok / total) * 100) : 0,
-    }
-  }, [tableData])
+  }, [tableData, vfdLastUpdate])
 
   const hasRuntimeData = useMemo(
     () => runtimeHistory.some((point) => point.seconds > 0),
@@ -1108,47 +1183,7 @@ export default function DeviceDetails() {
           </Card>
 
           <Row gutter={[16, 16]} className="modbus-visuals">
-            <Col xs={24} lg={9}>
-              <Card className="modbus-chart-card">
-                <div className="modbus-chart-header">
-                  <div className="modbus-chart-title">Register Status Overview</div>
-                  <div className="modbus-chart-subtitle">Real-time health snapshot</div>
-                </div>
-                <div className="modbus-pie-wrap">
-                  <div
-                    className="modbus-pie-chart"
-                    style={{
-                      background: `conic-gradient(#22c55e 0% ${statusSummary.okPct}%, #f59e0b ${statusSummary.okPct}% ${statusSummary.okPct + statusSummary.waitPct}%, #ef4444 ${statusSummary.okPct + statusSummary.waitPct}% 100%)`,
-                    }}
-                    role="img"
-                    aria-label={`Status distribution: ${statusSummary.ok} ok, ${statusSummary.waiting} waiting, ${statusSummary.error} error`}
-                  >
-                    <div className="modbus-pie-center">
-                      <span className="modbus-pie-score">{statusSummary.healthScore}%</span>
-                      <span className="modbus-pie-label">Healthy</span>
-                    </div>
-                  </div>
-                  <div className="modbus-pie-legend">
-                    <div className="modbus-legend-item">
-                      <span className="modbus-legend-dot is-ok" />
-                      <span>OK</span>
-                      <strong>{statusSummary.ok}</strong>
-                    </div>
-                    <div className="modbus-legend-item">
-                      <span className="modbus-legend-dot is-waiting" />
-                      <span>Waiting</span>
-                      <strong>{statusSummary.waiting}</strong>
-                    </div>
-                    <div className="modbus-legend-item">
-                      <span className="modbus-legend-dot is-error" />
-                      <span>Error</span>
-                      <strong>{statusSummary.error}</strong>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </Col>
-            <Col xs={24} lg={15}>
+            <Col xs={24}>
               <Card className="modbus-chart-card">
                 <div className="modbus-chart-header">
                   <div className="modbus-chart-title">Live Register Values</div>

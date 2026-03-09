@@ -1,0 +1,2419 @@
+nohup: ignoring input
+/home/mike/Documents/Internship/backend/main.py:195: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+/home/mike/Documents/Internship/backend/main.py:251: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+/home/mike/Documents/Internship/backend/main.py:310: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("shutdown")
+/home/mike/Documents/Internship/backend/main.py:351: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+INFO:     Started server process [35144]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     ('172.20.10.10', 54755) - "WebSocket /ws/esp32/connect?mac_address=A0%3AB7%3A65%3A29%3A3D%3A28&device_id=1&device_key=69ced61b-5521-4ef7-ab17-19a2cdf14af8" [accepted]
+INFO:     connection open
+ℹ️  User account 'user' already exists
+ℹ️  Admin account 'BITSOJT' already exists
+ℹ️ Modbus poller disabled (set MODBUS_ENABLED=1 to enable)
+ℹ️  Test ESP32 device 1 already up to date
+🔌 ESP32 WebSocket from 172.20.10.10 | mac=A0:B7:65:29:3D:28 | device_id=1 | device_key=***
+🔗 ESP32 device 1 active sessions: 1
+✅ ESP32 device 1 (Testing) authenticated from 172.20.10.10
+⚠️ Unknown message type: None
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.90000153Hz, Speed=1026.5RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-76
+💖 Heartbeat from device 1: RSSI=-76
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.90000153Hz, Speed=1026.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.40000153Hz, Speed=1442.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.60000038Hz, Speed=871RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.800000191Hz, Speed=1496.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.60000038Hz, Speed=102.8000031RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.29999924Hz, Speed=165.8999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.70000076Hz, Speed=449.8999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.29999924Hz, Speed=1070.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.20000076Hz, Speed=1050.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.699999809Hz, Speed=769.0999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.59999847Hz, Speed=1042.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.600000024Hz, Speed=338.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.59999847Hz, Speed=875.4000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.29999924Hz, Speed=6.699999809RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.60000038Hz, Speed=267.1000061RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29Hz, Speed=414.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.60000038Hz, Speed=823.2999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.89999962Hz, Speed=890RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.300000191Hz, Speed=1108.099976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.89999962Hz, Speed=1083.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.39999962Hz, Speed=210.1000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57Hz, Speed=641.4000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.60000038Hz, Speed=1241.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.29999924Hz, Speed=106.1999969RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.40000153Hz, Speed=217.3999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.09999847Hz, Speed=87.69999695RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.5Hz, Speed=999.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.20000076Hz, Speed=158RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.60000038Hz, Speed=1086.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.899999976Hz, Speed=750.7999878RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-76
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9Hz, Speed=475.6000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.40000153Hz, Speed=775RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.59999847Hz, Speed=848.4000244RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.29999924Hz, Speed=135.6999969RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53Hz, Speed=1148.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.09999847Hz, Speed=799.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.800000191Hz, Speed=1056.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.5Hz, Speed=699.9000244RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.79999924Hz, Speed=645.0999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.300000012Hz, Speed=421.2999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.59999847Hz, Speed=1164RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.70000076Hz, Speed=156.1999969RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.59999847Hz, Speed=1189.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36Hz, Speed=800RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.79999924Hz, Speed=816.7000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56Hz, Speed=1476.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.400000095Hz, Speed=1122.800049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.30000019Hz, Speed=39.59999847RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47.20000076Hz, Speed=1373.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.79999924Hz, Speed=880.5999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.800000191Hz, Speed=710.9000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.79999924Hz, Speed=1260.699951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.29999924Hz, Speed=1391.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.70000076Hz, Speed=1079.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30.29999924Hz, Speed=39RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.09999847Hz, Speed=1272.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.29999924Hz, Speed=1191.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.89999962Hz, Speed=934.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.900000095Hz, Speed=606.0999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.29999924Hz, Speed=1298RPM, Status=3
+💖 Heartbeat from device 1: RSSI=-76
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.10000038Hz, Speed=770RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.60000038Hz, Speed=509.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.59999847Hz, Speed=1304.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40Hz, Speed=302.1000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.70000076Hz, Speed=69.19999695RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30.5Hz, Speed=1376.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30.29999924Hz, Speed=987.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.90000153Hz, Speed=1288.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.39999962Hz, Speed=1154.800049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.400000095Hz, Speed=630.0999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.199999809Hz, Speed=1710RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.70000076Hz, Speed=749RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.40000153Hz, Speed=1496.800049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.69999981Hz, Speed=364.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.59999847Hz, Speed=332.7999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.20000076Hz, Speed=263.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.700000048Hz, Speed=1486.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.89999962Hz, Speed=1743.400024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.199999809Hz, Speed=1432.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.699999988Hz, Speed=189.1999969RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52Hz, Speed=1017RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.20000076Hz, Speed=1591.599976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.20000076Hz, Speed=1117.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.80000019Hz, Speed=1132.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.40000153Hz, Speed=526.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.90000153Hz, Speed=222.8000031RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.79999924Hz, Speed=932.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.39999962Hz, Speed=1429.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47Hz, Speed=671.4000244RPM, Status=2
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22Hz, Speed=1099.400024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.29999924Hz, Speed=1277.699951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.299999952Hz, Speed=296.3999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.10000038Hz, Speed=866.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.20000076Hz, Speed=388.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.40000153Hz, Speed=421.1000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.70000076Hz, Speed=1712.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.89999962Hz, Speed=1505.800049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.90000153Hz, Speed=189.1000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.29999924Hz, Speed=624.0999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.89999962Hz, Speed=1783.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.59999847Hz, Speed=577.2999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.09999847Hz, Speed=293.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.300000012Hz, Speed=1501.699951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.5Hz, Speed=608.2999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.60000038Hz, Speed=329.8999939RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.90000153Hz, Speed=15.60000038RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.09999847Hz, Speed=1628RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.39999962Hz, Speed=297.3999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.29999924Hz, Speed=959.5999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.20000076Hz, Speed=1265RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.20000076Hz, Speed=540.2999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.80000019Hz, Speed=1491.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.20000076Hz, Speed=383.1000061RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.10000038Hz, Speed=1293.300049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.79999924Hz, Speed=1403.599976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.79999924Hz, Speed=1639.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.70000076Hz, Speed=413.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.90000153Hz, Speed=1507.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.29999924Hz, Speed=1141.300049RPM, Status=2
+💖 Heartbeat from device 1: RSSI=-76
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.89999962Hz, Speed=591.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21Hz, Speed=1321.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.79999924Hz, Speed=570.0999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38Hz, Speed=112RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.400000095Hz, Speed=56.29999924RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30Hz, Speed=611.2000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.10000038Hz, Speed=1364.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.200000048Hz, Speed=1044.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.20000076Hz, Speed=789.5999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.09999847Hz, Speed=63.29999924RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.5Hz, Speed=1730.199951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.5Hz, Speed=1324.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.60000038Hz, Speed=893.2000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.89999962Hz, Speed=1467.099976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.5Hz, Speed=1524.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.599999905Hz, Speed=1504.099976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.5Hz, Speed=498.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.29999924Hz, Speed=415RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.80000019Hz, Speed=441.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.89999962Hz, Speed=1212.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.90000153Hz, Speed=1653.199951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11Hz, Speed=1261.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.5Hz, Speed=444.1000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.69999981Hz, Speed=1455.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.59999847Hz, Speed=1342.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.70000076Hz, Speed=1446.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.30000019Hz, Speed=855.9000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.300000191Hz, Speed=1622.599976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.40000153Hz, Speed=109.3000031RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.20000076Hz, Speed=859.7000122RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.70000076Hz, Speed=1373.699951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.79999924Hz, Speed=1033.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.59999847Hz, Speed=1326.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.199999809Hz, Speed=1697RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.10000038Hz, Speed=1574.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.79999924Hz, Speed=1449.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.900000095Hz, Speed=1120RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.300000191Hz, Speed=1227.800049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.20000076Hz, Speed=52.90000153RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.59999847Hz, Speed=330.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8Hz, Speed=1299.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.60000038Hz, Speed=1383.800049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.09999847Hz, Speed=675.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.20000076Hz, Speed=517.0999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.09999847Hz, Speed=590.5999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.70000076Hz, Speed=1354.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.39999962Hz, Speed=1291.599976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.79999924Hz, Speed=583RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42Hz, Speed=734.5999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.10000038Hz, Speed=450.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.70000076Hz, Speed=837.7999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.79999924Hz, Speed=580.0999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.70000076Hz, Speed=1009RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.79999924Hz, Speed=708.4000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.29999924Hz, Speed=1070.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38Hz, Speed=1260.599976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.89999962Hz, Speed=1786.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.70000076Hz, Speed=1437.699951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.39999962Hz, Speed=1788.5RPM, Status=3
+💖 Heartbeat from device 1: RSSI=-76
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30Hz, Speed=659.4000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.39999962Hz, Speed=636.9000244RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.70000076Hz, Speed=1541.400024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.700000048Hz, Speed=908.5999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.899999976Hz, Speed=1773.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.89999962Hz, Speed=717.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.899999976Hz, Speed=818.7000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.40000153Hz, Speed=1371.699951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45Hz, Speed=1625.300049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.59999847Hz, Speed=262.8999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.900000095Hz, Speed=107.0999985RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.70000076Hz, Speed=1633.099976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.20000076Hz, Speed=248.6999969RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.39999962Hz, Speed=1517.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.19999981Hz, Speed=420.3999939RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15Hz, Speed=840.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.20000076Hz, Speed=636.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.399999619Hz, Speed=426.6000061RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.70000076Hz, Speed=1788.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.60000038Hz, Speed=1587.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.79999924Hz, Speed=1246.400024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47.59999847Hz, Speed=940.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.10000038Hz, Speed=1542.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.699999809Hz, Speed=1592.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.89999962Hz, Speed=1308.099976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.5Hz, Speed=613.5999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.09999847Hz, Speed=929.9000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.70000076Hz, Speed=1693.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.60000038Hz, Speed=111.0999985RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.10000038Hz, Speed=813.2999878RPM, Status=1
+💖 Heartbeat from device 1: RSSI=-75
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.79999924Hz, Speed=749RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.20000076Hz, Speed=733.2000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.19999981Hz, Speed=546.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10Hz, Speed=1383.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.599999905Hz, Speed=1011.299988RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.10000038Hz, Speed=1409.099976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.09999847Hz, Speed=922.4000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.5Hz, Speed=1418.400024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48Hz, Speed=1431.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.79999924Hz, Speed=145.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.09999847Hz, Speed=458.6000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.29999924Hz, Speed=1581.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6Hz, Speed=273.8999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.09999847Hz, Speed=1583.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.59999847Hz, Speed=813.2000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.90000153Hz, Speed=433.3999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35Hz, Speed=144RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.299999952Hz, Speed=955.7000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.29999924Hz, Speed=1675.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.5Hz, Speed=618RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.70000076Hz, Speed=1086.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.39999962Hz, Speed=372RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.19999981Hz, Speed=1123.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46Hz, Speed=1082.400024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.800000191Hz, Speed=435RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.59999847Hz, Speed=1653RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.90000153Hz, Speed=664.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1Hz, Speed=1615.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54.90000153Hz, Speed=1574RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.89999962Hz, Speed=1294.5RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.29999924Hz, Speed=312.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.700000048Hz, Speed=1026.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.60000038Hz, Speed=399.7999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.89999962Hz, Speed=1210.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.40000153Hz, Speed=1230.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.60000038Hz, Speed=1295RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.60000038Hz, Speed=1439.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.79999924Hz, Speed=842.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.59999847Hz, Speed=1125.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.80000019Hz, Speed=411.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.80000019Hz, Speed=613.7999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.19999981Hz, Speed=1326.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.89999962Hz, Speed=1434.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.400000095Hz, Speed=1485.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.39999962Hz, Speed=915.4000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.70000076Hz, Speed=1505.300049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.29999924Hz, Speed=95.40000153RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.20000076Hz, Speed=968.7000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.800000191Hz, Speed=288.8999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.79999924Hz, Speed=414.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.20000076Hz, Speed=129.3000031RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.60000038Hz, Speed=10.80000019RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.20000076Hz, Speed=1733.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.5Hz, Speed=1133.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.70000076Hz, Speed=237.3999939RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.69999981Hz, Speed=14.19999981RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.900000095Hz, Speed=365.6000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.79999924Hz, Speed=1127.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54Hz, Speed=1518.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.60000038Hz, Speed=1727.900024RPM, Status=1
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.5Hz, Speed=694.4000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.10000038Hz, Speed=809.4000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47.29999924Hz, Speed=825.2000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.800000012Hz, Speed=840.4000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.199999809Hz, Speed=1781.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.20000076Hz, Speed=982.0999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.30000019Hz, Speed=545.2000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.20000076Hz, Speed=500.7000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.100000381Hz, Speed=1792.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.89999962Hz, Speed=917.2000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.5Hz, Speed=880RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.5Hz, Speed=1601.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.5Hz, Speed=594RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.79999924Hz, Speed=654.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.70000076Hz, Speed=343RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.70000076Hz, Speed=365.8999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.70000076Hz, Speed=98.90000153RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.29999924Hz, Speed=883.2999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.5Hz, Speed=28.89999962RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.09999847Hz, Speed=105.4000015RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.399999619Hz, Speed=853.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.89999962Hz, Speed=1229.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3Hz, Speed=137.6999969RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.20000076Hz, Speed=1028.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54.40000153Hz, Speed=683.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.20000076Hz, Speed=1681.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.29999924Hz, Speed=1270.099976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.60000038Hz, Speed=337.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.29999924Hz, Speed=1045RPM, Status=3
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.39999962Hz, Speed=1595.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.5Hz, Speed=498.2999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.20000076Hz, Speed=1097.800049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.099999905Hz, Speed=1392.699951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.79999924Hz, Speed=1006.400024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.89999962Hz, Speed=258.1000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.59999847Hz, Speed=1190.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23Hz, Speed=1019.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.099999905Hz, Speed=1467.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54.5Hz, Speed=1284.800049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.29999924Hz, Speed=1366.099976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19Hz, Speed=1219.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.69999981Hz, Speed=1524.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.89999962Hz, Speed=546.5999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.099999905Hz, Speed=601.4000244RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.29999924Hz, Speed=644.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.39999962Hz, Speed=1604.099976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.79999924Hz, Speed=294.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.699999809Hz, Speed=1790.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.09999847Hz, Speed=1364.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.20000076Hz, Speed=266RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.70000076Hz, Speed=227.8000031RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.59999847Hz, Speed=179.8999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.20000076Hz, Speed=54.90000153RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.89999962Hz, Speed=515.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.29999924Hz, Speed=253.8999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.20000076Hz, Speed=342.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.20000076Hz, Speed=187.1000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.69999981Hz, Speed=248.6999969RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.59999847Hz, Speed=1367.900024RPM, Status=3
+💖 Heartbeat from device 1: RSSI=-74
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.60000038Hz, Speed=966.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.5Hz, Speed=1397.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.09999847Hz, Speed=317.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.300000191Hz, Speed=1538.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.300000191Hz, Speed=1127.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.5Hz, Speed=1526.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56Hz, Speed=1686.599976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.400000095Hz, Speed=594.2999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.600000381Hz, Speed=800.7000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.70000076Hz, Speed=773.7000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.59999847Hz, Speed=345.7000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.799999952Hz, Speed=420.6000061RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.5Hz, Speed=234.6000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.29999924Hz, Speed=1392.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.5Hz, Speed=1505.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.5Hz, Speed=789.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.29999924Hz, Speed=1626.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.40000153Hz, Speed=503.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47.29999924Hz, Speed=1509.599976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.89999962Hz, Speed=323.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.90000153Hz, Speed=1421.400024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.20000076Hz, Speed=301.2000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.90000153Hz, Speed=1767.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.39999962Hz, Speed=638.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.89999962Hz, Speed=385.3999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.79999924Hz, Speed=1094.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.89999962Hz, Speed=1404.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.40000153Hz, Speed=1570.300049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.5Hz, Speed=684.2000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54.20000076Hz, Speed=726.5RPM, Status=3
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.20000076Hz, Speed=537.0999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.70000076Hz, Speed=1772.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23Hz, Speed=947.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36Hz, Speed=971.7999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.40000153Hz, Speed=1262.599976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.79999924Hz, Speed=1788.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.60000038Hz, Speed=1435.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.5Hz, Speed=339.3999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.89999962Hz, Speed=1649.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.59999847Hz, Speed=887.9000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.79999924Hz, Speed=636.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.5Hz, Speed=897.4000244RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.90000153Hz, Speed=268.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.70000076Hz, Speed=676.7000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.299999952Hz, Speed=881.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.699999809Hz, Speed=620.9000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.800000191Hz, Speed=823.0999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.70000076Hz, Speed=822.9000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.40000153Hz, Speed=829.9000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.09999847Hz, Speed=533.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.40000153Hz, Speed=1686.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.90000153Hz, Speed=642.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.70000076Hz, Speed=1658.400024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.39999962Hz, Speed=36.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.29999924Hz, Speed=1190.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17Hz, Speed=885.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.89999962Hz, Speed=1385.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.39999962Hz, Speed=1238.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.29999924Hz, Speed=984.7999878RPM, Status=2
+💖 Heartbeat from device 1: RSSI=-78
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.29999924Hz, Speed=109.9000015RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.40000153Hz, Speed=1601.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.699999809Hz, Speed=1262.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.90000153Hz, Speed=1048.800049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.5Hz, Speed=933.2999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.099999905Hz, Speed=1435.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.099999905Hz, Speed=53.79999924RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.59999847Hz, Speed=180.8999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.09999847Hz, Speed=363.6000061RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.29999924Hz, Speed=1266.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.70000076Hz, Speed=1558.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.79999924Hz, Speed=1202RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11Hz, Speed=728RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.10000038Hz, Speed=1388.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.10000038Hz, Speed=1033.400024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.89999962Hz, Speed=404.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.59999847Hz, Speed=615RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.19999981Hz, Speed=451.6000061RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.100000381Hz, Speed=1653.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54.40000153Hz, Speed=13.10000038RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.10000038Hz, Speed=64.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.59999847Hz, Speed=1783.699951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.70000076Hz, Speed=1794.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.5Hz, Speed=1458.800049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.699999809Hz, Speed=1663.300049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.70000076Hz, Speed=1763.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.60000038Hz, Speed=288RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.89999962Hz, Speed=628.4000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.29999924Hz, Speed=1740.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.19999981Hz, Speed=538.5RPM, Status=1
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.89999962Hz, Speed=1131.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.599999905Hz, Speed=493.7999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.599999905Hz, Speed=1188.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.90000153Hz, Speed=535.9000244RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.09999847Hz, Speed=41.20000076RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.199999809Hz, Speed=463.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.29999924Hz, Speed=443.6000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.5Hz, Speed=1689.300049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.29999924Hz, Speed=66.69999695RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.800000191Hz, Speed=828.5999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.90000153Hz, Speed=1252RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.200000048Hz, Speed=657RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.699999809Hz, Speed=804RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.89999962Hz, Speed=1090.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.70000076Hz, Speed=480.1000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50Hz, Speed=14.80000019RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.89999962Hz, Speed=1706.099976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19Hz, Speed=1379.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.5Hz, Speed=854.7000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.29999924Hz, Speed=1475.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.399999619Hz, Speed=1258.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.5Hz, Speed=545.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.5Hz, Speed=2.700000048RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.5Hz, Speed=1570.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.19999981Hz, Speed=581.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22Hz, Speed=324.7999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.10000038Hz, Speed=1098.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.89999962Hz, Speed=929.4000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.69999981Hz, Speed=866.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.5Hz, Speed=305.5RPM, Status=1
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.39999962Hz, Speed=1754.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.60000038Hz, Speed=1413.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.70000076Hz, Speed=622.5999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.099999905Hz, Speed=118.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.199999809Hz, Speed=1787.099976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.299999952Hz, Speed=1046.599976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.70000076Hz, Speed=828RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.29999924Hz, Speed=1302.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.20000076Hz, Speed=94.90000153RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.79999924Hz, Speed=1438.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.5Hz, Speed=1108.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.10000038Hz, Speed=1131.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.29999924Hz, Speed=1077.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.90000153Hz, Speed=1646.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.89999962Hz, Speed=548.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54.29999924Hz, Speed=889.4000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.5Hz, Speed=1174.800049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.400000095Hz, Speed=1040RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.10000038Hz, Speed=50.70000076RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.89999962Hz, Speed=32.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.39999962Hz, Speed=1642.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.70000076Hz, Speed=1667.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.60000038Hz, Speed=1442.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.59999847Hz, Speed=985.5999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.90000153Hz, Speed=1140.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.800000191Hz, Speed=198.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.59999847Hz, Speed=316.8999939RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.70000076Hz, Speed=1734RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.29999924Hz, Speed=608.0999756RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-68
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.800000191Hz, Speed=389.7999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.30000019Hz, Speed=176.8000031RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.79999924Hz, Speed=629.2000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.09999847Hz, Speed=1268.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.40000153Hz, Speed=424.6000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.89999962Hz, Speed=599.9000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.89999962Hz, Speed=398.6000061RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54Hz, Speed=899RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.59999847Hz, Speed=170.3000031RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.80000019Hz, Speed=1284RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.800000191Hz, Speed=1222.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.20000076Hz, Speed=1799.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.60000038Hz, Speed=972.0999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.20000076Hz, Speed=185.8000031RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.79999924Hz, Speed=577.2000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34Hz, Speed=1425.400024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.29999924Hz, Speed=1743.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.5Hz, Speed=1254.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.60000038Hz, Speed=459RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31Hz, Speed=1169.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58Hz, Speed=1063.300049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.79999924Hz, Speed=22.39999962RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.800000191Hz, Speed=578.2000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.79999924Hz, Speed=674.7000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.799999952Hz, Speed=679.9000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10Hz, Speed=426.3999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.09999847Hz, Speed=447.3999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.29999924Hz, Speed=792RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.19999981Hz, Speed=1659.300049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.400000095Hz, Speed=1354.900024RPM, Status=3
+💖 Heartbeat from device 1: RSSI=-78
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.5Hz, Speed=649.7000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.59999847Hz, Speed=1136.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22Hz, Speed=275.7000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.70000076Hz, Speed=1096.099976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.20000076Hz, Speed=288RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.5Hz, Speed=905.2999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.20000076Hz, Speed=1624.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.70000076Hz, Speed=1611.400024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30.79999924Hz, Speed=231.8999939RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42Hz, Speed=1104.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58Hz, Speed=1368.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.79999924Hz, Speed=988.0999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.70000076Hz, Speed=521RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.09999847Hz, Speed=616.9000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.10000038Hz, Speed=808.9000244RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39Hz, Speed=660RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8Hz, Speed=1394.199951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55Hz, Speed=1247.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.80000019Hz, Speed=1386.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.29999924Hz, Speed=1624.300049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36Hz, Speed=1517.199951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.89999962Hz, Speed=1607.099976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.5Hz, Speed=383.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.39999962Hz, Speed=1454.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.59999847Hz, Speed=205.6000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58Hz, Speed=1068.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.59999847Hz, Speed=831.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.29999924Hz, Speed=1344.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.09999847Hz, Speed=885.9000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.10000038Hz, Speed=1229.599976RPM, Status=1
+💖 Heartbeat from device 1: RSSI=-78
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.29999924Hz, Speed=1077.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.29999924Hz, Speed=1799.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.79999924Hz, Speed=447.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.70000076Hz, Speed=200.6999969RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.20000076Hz, Speed=313.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.89999962Hz, Speed=730.9000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.59999847Hz, Speed=806RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.5Hz, Speed=1716.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.899999976Hz, Speed=499RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47.5Hz, Speed=631.7000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.20000076Hz, Speed=671.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.59999847Hz, Speed=920.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.89999962Hz, Speed=835.7000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.900000095Hz, Speed=198.1999969RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.70000076Hz, Speed=884.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.5Hz, Speed=15RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.60000038Hz, Speed=258.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.79999924Hz, Speed=1564RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0Hz, Speed=601.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.59999847Hz, Speed=971.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.89999962Hz, Speed=331.8999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.29999924Hz, Speed=963.5999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.79999924Hz, Speed=1206.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.10000038Hz, Speed=512.7000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.39999962Hz, Speed=337.8999939RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30.39999962Hz, Speed=1095.800049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.60000038Hz, Speed=1491.099976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.90000153Hz, Speed=392.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.30000019Hz, Speed=56RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-76
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.59999847Hz, Speed=1710.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.5Hz, Speed=1306.699951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.39999962Hz, Speed=1677.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.70000076Hz, Speed=1187.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.5Hz, Speed=785RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.599999905Hz, Speed=1730.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.900000095Hz, Speed=1042RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.79999924Hz, Speed=893.5999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.59999847Hz, Speed=969.4000244RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.70000076Hz, Speed=1189.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.20000076Hz, Speed=1098.199951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.5Hz, Speed=985.5999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.79999924Hz, Speed=349.8999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.59999847Hz, Speed=378.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.10000038Hz, Speed=493.6000061RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.59999847Hz, Speed=885RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.5Hz, Speed=1717RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.5Hz, Speed=368.1000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.20000076Hz, Speed=1763.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30.39999962Hz, Speed=1282.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.5Hz, Speed=1110.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.90000153Hz, Speed=1204.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.5Hz, Speed=697.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.20000076Hz, Speed=58.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.29999924Hz, Speed=941.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.799999952Hz, Speed=1413.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.20000076Hz, Speed=1682.099976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.800000191Hz, Speed=136.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.29999924Hz, Speed=870.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47.5Hz, Speed=180.5RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-78
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.5Hz, Speed=732.9000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.10000038Hz, Speed=853.4000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.79999924Hz, Speed=1540.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.199999809Hz, Speed=375.8999939RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.20000076Hz, Speed=1343.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.70000076Hz, Speed=1141RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.80000019Hz, Speed=1343.400024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41Hz, Speed=1186.099976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.5Hz, Speed=816.0999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.79999924Hz, Speed=1304.699951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.099999905Hz, Speed=749.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.39999962Hz, Speed=887.4000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37Hz, Speed=595RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.700000048Hz, Speed=148.8000031RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.69999981Hz, Speed=1640.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.60000038Hz, Speed=495.2000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.5Hz, Speed=1148.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.09999847Hz, Speed=566.5999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.20000076Hz, Speed=1600.800049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.5Hz, Speed=381.6000061RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.899999619Hz, Speed=746.2999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.199999809Hz, Speed=509.1000061RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.60000038Hz, Speed=238.8000031RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.5Hz, Speed=535.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.5Hz, Speed=1606.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.20000076Hz, Speed=227RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.20000076Hz, Speed=512.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.300000191Hz, Speed=1660.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.200000048Hz, Speed=1046.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.90000153Hz, Speed=1015.099976RPM, Status=3
+💖 Heartbeat from device 1: RSSI=-78
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.79999924Hz, Speed=828.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.10000038Hz, Speed=1052.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.29999924Hz, Speed=933.5999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.59999847Hz, Speed=641.0999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38Hz, Speed=855.9000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.90000153Hz, Speed=1570.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.79999924Hz, Speed=307.3999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.30000019Hz, Speed=1709.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.20000076Hz, Speed=94.30000305RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.89999962Hz, Speed=1552.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.29999924Hz, Speed=98RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.60000038Hz, Speed=1137.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.200000048Hz, Speed=1689RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.800000191Hz, Speed=46.70000076RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.90000153Hz, Speed=264.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.79999924Hz, Speed=1601.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.5Hz, Speed=1668.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.59999847Hz, Speed=410RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.79999924Hz, Speed=401.3999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.900000095Hz, Speed=1013.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.89999962Hz, Speed=662.9000244RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.5Hz, Speed=116.8000031RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22Hz, Speed=1310.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.29999924Hz, Speed=1252.199951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.20000076Hz, Speed=44.70000076RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.70000076Hz, Speed=1202.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.20000076Hz, Speed=73.80000305RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.70000076Hz, Speed=1139.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.09999847Hz, Speed=1775.599976RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.79999924Hz, Speed=881.5999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.70000076Hz, Speed=471.6000061RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.10000038Hz, Speed=1590.300049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24Hz, Speed=222.1999969RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30Hz, Speed=287.7000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.399999619Hz, Speed=216RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.89999962Hz, Speed=1329.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.79999924Hz, Speed=1188.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.10000038Hz, Speed=511.3999939RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.90000153Hz, Speed=883.7999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.79999924Hz, Speed=24.79999924RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.599999905Hz, Speed=1094RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47Hz, Speed=1796.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.20000076Hz, Speed=1433.599976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.79999924Hz, Speed=497.7999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.700000048Hz, Speed=616.2000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.699999809Hz, Speed=498.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.10000038Hz, Speed=587.2000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.39999962Hz, Speed=1516.599976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.70000076Hz, Speed=1052.400024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51Hz, Speed=1637.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.29999924Hz, Speed=132.3999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.59999847Hz, Speed=445.7000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.39999962Hz, Speed=836.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.60000038Hz, Speed=534.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.5Hz, Speed=239.8000031RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.099999905Hz, Speed=895.5999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.10000038Hz, Speed=73RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.79999924Hz, Speed=1474.599976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.79999924Hz, Speed=108.1999969RPM, Status=2
+💖 Heartbeat from device 1: RSSI=-78
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17Hz, Speed=1477.699951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.40000153Hz, Speed=982.2000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.79999924Hz, Speed=416.2999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.20000076Hz, Speed=1625.099976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.79999924Hz, Speed=253.6000061RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.40000153Hz, Speed=1741.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.5Hz, Speed=162.3999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.89999962Hz, Speed=153.1000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.59999847Hz, Speed=236.6000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.09999847Hz, Speed=1691.800049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.5Hz, Speed=433.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.5Hz, Speed=966RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49Hz, Speed=1011RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.5Hz, Speed=226.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.900000095Hz, Speed=879.2999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.70000076Hz, Speed=1613.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.79999924Hz, Speed=703.5999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.59999847Hz, Speed=974.7999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.599999905Hz, Speed=39.29999924RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.60000038Hz, Speed=1459.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29Hz, Speed=531.4000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30Hz, Speed=1667.599976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46Hz, Speed=1118.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.59999847Hz, Speed=1447.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.79999924Hz, Speed=1084.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.79999924Hz, Speed=100.5999985RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.79999924Hz, Speed=1686.300049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.29999924Hz, Speed=1754.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.89999962Hz, Speed=424.1000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.20000076Hz, Speed=1633.5RPM, Status=2
+💖 Heartbeat from device 1: RSSI=-79
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.29999924Hz, Speed=1319.099976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.20000076Hz, Speed=1568.699951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.20000076Hz, Speed=104.9000015RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.5Hz, Speed=1293.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.599999905Hz, Speed=205.6999969RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.5Hz, Speed=27.79999924RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37Hz, Speed=1436RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.59999847Hz, Speed=726.7000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.90000153Hz, Speed=1234RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.29999924Hz, Speed=1388.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.09999847Hz, Speed=1738RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.40000153Hz, Speed=106.9000015RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.099999905Hz, Speed=1182.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.5Hz, Speed=1526.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.20000076Hz, Speed=1085.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.20000076Hz, Speed=965.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.60000038Hz, Speed=605.5999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.60000038Hz, Speed=283.8999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.40000153Hz, Speed=567.2000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.20000076Hz, Speed=570.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57Hz, Speed=86.30000305RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.20000076Hz, Speed=1178.400024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.5Hz, Speed=835.5999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.600000381Hz, Speed=26.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.59999847Hz, Speed=1425.400024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.29999924Hz, Speed=956.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.40000153Hz, Speed=518.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43Hz, Speed=270.2000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.40000153Hz, Speed=104.4000015RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.79999924Hz, Speed=1754.800049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.10000038Hz, Speed=1041.300049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.40000153Hz, Speed=1498.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.40000153Hz, Speed=1161.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.90000153Hz, Speed=1613.099976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.5Hz, Speed=1799.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.200000003Hz, Speed=215.1000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.5Hz, Speed=926.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28Hz, Speed=1660.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22Hz, Speed=898.5999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.70000076Hz, Speed=320.1000061RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.5Hz, Speed=712.7000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.09999847Hz, Speed=483.7000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24Hz, Speed=33.70000076RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.20000076Hz, Speed=1484.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.10000038Hz, Speed=154.8999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.800000191Hz, Speed=1680.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.5Hz, Speed=842.0999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.59999847Hz, Speed=117RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.90000153Hz, Speed=1277.400024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.100000024Hz, Speed=1020.200012RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.29999924Hz, Speed=1765.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.60000038Hz, Speed=827.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.300000191Hz, Speed=815.4000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.39999962Hz, Speed=1020.099976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.40000153Hz, Speed=100.6999969RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.20000076Hz, Speed=782.7000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.20000076Hz, Speed=159.8999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.79999924Hz, Speed=1360.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.40000153Hz, Speed=43.20000076RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-81
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.5Hz, Speed=924.7999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47.40000153Hz, Speed=1556.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.79999924Hz, Speed=1745.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.20000076Hz, Speed=483.7000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.40000153Hz, Speed=91.69999695RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.39999962Hz, Speed=803.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.39999962Hz, Speed=9.399999619RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.20000076Hz, Speed=1672.699951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3Hz, Speed=337.7000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.5Hz, Speed=793.9000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.70000076Hz, Speed=67.90000153RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13Hz, Speed=125.3000031RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.29999924Hz, Speed=250.6999969RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.300000191Hz, Speed=246RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.20000076Hz, Speed=271.3999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.90000153Hz, Speed=1486.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.40000153Hz, Speed=354.2999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18Hz, Speed=1224.300049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.29999924Hz, Speed=1726.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.300000191Hz, Speed=421RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.899999619Hz, Speed=210.8999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.10000038Hz, Speed=1611.599976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.5Hz, Speed=1595.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58Hz, Speed=1763.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38Hz, Speed=1318.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.40000153Hz, Speed=1038.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.399999619Hz, Speed=639.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.89999962Hz, Speed=131.3999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34Hz, Speed=1434RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.900000095Hz, Speed=1449.5RPM, Status=3
+💖 Heartbeat from device 1: RSSI=-82
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54.90000153Hz, Speed=15RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.20000076Hz, Speed=680.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.399999976Hz, Speed=566RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47.40000153Hz, Speed=31.20000076RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54.09999847Hz, Speed=760.0999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.70000076Hz, Speed=1661RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=60Hz, Speed=1.899999976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.800000191Hz, Speed=1352.300049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.90000153Hz, Speed=952.7000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.90000153Hz, Speed=1511.199951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.5Hz, Speed=472RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.5Hz, Speed=896.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.10000038Hz, Speed=1541.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30.39999962Hz, Speed=1769.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.5Hz, Speed=295.3999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.70000076Hz, Speed=234.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.89999962Hz, Speed=1515.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.29999924Hz, Speed=1293.599976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.30000019Hz, Speed=1504.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.20000076Hz, Speed=142RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.79999924Hz, Speed=1092.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.600000024Hz, Speed=799RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47.70000076Hz, Speed=752RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.70000076Hz, Speed=762RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.30000019Hz, Speed=371RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.10000038Hz, Speed=1720.099976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.900000095Hz, Speed=207.3999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.70000076Hz, Speed=1779.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.29999924Hz, Speed=891.2000122RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-81
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.5Hz, Speed=1366.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.80000019Hz, Speed=142.1999969RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.89999962Hz, Speed=1645.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51Hz, Speed=601.5999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.70000076Hz, Speed=222.8999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.90000153Hz, Speed=642.2000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54Hz, Speed=1681.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.79999924Hz, Speed=1066.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.79999924Hz, Speed=1085.599976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.19999981Hz, Speed=1526.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.59999847Hz, Speed=1527RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.5Hz, Speed=1577.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.79999924Hz, Speed=35.70000076RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.39999962Hz, Speed=182.6000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.700000048Hz, Speed=834.0999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.799999952Hz, Speed=1719.199951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53.59999847Hz, Speed=697.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.90000153Hz, Speed=898.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.79999924Hz, Speed=810.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.20000076Hz, Speed=1203RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.39999962Hz, Speed=511RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.399999619Hz, Speed=1286.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.29999924Hz, Speed=1103.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.79999924Hz, Speed=1243.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.39999962Hz, Speed=1357.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.60000038Hz, Speed=1212.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.39999962Hz, Speed=1548.699951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.60000038Hz, Speed=1172.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.20000076Hz, Speed=588.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.10000038Hz, Speed=644.5999756RPM, Status=1
+💖 Heartbeat from device 1: RSSI=-81
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.69999981Hz, Speed=284.1000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.20000076Hz, Speed=1569.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.70000076Hz, Speed=128.3999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.099999905Hz, Speed=917.5999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.29999924Hz, Speed=1358.800049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.199999809Hz, Speed=1644.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.20000076Hz, Speed=778.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.60000038Hz, Speed=564.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.29999924Hz, Speed=1161RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59Hz, Speed=441.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.20000076Hz, Speed=777.5999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.60000038Hz, Speed=980.9000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54Hz, Speed=1284.199951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.900000095Hz, Speed=1492.699951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.099999905Hz, Speed=236.3000031RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.10000038Hz, Speed=504.3999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32Hz, Speed=1571.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.10000038Hz, Speed=80.69999695RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.59999847Hz, Speed=1542.300049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.89999962Hz, Speed=559RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.700000048Hz, Speed=791.2000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7Hz, Speed=90.09999847RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=26.70000076Hz, Speed=950.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.900000095Hz, Speed=1579.400024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.699999809Hz, Speed=977.7000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.10000038Hz, Speed=546.0999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.400000095Hz, Speed=737.4000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.10000038Hz, Speed=483.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.80000019Hz, Speed=472RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.90000153Hz, Speed=555RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-82
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.20000076Hz, Speed=302.2999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.70000076Hz, Speed=966.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42Hz, Speed=1215.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41Hz, Speed=1543.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.79999924Hz, Speed=362.7999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.39999962Hz, Speed=205RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.299999952Hz, Speed=1486.699951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.70000076Hz, Speed=766.9000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.20000076Hz, Speed=1693.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.09999847Hz, Speed=1703.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.399999619Hz, Speed=362RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.60000038Hz, Speed=175.3999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.199999809Hz, Speed=754.4000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.400000095Hz, Speed=926.4000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31Hz, Speed=18.89999962RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.70000076Hz, Speed=717RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.399999619Hz, Speed=1581.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.5Hz, Speed=1213.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.299999952Hz, Speed=18.29999924RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.899999619Hz, Speed=1506.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.39999962Hz, Speed=1389.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.800000191Hz, Speed=651.2000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47.79999924Hz, Speed=1176.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.79999924Hz, Speed=205.1999969RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.70000076Hz, Speed=285.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.099999905Hz, Speed=362.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.5Hz, Speed=1747.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.10000038Hz, Speed=138.1000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.099999905Hz, Speed=296.5RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.59999847Hz, Speed=147.6999969RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12Hz, Speed=1720RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.29999924Hz, Speed=1251.199951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.29999924Hz, Speed=34.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.300000191Hz, Speed=115.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46Hz, Speed=1016.299988RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19Hz, Speed=1192.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53Hz, Speed=738.2000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.59999847Hz, Speed=58.20000076RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.5Hz, Speed=609.7000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.400000006Hz, Speed=305.1000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.099999905Hz, Speed=859.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.90000153Hz, Speed=406.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.5Hz, Speed=97.90000153RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28Hz, Speed=761.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.09999847Hz, Speed=681RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.70000076Hz, Speed=1642.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.60000038Hz, Speed=1781.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.70000076Hz, Speed=138.3000031RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.89999962Hz, Speed=333.7999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.10000038Hz, Speed=1661.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.5Hz, Speed=1006.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.20000076Hz, Speed=1407.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.70000076Hz, Speed=468.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13Hz, Speed=1227.599976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25Hz, Speed=816.5999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.29999924Hz, Speed=499.7000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.09999847Hz, Speed=1684.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.29999924Hz, Speed=1700.400024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.79999924Hz, Speed=48.40000153RPM, Status=1
+💖 Heartbeat from device 1: RSSI=-75
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.89999962Hz, Speed=244.1000061RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44Hz, Speed=1471.699951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40Hz, Speed=743.9000244RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.29999924Hz, Speed=1100.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.29999924Hz, Speed=92.19999695RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.59999847Hz, Speed=225.8000031RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.59999847Hz, Speed=1140.800049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.40000153Hz, Speed=237.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.29999924Hz, Speed=1182.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22.20000076Hz, Speed=16.60000038RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.29999924Hz, Speed=1274.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.29999924Hz, Speed=1756.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.29999924Hz, Speed=191.1000061RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.09999847Hz, Speed=1504.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.19999981Hz, Speed=1220.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.10000038Hz, Speed=1545.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.09999847Hz, Speed=566.4000244RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.60000038Hz, Speed=409.2000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.89999962Hz, Speed=1724.099976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.5Hz, Speed=456.6000061RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.90000153Hz, Speed=1274.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.90000153Hz, Speed=1776RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.70000076Hz, Speed=1739.199951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.09999847Hz, Speed=359.6000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.29999924Hz, Speed=108.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.20000076Hz, Speed=1422.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.30000019Hz, Speed=248RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.59999847Hz, Speed=418.3999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.5Hz, Speed=1432.099976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.20000076Hz, Speed=358.8999939RPM, Status=1
+💖 Heartbeat from device 1: RSSI=-75
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.099999905Hz, Speed=1302.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.39999962Hz, Speed=142.3999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.200000048Hz, Speed=1493.199951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.80000019Hz, Speed=564.0999756RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47.59999847Hz, Speed=1104.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.5Hz, Speed=837.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.5Hz, Speed=379.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.10000038Hz, Speed=424.1000061RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.300000191Hz, Speed=1396.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.700000048Hz, Speed=1327.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.70000076Hz, Speed=975.7999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=56.70000076Hz, Speed=331RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.19999981Hz, Speed=434.8999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.29999924Hz, Speed=1154RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.10000038Hz, Speed=821.7000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46Hz, Speed=1408.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.69999981Hz, Speed=1780RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.300000191Hz, Speed=1212.800049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.20000076Hz, Speed=1151.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.19999981Hz, Speed=1766.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.899999976Hz, Speed=888.2000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.30000019Hz, Speed=955.0999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.09999847Hz, Speed=1098.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=57.5Hz, Speed=935.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.79999924Hz, Speed=383.2000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.39999962Hz, Speed=479.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54.29999924Hz, Speed=1639.599976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.70000076Hz, Speed=177.6999969RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.39999962Hz, Speed=1287.300049RPM, Status=1
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.90000153Hz, Speed=519.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.79999924Hz, Speed=1048.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.39999962Hz, Speed=783RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.89999962Hz, Speed=434.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.60000038Hz, Speed=680.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.5Hz, Speed=1044.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54.20000076Hz, Speed=382.2000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.400000095Hz, Speed=1274.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.699999809Hz, Speed=1076.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.60000038Hz, Speed=697.7000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8Hz, Speed=1300.699951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.40000153Hz, Speed=786.0999756RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.800000191Hz, Speed=1656.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.89999962Hz, Speed=272.3999939RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.70000076Hz, Speed=1488.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.800000191Hz, Speed=1072.300049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.59999847Hz, Speed=653.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.60000038Hz, Speed=439.6000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.29999924Hz, Speed=926.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=19.60000038Hz, Speed=304.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.19999981Hz, Speed=780.9000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.29999924Hz, Speed=754RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17Hz, Speed=1411.300049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.70000076Hz, Speed=1614.800049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.29999924Hz, Speed=801.0999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35Hz, Speed=1691.699951RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.29999924Hz, Speed=721.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.5Hz, Speed=1768.599976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=5.699999809Hz, Speed=112.5999985RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.100000381Hz, Speed=385.2999878RPM, Status=2
+💖 Heartbeat from device 1: RSSI=-76
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.60000038Hz, Speed=841.4000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.70000076Hz, Speed=1275.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.70000076Hz, Speed=38.29999924RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.59999847Hz, Speed=1442.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.20000076Hz, Speed=1243.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.40000153Hz, Speed=266.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.40000153Hz, Speed=140.8999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.20000076Hz, Speed=287RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.90000153Hz, Speed=523.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.90000153Hz, Speed=420.6000061RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.90000153Hz, Speed=1126.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.10000038Hz, Speed=518.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.90000153Hz, Speed=596.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.09999847Hz, Speed=1793.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.09999847Hz, Speed=966.7000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=22Hz, Speed=1660.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.20000076Hz, Speed=689.9000244RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.89999962Hz, Speed=272.3999939RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.40000153Hz, Speed=1789RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=30.29999924Hz, Speed=1348.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.90000153Hz, Speed=1349.599976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.89999962Hz, Speed=23.70000076RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45Hz, Speed=1741.099976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43.20000076Hz, Speed=730.2000122RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.59999847Hz, Speed=1768.699951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.60000038Hz, Speed=1480.199951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54Hz, Speed=72.30000305RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55Hz, Speed=246RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.20000076Hz, Speed=1664.300049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=16.29999924Hz, Speed=1165.199951RPM, Status=1
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34.20000076Hz, Speed=1482.099976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.59999847Hz, Speed=194.6999969RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.09999847Hz, Speed=1446.699951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.09999847Hz, Speed=981.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=29.5Hz, Speed=324.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=42.5Hz, Speed=1650.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58.40000153Hz, Speed=603.0999756RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.40000153Hz, Speed=1784.099976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=34Hz, Speed=1476.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.699999809Hz, Speed=369.3999939RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.79999924Hz, Speed=1001.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.10000038Hz, Speed=23.60000038RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.30000019Hz, Speed=706.2999878RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.79999924Hz, Speed=1212.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.40000153Hz, Speed=66.40000153RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.70000076Hz, Speed=417.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.40000153Hz, Speed=65.59999847RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=17.29999924Hz, Speed=1025.300049RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=49.09999847Hz, Speed=618RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=1.700000048Hz, Speed=1033.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.90000153Hz, Speed=1383.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.29999924Hz, Speed=1078.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=36.29999924Hz, Speed=1436.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=7.300000191Hz, Speed=578.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=43Hz, Speed=1102.800049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.29999924Hz, Speed=579.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.5Hz, Speed=1585.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.79999924Hz, Speed=1262.900024RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=15.69999981Hz, Speed=383.6000061RPM, Status=2
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.39999962Hz, Speed=469.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.5Hz, Speed=357.2000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.19999981Hz, Speed=400.3999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=53Hz, Speed=760.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=9.300000191Hz, Speed=1783.400024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=47Hz, Speed=991.2000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.299999952Hz, Speed=1197.5RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44Hz, Speed=902.2999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.400000006Hz, Speed=1620.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.5Hz, Speed=1478.699951RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33Hz, Speed=1426.599976RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=18.70000076Hz, Speed=1620.900024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=3.599999905Hz, Speed=1268.800049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=51.20000076Hz, Speed=81.40000153RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.400000095Hz, Speed=1626.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.29999924Hz, Speed=814RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.70000076Hz, Speed=1243.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.19999981Hz, Speed=1369.699951RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.89999962Hz, Speed=282.1000061RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25Hz, Speed=1748.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.700000048Hz, Speed=682.2000122RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.29999924Hz, Speed=964.4000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.59999847Hz, Speed=398.8999939RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=21.60000038Hz, Speed=258.2999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.70000076Hz, Speed=1236.300049RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.79999924Hz, Speed=1044.199951RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=25.70000076Hz, Speed=1185RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=31.70000076Hz, Speed=871.7999878RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44.5Hz, Speed=147.1999969RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.29999924Hz, Speed=868.7999878RPM, Status=3
+💖 Heartbeat from device 1: RSSI=-77
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=4.099999905Hz, Speed=1554.099976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.29999924Hz, Speed=1196.599976RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=38.20000076Hz, Speed=126.5999985RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=6.199999809Hz, Speed=387RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.899999619Hz, Speed=8.899999619RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=11.10000038Hz, Speed=451.7999878RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=48.20000076Hz, Speed=1679.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39.90000153Hz, Speed=674.5RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=2.400000095Hz, Speed=681.9000244RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=41.59999847Hz, Speed=684.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=0.100000001Hz, Speed=1745.900024RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.09999847Hz, Speed=1767.800049RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=8.600000381Hz, Speed=599.7000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=24.39999962Hz, Speed=1353.099976RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=46.79999924Hz, Speed=1064.400024RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=33.20000076Hz, Speed=697.4000244RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=59.20000076Hz, Speed=1608.900024RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=58Hz, Speed=342.8999939RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55.40000153Hz, Speed=942.7000122RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=37.90000153Hz, Speed=1480.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=12.10000038Hz, Speed=1451.599976RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=28.70000076Hz, Speed=224.6999969RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=32.29999924Hz, Speed=686.0999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=20.29999924Hz, Speed=592RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=45.40000153Hz, Speed=178.1000061RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=52.79999924Hz, Speed=514RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=27.10000038Hz, Speed=1076.5RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=55Hz, Speed=309.2999878RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=50.20000076Hz, Speed=534.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=13.80000019Hz, Speed=1687RPM, Status=0
+💖 Heartbeat from device 1: RSSI=-76
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=39Hz, Speed=393.5RPM, Status=1
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=14.19999981Hz, Speed=1655.300049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=40.29999924Hz, Speed=731RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=35.90000153Hz, Speed=901RPM, Status=3
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=23.79999924Hz, Speed=159.3000031RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=44Hz, Speed=1540.300049RPM, Status=0
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=10.69999981Hz, Speed=437.7000122RPM, Status=2
+✅ Device 1 marked online - heartbeat updated
+📡 VFD data from device 1: Freq=54.79999924Hz, Speed=548.0999756RPM, Status=1
+✅ Device 1 marked online - heartbeat updated

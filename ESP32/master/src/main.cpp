@@ -46,7 +46,6 @@ void checkWiFiConnection();
 void loadCredentials();
 void saveCredentials();
 void connectWebSocket();
-bool canReachServer();
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length);
 void handleRegistrationResponse(JsonDocument& doc);
 void sendSensorData();
@@ -244,15 +243,11 @@ void connectWebSocket() {
     return;
   }
 
-  if (!canReachServer()) {
-    Serial.println("❌ Server not reachable from ESP32 static IP (TCP check failed)");
-    return;
-  }
-
   lastWebSocketAttemptTime = millis();
   
   Serial.println("\n🔌 Connecting to WebSocket...");
   Serial.printf("  Server: %s:%d\n", SERVER_IP, SERVER_PORT);
+  Serial.printf("  MAC Address: %s\n", deviceMAC.c_str());
   
   // Build WebSocket path: mac_address must be URL-encoded (colons break some servers)
   String macEncoded = urlEncode(deviceMAC);
@@ -262,39 +257,21 @@ void connectWebSocket() {
   if (isRegistered && deviceID > 0 && deviceKey.length() > 0) {
     wsPath += "&device_id=" + String(deviceID);
     wsPath += "&device_key=" + deviceKey;
-    Serial.printf("  Authenticating with device_id=%d\n", deviceID);
+    Serial.printf("  ✅ Authenticating with device_id=%d\n", deviceID);
   } else {
-    Serial.println("  Requesting auto-registration");
+    Serial.println("  ℹ️  Requesting auto-registration (no stored credentials)");
   }
   
-  Serial.printf("  Path: %s\n", wsPath.c_str());
+  Serial.printf("  WebSocket Path: ws://%s:%d%s\n", SERVER_IP, SERVER_PORT, SERVER_PATH);
+  Serial.printf("  Full URL: ws://%s:%d%s\n", SERVER_IP, SERVER_PORT, wsPath.c_str());
   
   webSocket.begin(SERVER_IP, SERVER_PORT, wsPath);
-  webSocket.setReconnectInterval(5000);
+  webSocket.setReconnectInterval(0);  // Manual retry loop in loop() controls reconnect timing.
   webSocket.enableHeartbeat(15000, 3000, 2);
   
   reconnectAttempts = 0;
-}
-
-bool canReachServer() {
-  WiFiClient testClient;
-  IPAddress serverIp;
-
-  if (!serverIp.fromString(SERVER_IP)) {
-    Serial.println("❌ Invalid SERVER_IP format");
-    return false;
-  }
-
-  Serial.printf("🔎 Checking server reachability: %s:%d ...\n", SERVER_IP, SERVER_PORT);
-  bool ok = testClient.connect(serverIp, SERVER_PORT);
-  if (ok) {
-    Serial.println("✅ Server TCP reachable");
-    testClient.stop();
-    return true;
-  }
-
-  Serial.println("⚠️ Server TCP unreachable (route/firewall/server bind issue)");
-  return false;
+  
+  Serial.println("⏳ Waiting for WebSocket handshake...");
 }
 
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
@@ -302,15 +279,9 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
     
     case WStype_DISCONNECTED: {
       isConnected = false;
-      Serial.println("❌ WebSocket disconnected");
       reconnectAttempts++;
-      
-      if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-        uint32_t delayMs = min(30000UL, 1000UL * (1 << reconnectAttempts)); // Exponential backoff, max 30s
-        Serial.printf("⏳ Reconnect scheduled by WebSocket client (attempt %u/%u, interval=%lums)...\n", reconnectAttempts, MAX_RECONNECT_ATTEMPTS, delayMs);
-      } else {
-        Serial.println("❌ Max reconnection attempts reached - will retry later");
-        webSocket.setReconnectInterval(30000);
+      Serial.printf("❌ WebSocket disconnected (attempt counter=%u). Waiting for next retry tick...\n", reconnectAttempts);
+      if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
         reconnectAttempts = 0;
       }
       break;
@@ -320,7 +291,21 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
       isConnected = true;
       reconnectAttempts = 0;
       lastWebSocketAttemptTime = millis();
-      Serial.println("✅ WebSocket connected - waiting for registration response...");
+      Serial.println("✅ WebSocket connected - sending initial credentials...");
+      
+      // Send credentials as first message (fallback in case query params weren't sent)
+      StaticJsonDocument<256> credMsg;
+      credMsg["mac_address"] = deviceMAC;
+      if (isRegistered && deviceID > 0 && deviceKey.length() > 0) {
+        credMsg["device_id"] = deviceID;
+        credMsg["device_key"] = deviceKey;
+      }
+      
+      String jsonString;
+      serializeJson(credMsg, jsonString);
+      webSocket.sendTXT(jsonString);
+      
+      Serial.println("📨 Credentials message sent to server");
       break;
     }
     
