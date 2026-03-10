@@ -47,8 +47,13 @@
 #define SECONDARY_DNS_3 8
 
 // Server Configuration
-#define SERVER_IP "172.20.10.4"   // Backend server IP on network (current PC IP)
+// For local/LAN backend:
+//   SERVER_HOST "172.20.10.4", SERVER_PORT 8000, USE_WSS 0
+// For cloud backend (Railway/custom domain):
+//   SERVER_HOST "api.yourdomain.com", SERVER_PORT 443, USE_WSS 1
+#define SERVER_HOST "172.20.10.4"   // Can be IP or DNS hostname
 #define SERVER_PORT 8000
+#define USE_WSS 0
 #define SERVER_PATH "/ws/esp32/connect"
 
 // Device Configuration - use static "Testing" device (must match backend)

@@ -769,7 +769,7 @@ export default function Home() {
             title="Devices"
             extra={
               <Space>
-                <Button onClick={fetchDevices} loading={fetchLoading}>Refresh</Button>
+                <Button onClick={() => fetchDevices()} loading={fetchLoading}>Refresh</Button>
                 <Button type="primary" icon={<PlusOutlined />} onClick={onAddClick}>
                   Add Device
                 </Button>

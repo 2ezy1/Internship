@@ -63,10 +63,6 @@ type SerialPortLike = {
   writable: WritableStream<Uint8Array>
 }
 
-type SerialLike = {
-  requestPort: () => Promise<SerialPortLike>
-}
-
 type DataPoint = {
   timestamp: string
   registerNames: string[]
@@ -102,6 +98,18 @@ function formatDecimal(value: string | number | null | undefined): string {
   return num.toFixed(2)
 }
 
+function getDefaultServerHost(): string {
+  const configuredApiBase = (import.meta.env.VITE_API_BASE as string | undefined)?.trim()
+  if (configuredApiBase) {
+    try {
+      return new URL(configuredApiBase).hostname
+    } catch {
+      // Keep runtime fallback if env value is malformed.
+    }
+  }
+  return window.location.hostname
+}
+
 export default function DeviceDetails() {
   const runtimeStorageKey = 'modbus_runtime_history_v1'
   const statsStorageKey = 'modbus_stats_v1'
@@ -115,17 +123,11 @@ export default function DeviceDetails() {
     routeDeviceId ? localStorage.getItem(`device_brand_${routeDeviceId}`) ?? '' : ''
   ).trim()
   const resolvedSavedBrand = selectedBrandFromDevice || selectedBrandFromStorage
-  const [slaveId, setSlaveId] = useState(1)
-  const [baudRate, setBaudRate] = useState(9600)
-  const [dataBits, setDataBits] = useState(8)
-  const [stopBits, setStopBits] = useState(1)
-  const [parity, setParity] = useState('none')
+  const [slaveId, _setSlaveId] = useState(1)
   const [brandModel, setBrandModel] = useState(resolvedSavedBrand)
 
-  // WebSocket configuration (auto-detect server from current host or use default)
-  const [serverHost, setServerHost] = useState(
-    window.location.hostname === 'localhost' ? '192.168.254.110' : window.location.hostname
-  )
+  // WebSocket configuration (auto-detect server from env or current host)
+  const [serverHost, setServerHost] = useState(getDefaultServerHost)
   const [serverPort, setServerPort] = useState(8000)
   const [deviceId, setDeviceId] = useState(1)
   const [useWebSocket] = useState(true) // Always use WebSocket
@@ -138,8 +140,8 @@ export default function DeviceDetails() {
   const [, setDataLog] = useState<DataPoint[]>([])
   const [logs, setLogs] = useState<LogEntry[]>([])
 
-  const [statusText, setStatusText] = useState('Ready - Configure connection and click Connect')
-  const [statusType, setStatusType] = useState<'info' | 'success' | 'error'>('info')
+  const [_statusText, setStatusText] = useState('Ready - Configure connection and click Connect')
+  const [_statusType, setStatusType] = useState<'info' | 'success' | 'error'>('info')
 
   const [brandModalOpen, setBrandModalOpen] = useState(false)
   const [connectModalOpen, setConnectModalOpen] = useState(false)
@@ -151,7 +153,7 @@ export default function DeviceDetails() {
   const [connected, setConnected] = useState(false)
 
   // Live VFD data from server (for static "Testing" / ESP32_Master device)
-  const { isConnected: vfdWsConnected, lastUpdate: vfdLastUpdate, error: vfdError } = useDeviceRealtime(routeDeviceId ?? 0)
+  const { isConnected: vfdWsConnected, lastUpdate: vfdLastUpdate } = useDeviceRealtime(routeDeviceId ?? 0)
 
   const portRef = useRef<SerialPortLike | null>(null)
   const readerRef = useRef<ReadableStreamDefaultReader<Uint8Array> | null>(null)
@@ -240,10 +242,6 @@ export default function DeviceDetails() {
     }
     runtimeSessionStartRef.current = resetStart ? Date.now() : null
   }
-
-  const serialSupported = useMemo(() => {
-    return typeof navigator !== 'undefined' && 'serial' in navigator
-  }, [])
 
   const addLog = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
     const now = Date.now()

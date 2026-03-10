@@ -54,11 +54,26 @@ SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 365 * 10  # 10 years (never expires)
 
-# Allow React to access this API
+def parse_allowed_origins() -> list[str]:
+    """Parse comma-separated CORS origins from environment."""
+    raw_origins = os.getenv("CORS_ALLOWED_ORIGINS", "").strip()
+    if not raw_origins:
+        return [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+        ]
+    origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+    return origins or ["http://localhost:5173"]
+
+
+cors_allowed_origins = parse_allowed_origins()
+allow_all_origins = cors_allowed_origins == ["*"]
+
+# Allow frontend to access this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Change this to your frontend URL in production
-    allow_credentials=True,
+    allow_origins=cors_allowed_origins,
+    allow_credentials=not allow_all_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -105,7 +105,7 @@ void setup() {
     isRegistered = false;
   }
   
-  Serial.printf("Server: %s:%d\n", SERVER_IP, SERVER_PORT);
+  Serial.printf("Server: %s:%d\n", SERVER_HOST, SERVER_PORT);
   Serial.println();
 
   // Setup WebSocket callbacks
@@ -246,7 +246,7 @@ void connectWebSocket() {
   lastWebSocketAttemptTime = millis();
   
   Serial.println("\n🔌 Connecting to WebSocket...");
-  Serial.printf("  Server: %s:%d\n", SERVER_IP, SERVER_PORT);
+  Serial.printf("  Server: %s:%d\n", SERVER_HOST, SERVER_PORT);
   Serial.printf("  MAC Address: %s\n", deviceMAC.c_str());
   
   // Build WebSocket path: mac_address must be URL-encoded (colons break some servers)
@@ -262,10 +262,15 @@ void connectWebSocket() {
     Serial.println("  ℹ️  Requesting auto-registration (no stored credentials)");
   }
   
-  Serial.printf("  WebSocket Path: ws://%s:%d%s\n", SERVER_IP, SERVER_PORT, SERVER_PATH);
-  Serial.printf("  Full URL: ws://%s:%d%s\n", SERVER_IP, SERVER_PORT, wsPath.c_str());
-  
-  webSocket.begin(SERVER_IP, SERVER_PORT, wsPath);
+  const char* wsScheme = USE_WSS ? "wss" : "ws";
+  Serial.printf("  WebSocket Path: %s://%s:%d%s\n", wsScheme, SERVER_HOST, SERVER_PORT, SERVER_PATH);
+  Serial.printf("  Full URL: %s://%s:%d%s\n", wsScheme, SERVER_HOST, SERVER_PORT, wsPath.c_str());
+
+  if (USE_WSS) {
+    webSocket.beginSSL(SERVER_HOST, SERVER_PORT, wsPath);
+  } else {
+    webSocket.begin(SERVER_HOST, SERVER_PORT, wsPath);
+  }
   webSocket.setReconnectInterval(0);  // Manual retry loop in loop() controls reconnect timing.
   webSocket.enableHeartbeat(15000, 3000, 2);
   

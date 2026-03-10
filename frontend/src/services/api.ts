@@ -7,7 +7,7 @@ const getApiBaseUrl = () => {
   }
   // If running on network, use the same host as the frontend
   const host = window.location.hostname
-  return `http://${host}:8000`
+  return `${window.location.protocol}//${host}:8000`
 }
 
 const API_BASE_URL = getApiBaseUrl()
