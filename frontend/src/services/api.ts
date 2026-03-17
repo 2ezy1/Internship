@@ -1,13 +1,12 @@
 import axios from 'axios'
 
-// Use environment variable if set, otherwise detect from current host
+// Use environment variable if set, otherwise same-origin.
+// In dev, Vite proxies API paths to the backend (see vite.config.ts).
 const getApiBaseUrl = () => {
   if (import.meta.env.VITE_API_BASE) {
     return import.meta.env.VITE_API_BASE
   }
-  // If running on network, use the same host as the frontend
-  const host = window.location.hostname
-  return `${window.location.protocol}//${host}:8000`
+  return window.location.origin
 }
 
 const API_BASE_URL = getApiBaseUrl()

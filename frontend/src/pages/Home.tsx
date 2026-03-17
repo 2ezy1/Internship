@@ -70,9 +70,7 @@ export default function Home() {
     return String(detail)
   }
 
-  const apiBase =
-    (import.meta.env.VITE_API_BASE as string) ||
-    `${window.location.protocol}//${window.location.hostname}:8000`
+  const apiBase = (import.meta.env.VITE_API_BASE as string) || window.location.origin
 
   const getDeviceImage = (_deviceType: string) => {
     return rs485Image

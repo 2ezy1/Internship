@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, Header, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from database import engine, get_db, Base
@@ -375,9 +377,14 @@ def health_check():
     """Check API health status"""
     return HealthCheck(status="healthy", message="API is running")
 
-# Root endpoint
-@app.get("/")
-def read_root():
+# Public static file needed by frontend builds
+@app.get("/vfd_brand_model_registers.json", include_in_schema=False)
+def vfd_brand_model_registers_json():
+    return FileResponse(MODBUS_REGISTER_PATH, media_type="application/json")
+
+# API root endpoint (keep separate from frontend "/")
+@app.get("/api", include_in_schema=False)
+def api_root():
     return {"message": "Device Management API - Running on FastAPI"}
 
 
@@ -1278,6 +1285,41 @@ def delete_vfd_readings(
     db.commit()
     
     return {"message": f"Deleted {count} VFD readings for device {device_id}"}
+
+
+# Serve built frontend (SPA) from backend on the same port (8000)
+FRONTEND_DIST_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+)
+
+if os.path.isdir(FRONTEND_DIST_DIR):
+    app.mount(
+        "/assets",
+        StaticFiles(directory=os.path.join(FRONTEND_DIST_DIR, "assets")),
+        name="assets",
+    )
+
+    @app.get("/", include_in_schema=False)
+    async def serve_frontend_root():
+        return FileResponse(os.path.join(FRONTEND_DIST_DIR, "index.html"))
+
+    # Catch-all for SPA routes (e.g. /home). Do not shadow API routes.
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_frontend_catch_all(full_path: str):
+        if full_path.startswith(
+            (
+                "api",
+                "auth",
+                "devices",
+                "sensors",
+                "vfd",
+                "docs",
+                "redoc",
+                "openapi.json",
+            )
+        ):
+            raise HTTPException(status_code=404, detail="Not Found")
+        return FileResponse(os.path.join(FRONTEND_DIST_DIR, "index.html"))
 
 
 if __name__ == "__main__":

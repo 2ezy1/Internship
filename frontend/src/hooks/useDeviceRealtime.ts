@@ -33,9 +33,7 @@ export function useDeviceRealtime(deviceId: number | string) {
   const shouldReconnectRef = useRef(true)
 
   const getWebSocketUrl = useCallback(() => {
-    const apiBase =
-      (import.meta.env.VITE_API_BASE as string) ||
-      `${window.location.protocol}//${window.location.hostname}:8000`
+    const apiBase = (import.meta.env.VITE_API_BASE as string) || window.location.origin
     const wsBase = apiBase.replace(/^http/, 'ws')
     return `${wsBase}/ws/device/${deviceId}`
   }, [deviceId])

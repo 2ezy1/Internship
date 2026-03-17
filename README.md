@@ -275,7 +275,7 @@ pip install -r requirements.txt
 
 ### 4. Environment Configuration
 Backend defaults from `backend/database.py`:
-- `DATABASE_URL=postgresql://postgres:bisumain@localhost:5432/devices_db`
+- `DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/devices_db`
 
 Recommended explicit setup:
 ```bash
@@ -300,7 +300,7 @@ chmod +x setup_postgres.sh
 Option B (manual):
 ```bash
 sudo -u postgres psql -c "CREATE DATABASE devices_db;"
-sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'bisumain';"
+sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'YOUR_PASSWORD';"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE devices_db TO postgres;"
 ```
 
@@ -326,12 +326,35 @@ npm install
 npm run dev
 ```
 
+### 7b. Single-port mode (Recommended for Slim)
+If you want **one public URL** that serves **both** the frontend and backend (so login works without CORS issues), run the React build and let FastAPI serve it from **port 8000**.
+
+Build frontend once:
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+Then start backend on port 8000:
+```bash
+cd backend
+source venv/bin/activate
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+Local URLs in this mode:
+- App UI: `http://localhost:8000/`
+- API docs: `http://localhost:8000/docs`
+
+Development note:
+- During local frontend development (`npm run dev` on `:5173`), the Vite dev server proxies API requests to `http://localhost:8000` via `frontend/vite.config.ts`.
+
 ### Default Login Credentials
 Use this account to log in after the server starts:
 
 - Username: `BITSOJT`
 - Password: `BITS2026`
-
 ### 8. Verify Server is Running
 - Open API docs (if FastAPI app is running):
   - `http://localhost:8000/docs`
@@ -543,12 +566,98 @@ Fix:
 - Set `VITE_API_BASE` to the correct backend URL if frontend/backend are on different hosts.
 - Check browser console for WebSocket close/error frames.
 
+## Slim Forwarding (Expose VM to the Internet)
+This project supports tunneling with Slim. The recommended approach is:
+- **Expose the app on a single port** (FastAPI serves the built frontend on `:8000`)
+- Use **one Slim tunnel** for the app
+- Optionally expose **pgAdmin** separately for database browsing
+
+### A) Forward the app (FastAPI + built React) on port 8000
+1) Start the backend (single-port mode) on the VM:
+```bash
+cd backend
+source venv/bin/activate
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+2) In another terminal, start Slim:
+```bash
+slim share --port 8000
+```
+
+3) Open the **Slim URL** Slim prints.
+- Do **not** add `:8000` to the Slim URL.
+
+### B) Forward pgAdmin (optional) on port 5050
+pgAdmin is a separate web app for browsing PostgreSQL. In this repo/workspace we run it with Docker and expose it on port `5050`.
+
+Start/verify pgAdmin on the VM (host networking + reverse-proxy settings for Slim):
+```bash
+docker rm -f pgadmin 2>/dev/null || true
+docker run -d --name pgadmin --network host \
+  -e PGADMIN_LISTEN_ADDRESS=0.0.0.0 \
+  -e PGADMIN_LISTEN_PORT=5050 \
+  -e PGADMIN_DEFAULT_EMAIL=YOUR_EMAIL@example.com \
+  -e PGADMIN_DEFAULT_PASSWORD=YOUR_PGADMIN_PASSWORD \
+  -e PGADMIN_CONFIG_PROXY_X_FOR_COUNT=1 \
+  -e PGADMIN_CONFIG_PROXY_X_PROTO_COUNT=1 \
+  -e PGADMIN_CONFIG_PROXY_X_HOST_COUNT=1 \
+  -e PGADMIN_CONFIG_PROXY_X_PREFIX_COUNT=1 \
+  -e "PGADMIN_CONFIG_PREFERRED_URL_SCHEME='https'" \
+  -e PGADMIN_CONFIG_WTF_CSRF_SSL_STRICT=False \
+  -v pgadmin-data:/var/lib/pgadmin \
+  dpage/pgadmin4
+```
+
+Forward pgAdmin with Slim:
+```bash
+slim share --port 5050
+```
+
+Then open the Slim URL (in a private window if you see session/cookie issues).
+
+### C) Database credentials (PostgreSQL)
+**Security note:** do **not** commit real passwords to git. Use environment variables or a local `.env` that is git-ignored.
+
+- **PostgreSQL host (from inside the VM / from pgAdmin running on the VM)**: `127.0.0.1`
+- **PostgreSQL host (from another machine on the same LAN)**: `172.20.10.6`
+- **Port**: `5432`
+- **Database**: `devices_db`
+- **User (recommended)**: `devices_user`
+- **Password**: `<set-your-own-password>`
+
+### D) pgAdmin web login credentials (pgAdmin UI)
+These are **NOT** PostgreSQL credentials. They are only for signing into the pgAdmin web UI:
+- **Email**: `<your-email>`
+- **Password**: `<your-pgadmin-password>`
+
+### E) Flowchart: Browser → Slim → VM services
+```mermaid
+flowchart LR
+  subgraph Internet
+    U[User Browser]
+    S1[Slim URL for App]
+    S2[Slim URL for pgAdmin]
+  end
+
+  subgraph VM["VM (172.20.10.6)"]
+    A[FastAPI :8000<br/>serves React UI + API + WS]
+    P[(PostgreSQL :5432)]
+    G[pgAdmin :5050<br/>Docker host network]
+  end
+
+  U -->|HTTPS| S1 -->|Tunnel| A
+  A --> P
+
+  U -->|HTTPS| S2 -->|Tunnel| G
+  G -->|TCP 5432| P
+```
+
 ## Cloud Deployment (Vercel + Railway)
 
 This section explains where Vercel and Railway fit in production deployment.
 
 ### Deployment Architecture
-
 - Railway:
   - Hosts the backend API service.
   - Hosts PostgreSQL database.

@@ -40,9 +40,7 @@ export class DeviceWebSocket {
    * Get WebSocket URL based on environment
    */
   private getWebSocketUrl(): string {
-    const apiBase =
-      (import.meta.env.VITE_API_BASE as string) ||
-      `${window.location.protocol}//${window.location.hostname}:8000`
+    const apiBase = (import.meta.env.VITE_API_BASE as string) || window.location.origin
     
     // Convert http(s) to ws(s)
     const wsBase = apiBase.replace(/^http/, 'ws')
