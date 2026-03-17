@@ -1,253 +1,490 @@
-# Internship IoT Monitoring System - Complete Documentation
+# VFD IoT Monitoring System (ESP32 + FastAPI + PostgreSQL)
 
-This repository contains an end-to-end IoT monitoring stack:
-- FastAPI backend (`backend/`) for authentication, device management, WebSocket ingestion, and historical VFD/sensor storage
-- React + Vite frontend (`frontend/`) for dashboard, realtime monitoring, and device details
-- ESP32 firmware (`ESP32/master/`) that sends heartbeat and VFD data over WebSocket
-- Optional Modbus polling service (started by backend) for serial VFD register polling
+## System Overview
+This project is an IoT monitoring system for Variable Frequency Drive (VFD) telemetry.
 
-This file is the single documentation source for setup, operation, architecture, and troubleshooting.
+The system is designed for real-time data ingestion from ESP32 devices, backend processing, and storage for monitoring and analysis.
 
-## 1. System Architecture
+Core purpose:
+- Collect VFD operating data from edge hardware.
+- Stream data to a backend using WebSockets.
+- Persist telemetry in a relational database.
+- Provide device lifecycle management (register, identify, monitor, remove).
 
-### 1.1 High-Level Components
-- **Frontend (React)**: User login, device list, live status, charts, and detailed telemetry.
-- **Backend (FastAPI + SQLAlchemy)**: REST API, JWT auth, WebSocket server, heartbeat monitor, and DB persistence.
-- **Database**: PostgreSQL (required).
-- **ESP32 Master**: Connects via WiFi to backend WebSocket, authenticates/registers, sends heartbeat and VFD data.
-- **Optional Modbus Poller**: Reads VFD registers over serial and writes to `vfd_readings`.
+## System Architecture
 
-### 1.2 End-to-End Flow
+### High-Level Communication Path
+ESP32 master -> WebSocket -> Backend server -> Database
+
 ```mermaid
 flowchart LR
-  A[ESP32 Master] -->|WebSocket /ws/esp32/connect| B[FastAPI Backend]
-  C[Modbus Poller] -->|Serial register reads| B
-  D[RS485 Sender] -->|WebSocket /ws/rs485/send/{device_id}| B
-  B -->|SQLAlchemy| E[(PostgreSQL)]
-  F[Frontend React App] -->|REST + WebSocket| B
-  B -->|Broadcast realtime updates| F
+  A["Step 1: ESP32 reads VFD values"] --> B["Step 2: Send data over WebSocket"]
+  B --> C["Step 3: Backend receives and validates data"]
+  C --> D["Step 4: Store readings in PostgreSQL"]
+  C --> E["Step 5: Update device status in Device Management"]
 ```
 
-### 1.3 ESP32 Session/Registration Flow
+### Component Roles
+- ESP32 master:
+  - Reads VFD values from UART/RS485 side (in this repo: `Serial2` input + JSON parsing).
+  - Maintains Wi-Fi and WebSocket connectivity.
+  - Sends heartbeat and sensor payloads periodically.
+- WebSocket communication:
+  - Persistent full-duplex channel for low-latency telemetry.
+  - Used by ESP32 for registration/authentication + streaming data.
+  - Used by frontend hooks for live device updates.
+- Backend server:
+  - Accepts WebSocket connections from devices.
+  - Validates/identifies devices.
+  - Processes heartbeat and telemetry messages.
+  - Writes readings to database and updates online state.
+- Database:
+  - Stores device metadata and historical VFD readings.
+  - Supports monitoring, history, and future analytics.
+- Device management module:
+  - Handles registration and identity (device ID, key, MAC).
+  - Tracks online/offline state through heartbeat metadata.
+  - Supports add/list/update/delete device operations.
+
+## Communication Flow
+
+### End-to-End Flow (Step-by-Step)
+This is the runtime flow in simple terms:
+
+1. ESP32 connects to the backend WebSocket.
+2. Backend verifies the device (or registers it if new).
+3. ESP32 sends heartbeat messages so the backend knows it is online.
+4. ESP32 sends VFD data at a fixed interval.
+5. Backend stores each reading in PostgreSQL and confirms receipt.
+
 ```mermaid
 flowchart TD
-  A[ESP32 connects with MAC and optional credentials] --> B{Credentials valid?}
-  B -->|Yes| C[Authenticate existing device]
-  B -->|No| D{Device found by MAC?}
-  D -->|Yes| E[Reuse existing device]
-  D -->|No| F[Auto-register new device and generate key]
-  C --> G[Send registration success + device_key]
-  E --> G
-  F --> G
-  G --> H[ESP32 sends heartbeat every 30s]
-  G --> I[ESP32 sends VFD sensor_data every poll interval]
-  H --> J[Update is_online and last_heartbeat]
-  I --> K[Store VFD reading and broadcast vfd_update]
+  A["Step 1: ESP32 connects to backend WebSocket"] --> B["Step 2: Backend verifies or registers device"]
+  B --> C["Step 3: ESP32 sends heartbeat messages"]
+  C --> D["Step 4: ESP32 sends VFD telemetry data"]
+  D --> E["Step 5: Backend stores data in PostgreSQL and sends ack"]
 ```
 
-### 1.4 Device Status Logic
+### Message Processing Model
+1. Connection established at device WebSocket endpoint.
+2. Device provides identity using query params and/or first credentials message.
+3. Server validates existing credentials or registers device by MAC.
+4. Heartbeat messages refresh device liveness metadata.
+5. Sensor messages are parsed into VFD fields and written to `vfd_readings`.
+6. Backend can broadcast latest updates to frontend device streams.
+
+## Device Management
+Device management logic is responsible for inventory control and runtime state.
+
+Functions covered by the module:
+- Registration:
+  - New ESP32 can be auto-registered from MAC address.
+  - Server returns `device_id` and `device_key` for subsequent auth.
+- Identification:
+  - Device session can be verified by `device_id` + `device_key` + MAC.
+  - Credentials can be persisted on ESP32 (Preferences storage).
+- Monitoring:
+  - Tracks online state using heartbeat timestamps.
+  - Supports status views such as Online / Warning / Offline.
+- Lifecycle operations:
+  - Add device manually.
+  - List and inspect devices.
+  - Update metadata.
+  - Remove device and related readings.
+
+## Server-Side Architecture and Processing
+
+This section explains what happens inside the backend server, not only how ESP32 sends data.
+
+### 1) Backend Runtime Layers
+The backend is organized as a typical FastAPI + SQLAlchemy service:
+
+- API layer:
+  - Exposes REST endpoints for auth, device CRUD, and telemetry queries.
+  - Exposes WebSocket endpoints for realtime ingestion and device streaming.
+- Validation layer:
+  - Uses Pydantic schemas (`backend/schemas.py`) to validate and serialize request/response payloads.
+- Service logic layer:
+  - Handles authentication, device verification, registration logic, heartbeat updates, and telemetry processing.
+- Data layer:
+  - SQLAlchemy session/engine from `backend/database.py`.
+  - ORM entities in `backend/models.py` map to PostgreSQL tables.
+- Background processing:
+  - Optional Modbus polling worker (`backend/modbus_polling.py`) collects register data and writes readings.
+
+### 2) Startup Lifecycle (What Server Does on Boot)
+When the backend process starts, the expected sequence is:
+
+1. Load environment variables (for DB URL and runtime settings).
+2. Initialize PostgreSQL connection engine and session factory.
+3. Initialize/validate database schema (ORM tables).
+4. Start HTTP and WebSocket routes.
+5. Start optional background jobs (for example Modbus poller, heartbeat status checks).
+6. Begin accepting REST and WebSocket traffic.
+
 ```mermaid
 flowchart TD
-  A[last_heartbeat present?] -->|No| B[Offline or Warning based on is_online]
-  A -->|Yes| C[Compute seconds since heartbeat]
-  C -->|< HEARTBEAT_WARNING_SECONDS| D[Online]
-  C -->|>= WARNING and < OFFLINE| E[Warning]
-  C -->|>= HEARTBEAT_OFFLINE_SECONDS| F[Offline]
+  A["Load environment and config"] --> B["Create DB engine and session factory"]
+  B --> C["Initialize ORM models and tables"]
+  C --> D["Register REST and WebSocket routes"]
+  D --> E["Start background workers"]
+  E --> F["Server ready and listening"]
 ```
 
-## 2. Repository Layout
+### 3) REST Request Processing Pipeline
+For normal API requests (login, device CRUD, readings queries), the server pipeline is:
 
-- `backend/main.py`: FastAPI app, routes, WebSocket handlers, heartbeat checker
-- `backend/database.py`: SQLAlchemy engine/session config from `DATABASE_URL`
-- `backend/models.py`: ORM models (`users`, `devices`, `sensor_readings`, `vfd_readings`)
-- `backend/schemas.py`: Pydantic request/response models
-- `backend/modbus_polling.py`: Optional serial Modbus VFD polling thread
-- `frontend/src/services/api.ts`: REST client; defaults API base to `http://<frontend-host>:8000`
-- `frontend/src/services/websocket.ts`: Frontend WebSocket client for `/ws/device/{device_id}`
-- `ESP32/master/src/main.cpp`: ESP32 WiFi, WebSocket, heartbeat, VFD transmission
-- `ESP32/master/src/config.h`: ESP32 network, server, and device credential config
+1. Request enters FastAPI route.
+2. Payload/params are validated by schema models.
+3. Auth middleware/dependencies validate token (for protected routes).
+4. Business logic executes (query, insert, update, delete).
+5. SQLAlchemy session commits changes (or rolls back on error).
+6. Response is serialized and returned to client.
 
-## 3. Prerequisites
+Why this matters:
+- Keeps validation centralized.
+- Prevents malformed writes to DB.
+- Ensures transactional behavior (commit/rollback).
 
-### 3.1 Required
+### 4) WebSocket Processing Pipeline (Server Side)
+For realtime channels, the server generally follows this loop:
+
+1. Accept WebSocket connection.
+2. Extract identity from query params and/or first message.
+3. Verify existing device credentials or register a new device.
+4. Enter message loop:
+   - If `heartbeat`: update `devices.last_heartbeat` and `devices.is_online`.
+   - If `sensor_data`: parse VFD payload and insert into `vfd_readings`.
+   - Optionally broadcast update to frontend subscribers.
+5. On disconnect/error: clean up connection state and mark status according to timeout logic.
+
+### 5) Database Write Processes in the Server
+The backend performs multiple write paths, each with a different purpose:
+
+- Device state writes (`devices` table):
+  - Registration or credential updates.
+  - Online/offline metadata (`is_online`, `last_heartbeat`).
+- Telemetry writes (`vfd_readings` table):
+  - Frequency, speed, current, voltage, power, torque, status, fault code.
+  - Timestamped historical records for trend/history pages.
+- Optional generic sensor writes (`sensor_readings` table):
+  - Additional non-VFD telemetry fields.
+
+### 6) Background Processes (Beyond Request/Response)
+The server can run processes that are not triggered by a direct HTTP call:
+
+- Modbus poller worker (`backend/modbus_polling.py`):
+  - Reads configured registers on intervals.
+  - Maps fields, builds payload, writes to `vfd_readings`.
+  - Updates associated device heartbeat/online status.
+- Heartbeat monitor (if enabled in backend runtime):
+  - Periodically checks `last_heartbeat` age.
+  - Transitions devices between Online/Warning/Offline windows.
+
+### 7) Error Handling and Recovery Paths
+Important server-side failure paths include:
+
+- DB unavailable:
+  - Connection errors prevent startup or writes.
+  - Safe behavior is fail-fast at boot or rollback on write errors.
+- Invalid device credentials:
+  - Connection/message rejected or re-registration flow triggered.
+- Malformed telemetry payload:
+  - Message ignored/rejected; valid stream continues.
+- Worker/serial errors in Modbus polling:
+  - Poll cycle logs error and retries next interval.
+
+### 8) Concurrency Model (How Multiple Things Run)
+At runtime the backend handles:
+
+- Concurrent REST calls (many clients at once).
+- Concurrent WebSocket sessions (multiple devices and frontend listeners).
+- Background polling/monitoring jobs.
+
+This means the server must keep DB operations short, use isolated DB sessions, and avoid blocking the event loop with long synchronous operations in request paths.
+
+### 9) Server-Side Data Lifecycle Summary
+End-to-end inside backend:
+
+1. Ingest message/request.
+2. Validate and authenticate.
+3. Transform payload into internal model fields.
+4. Persist with transaction semantics.
+5. Update live state (device status, stream subscribers).
+6. Serve historical and realtime data back to clients.
+
+## Project Structure
+
+```text
+Internship/
+├── backend/
+│   ├── database.py            # SQLAlchemy engine/session setup (PostgreSQL)
+│   ├── models.py              # ORM models: users, devices, sensor_readings, vfd_readings
+│   ├── schemas.py             # Pydantic schemas for API payloads
+│   ├── modbus_polling.py      # Optional Modbus poller writing VFD readings
+│   ├── check_vfd.py           # Utility script to inspect latest VFD rows
+│   ├── setup_postgres.sh      # PostgreSQL bootstrap script
+│   ├── setup_db.sql           # SQL setup snippet
+│   └── requirements.txt       # Backend Python dependencies
+│
+├── frontend/
+│   ├── package.json           # Vite scripts and JS dependencies
+│   ├── src/
+│   │   ├── hooks/useDeviceRealtime.ts  # Frontend WebSocket client for device updates
+│   │   ├── components/ThemeToggle.tsx
+│   │   ├── theme/ThemeContext.tsx
+│   │   └── ...
+│   └── public/
+│       └── vfd_brand_model_registers.json
+│
+├── ESP32/
+│   ├── master/
+│   │   ├── platformio.ini     # PlatformIO board + libs
+│   │   └── src/
+│   │       ├── config.h        # Wi-Fi/server/device constants
+│   │       └── main.cpp        # WebSocket connection + heartbeat + sensor send logic
+│   └── slave/
+│       └── src/main.cpp
+│
+├── push.sh                    # Helper script to git add/commit/push
+└── README.md
+```
+
+## Server Setup Guide (Local Development)
+
+### 1. Required Software
 - Python 3.10+
-- Node.js 18+
-- npm 9+
+- Node.js 18+ and npm
 - PostgreSQL 14+
 - Git
+- Optional for firmware: PlatformIO CLI
 
-### 3.2 Optional
-- PlatformIO CLI (for flashing ESP32)
-- USB/serial permissions on Linux (`dialout` group)
-
-## 4. Quick Start (Recommended)
-
-### 4.0 Database Setup (First Time Only)
-Before starting the backend, ensure PostgreSQL is installed and running:
-
+### 2. Clone and Enter Project
 ```bash
-# Install PostgreSQL (Ubuntu/Debian)
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-
-# Start PostgreSQL service
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
-
-# Create database and user
-sudo -u postgres psql -c "CREATE DATABASE devices_db;"
-sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'bisumain';"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE devices_db TO postgres;"
+git clone https://github.com/2ezy1/Internship.git
+cd Internship
 ```
 
-Or use the provided setup script:
-```bash
-cd backend
-./setup_postgres.sh
-```
-
-Run backend and frontend in separate terminals.
-
-### 4.1 Backend
+### 3. Backend Installation
 ```bash
 cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-python main.py
 ```
 
-Backend starts at:
-- API root: `http://<server-ip>:8000/`
-- Health: `http://<server-ip>:8000/health`
-- Swagger docs: `http://<server-ip>:8000/docs`
+### 4. Environment Configuration
+Backend defaults from `backend/database.py`:
+- `DATABASE_URL=postgresql://postgres:bisumain@localhost:5432/devices_db`
 
-### 4.2 Frontend
+Recommended explicit setup:
 ```bash
-cd frontend
-npm install
-npm run dev
+export DATABASE_URL="postgresql://postgres:your_password@localhost:5432/devices_db"
 ```
 
-Frontend starts at:
-- `http://localhost:5173`
-
-### 4.3 Login Credentials (auto-created on backend startup)
-- User: `user` / `user123`
-- Admin: `BITSOJT` / `BITS2026`
-
-## 5. Environment Configuration
-
-## 5.1 Backend Environment Variables
-`backend/database.py` and `backend/main.py` read from environment.
-
-- `DATABASE_URL` (required)
-  - Default: `postgresql://postgres:bisumain@localhost:5432/devices_db`
-  - Must be a PostgreSQL connection string
-  - Format: `postgresql://username:password@host:port/database_name`
-- `JWT_SECRET_KEY` (recommended to set in production)
+Optional backend environment values typically used in this system:
+- `JWT_SECRET_KEY`
 - `AUTH_SALT`
-- `HEARTBEAT_CHECK_INTERVAL_SECONDS` (default `15`)
-- `HEARTBEAT_WARNING_SECONDS` (default `60`)
-- `HEARTBEAT_OFFLINE_SECONDS` (default `120`)
+- `HEARTBEAT_CHECK_INTERVAL_SECONDS`
+- `HEARTBEAT_WARNING_SECONDS`
+- `HEARTBEAT_OFFLINE_SECONDS`
 
-Modbus poller variables:
-- `MODBUS_PORT` (default `COM5`)
-- `MODBUS_BAUDRATE` (default `9600`)
-- `MODBUS_SLAVE_ID` (default `1`)
-- `MODBUS_POLL_INTERVAL_MS` (default `1000`)
-- `MODBUS_BRAND` (default `teco`)
-- `MODBUS_DEVICE_ID` (optional)
-
-Linux serial example:
-```bash
-export MODBUS_PORT=/dev/ttyUSB0
-```
-
-### 5.2 Frontend Environment Variables
-From `frontend/src/services/api.ts`:
-- `VITE_API_BASE` (optional)
-  - If unset, frontend uses `http://<current-host>:8000`
-
-Example `frontend/.env`:
-```bash
-VITE_API_BASE=http://192.168.1.100:8000
-```
-
-## 6. Database Setup
-
-### 6.1 PostgreSQL Installation
-**Ubuntu/Debian:**
-```bash
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
-```
-
-**macOS:**
-```bash
-brew install postgresql@14
-brew services start postgresql@14
-```
-
-**Windows:**
-Download and install from https://www.postgresql.org/download/windows/
-
-### 6.2 Database Creation
-```bash
-# Create database
-sudo -u postgres psql -c "CREATE DATABASE devices_db;"
-
-# Set password for postgres user
-sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'bisumain';"
-
-# Grant privileges
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE devices_db TO postgres;"
-```
-
-Or use the provided script:
+### 5. Database Setup
+Option A (script):
 ```bash
 cd backend
 chmod +x setup_postgres.sh
 ./setup_postgres.sh
 ```
 
-### 6.3 Custom Database Configuration
-If you want to use different credentials:
+Option B (manual):
 ```bash
-export DATABASE_URL="postgresql://your_user:your_password@localhost:5432/your_database"
+sudo -u postgres psql -c "CREATE DATABASE devices_db;"
+sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'bisumain';"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE devices_db TO postgres;"
+```
+
+### 6. Start the Backend Server
+Expected startup (per project scripts):
+```bash
 cd backend
+source venv/bin/activate
 python main.py
 ```
 
-Notes:
-- Backend will exit with an error if PostgreSQL is not configured
-- Tables are created automatically on first run
-- For production, store secrets in environment or secret manager, not hardcoded scripts
+Alternative if using Uvicorn directly:
+```bash
+cd backend
+source venv/bin/activate
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
 
-## 7. How Backend Works
+### 7. Start Frontend (Optional but Recommended)
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-### 7.1 Startup Behavior
-On startup (`backend/main.py`):
-- Validates PostgreSQL connection (exits if not PostgreSQL)
-- Creates DB tables if missing
-- Creates default `user` and `BITSOJT` accounts if missing
-- Ensures static test ESP32 device exists:
-  - `id=1`, `name=Testing`
-  - `device_key=69ced61b-5521-4ef7-ab17-19a2cdf14af8`
-  - `mac=A0:B7:65:29:3D:28`
-- Starts Modbus polling thread
-- Starts heartbeat background checker
+### Default Login Credentials
+Use this account to log in after the server starts:
 
-### 7.2 Auth Model
-- Login endpoint: `POST /auth/login`
-- Returns JWT bearer token
-- Frontend stores token in localStorage and sends `Authorization: Bearer <token>`
+- Username: `BITSOJT`
+- Password: `BITS2026`
 
-### 7.3 Main REST Endpoints
-- `GET /health`
+### 8. Verify Server is Running
+- Open API docs (if FastAPI app is running):
+  - `http://localhost:8000/docs`
+- Health endpoint (expected):
+  - `http://localhost:8000/health`
+- Frontend local URL:
+  - `http://localhost:5173`
+- DB check (latest rows):
+```bash
+cd backend
+source venv/bin/activate
+python check_vfd.py
+```
+
+## ESP32 Integration
+
+### ESP32 Connection Strategy
+From `ESP32/master/src/main.cpp` and `config.h`:
+- WebSocket path: `/ws/esp32/connect`
+- Supports both:
+  - `ws://host:port/...` when `USE_WSS=0`
+  - `wss://host:443/...` when `USE_WSS=1`
+- Query parameters include:
+  - `mac_address` (URL encoded)
+  - `device_id` and `device_key` when known
+
+The firmware also sends a first JSON credentials message after connect as fallback.
+
+### ESP32 Message Formats
+Heartbeat payload:
+```json
+{
+  "type": "heartbeat",
+  "device_id": 1,
+  "device_key": "69ced61b-5521-4ef7-ab17-19a2cdf14af8",
+  "timestamp": "1234567",
+  "rssi": -62,
+  "uptime": 1234567
+}
+```
+
+VFD sensor payload:
+```json
+{
+  "type": "sensor_data",
+  "device_id": 1,
+  "device_key": "69ced61b-5521-4ef7-ab17-19a2cdf14af8",
+  "timestamp": "1234577",
+  "rssi": -61,
+  "uptime": 1234577,
+  "data": {
+    "frequency": 49.9,
+    "speed": 1485.0,
+    "current": 6.2,
+    "voltage": 399.0,
+    "power": 3.4,
+    "torque": 22.1,
+    "status": 1,
+    "faultCode": 0
+  }
+}
+```
+
+## Database Schema
+
+### Main Tables
+The SQLAlchemy models in `backend/models.py` define these tables:
+
+1. `users`
+- `id` (PK)
+- `username` (unique)
+- `hashed_password`
+- `role`
+- `created_at`
+
+2. `devices`
+- `id` (PK)
+- `device_name`
+- `ip_address` (unique)
+- `type`
+- `date_installed`
+- `user_id` (FK -> users.id)
+- `is_online`
+- `last_heartbeat`
+- `device_key` (unique)
+- `mac_address`
+- `created_at`, `updated_at`
+
+3. `sensor_readings`
+- `id` (PK)
+- `device_id` (FK -> devices.id)
+- Generic sensor columns (`temperature`, `humidity`, etc.)
+- `custom_data`
+- `timestamp`
+
+4. `vfd_readings`
+- `id` (PK)
+- `device_id` (FK -> devices.id)
+- `frequency`, `speed`, `current`, `voltage`, `power`, `torque`
+- `status`, `fault_code`
+- `custom_data`
+- `timestamp`
+
+## Example Data Flow
+
+### Example: Incoming WebSocket Frame
+```json
+{
+  "type": "sensor_data",
+  "device_id": 1,
+  "device_key": "69ced61b-5521-4ef7-ab17-19a2cdf14af8",
+  "data": {
+    "frequency": 50.0,
+    "speed": 1500.0,
+    "current": 6.5,
+    "voltage": 400.0,
+    "power": 3.6,
+    "torque": 23.0,
+    "status": 1,
+    "faultCode": 0
+  }
+}
+```
+
+### Example: Persisted Row (`vfd_readings`)
+```text
+id: 1285
+device_id: 1
+frequency: "50.0"
+speed: "1500.0"
+current: "6.5"
+voltage: "400.0"
+power: "3.6"
+torque: "23.0"
+status: 1
+fault_code: 0
+timestamp: 2026-03-16T14:21:33Z
+```
+
+## API and WebSocket Endpoints
+
+### WebSocket Endpoints
+- `ws://<host>:8000/ws/esp32/connect`
+  - ESP32 registration/auth + heartbeat + sensor_data upload
+- `ws://<host>:8000/ws/device/{device_id}`
+  - Frontend realtime subscription (used in `useDeviceRealtime.ts`)
+- `ws://<host>:8000/ws/rs485/send/{device_id}`
+  - Optional RS485 sender channel (if implemented in backend)
+
+### REST Endpoints (Device Management and Data)
+Commonly used by this architecture:
 - `POST /auth/login`
+- `GET /health`
 - `POST /devices/`
 - `GET /devices/`
 - `GET /devices/{device_id}`
@@ -255,200 +492,137 @@ On startup (`backend/main.py`):
 - `DELETE /devices/{device_id}`
 - `GET /devices/{device_id}/status`
 - `POST /devices/{device_id}/regenerate-key`
-- `POST /devices/{device_id}/initialize-esp32`
 - `GET /devices/{device_id}/vfd-readings`
 - `GET /devices/{device_id}/vfd-readings/latest`
-- `DELETE /devices/{device_id}/vfd-readings`
-- `POST /sensors/readings`
-- `GET /sensors/readings/{device_id}`
-- `GET /sensors/latest/{device_id}`
 
-Admin endpoints (currently same auth dependency allows authenticated users):
-- `GET /admin/users`
-- `GET /admin/users/{user_id}`
-- `GET /admin/devices`
-- `GET /admin/devices/with-owners`
-- `GET /admin/stats`
+## Troubleshooting
 
-### 7.4 WebSocket Endpoints
-- `ws://<host>:8000/ws/device/{device_id}`
-  - Frontend subscribes for realtime updates (`sensor_update`, `vfd_update`)
-- `ws://<host>:8000/ws/rs485/send/{device_id}`
-  - RS485 sender pushes readings to backend
-- `ws://<host>:8000/ws/esp32/connect?mac_address=...&device_id=...&device_key=...`
-  - ESP32 auth/registration + heartbeat + VFD upload
+### 1. PostgreSQL Connection Errors
+Symptoms:
+- Backend exits at startup.
+- DB connection refused/auth failed.
 
-## 8. ESP32 Setup and Operation
-
-### 8.1 Configure Firmware
-Edit `ESP32/master/src/config.h`:
-- WiFi SSID and password
-- Static IP / gateway / subnet / DNS
-- `SERVER_IP`, `SERVER_PORT`, `SERVER_PATH`
-- Optional static credentials (`DEVICE_ID`, `DEVICE_KEY`)
-
-Two credential modes:
-- **Static testing mode**: use configured `DEVICE_ID` and `DEVICE_KEY` (device 1 / Testing)
-- **Auto-registration mode**: remove/comment static credentials; ESP32 registers by MAC
-
-### 8.2 Build/Upload (PlatformIO)
-```bash
-cd ESP32/master
-pio run --target upload
-pio device monitor --baud 115200
-```
-
-### 8.3 Runtime Behavior
-- Connects to WiFi (static IP config)
-- Connects WebSocket to backend
-- Sends credentials first
-- Sends heartbeat every `HEARTBEAT_INTERVAL_MS`
-- Sends VFD data every `POLL_INTERVAL_MS`
-- Parses UART JSON from slave via `Serial2`
-
-## 9. Frontend Runtime Behavior
-
-- API base is dynamic (`VITE_API_BASE` or same host on port 8000)
-- Device details page uses WebSocket stream for live updates
-- Home page includes optimized interaction logic for smoother filtering and realtime UX
-
-## 10. Run Profiles
-
-### 10.1 Local Development (Most Common)
-1. Start backend (`python main.py`)
-2. Start frontend (`npm run dev`)
-3. Login in browser
-4. Connect ESP32 on same network and verify data appears
-
-### 10.2 Backend Only (API testing)
-- Use Swagger docs at `/docs`
-- Use Postman/curl for auth + device/vfd endpoints
-
-### 10.3 ESP32 Hardware Test
-- Keep serial monitor open
-- Validate successful registration/auth response
-- Confirm heartbeat logs every 30s
-- Confirm VFD updates arrive and appear in frontend
-
-## 11. Verification Checklist
-
-- PostgreSQL service running: `sudo systemctl status postgresql` (Linux) or `brew services list` (macOS)
-- Database exists: `psql -U postgres -d devices_db -c "\dt"`
-- Backend healthy: `GET /health` returns `{"status":"healthy"...}`
-- Frontend opens at `http://localhost:5173`
-- Login works with default account
-- Devices list loads
-- ESP32 appears online after heartbeat
-- New VFD readings appear in `/devices/{id}/vfd-readings/latest`
-- Device status transitions Online -> Warning -> Offline if heartbeat stops
-
-## 12. Troubleshooting
-
-### 12.1 Backend Won't Start - Database Error
+Fix:
 - Ensure PostgreSQL is running: `sudo systemctl status postgresql`
-- Verify database exists: `sudo -u postgres psql -l | grep devices_db`
-- Check credentials in `DATABASE_URL` match PostgreSQL user/password
-- Test connection: `psql -U postgres -d devices_db`
-- Review backend startup logs for specific error messages
+- Validate `DATABASE_URL`.
+- Re-run `backend/setup_postgres.sh`.
 
-### 12.2 Frontend Cannot Reach Backend
-- Check backend running on `0.0.0.0:8000`
-- Verify host firewall and network routing
-- Set `VITE_API_BASE` explicitly if frontend and backend hosts differ
+### 2. WebSocket Fails to Connect from ESP32
+Symptoms:
+- ESP32 repeatedly logs reconnect attempts.
 
-### 12.3 ESP32 Fails WebSocket Handshake
-- Verify `SERVER_IP` and port in `config.h`
-- Ensure `mac_address` reaches backend (query params or first message fallback)
-- Confirm backend log for registration errors
+Fix:
+- Check `SERVER_HOST`, `SERVER_PORT`, `USE_WSS`, `SERVER_PATH` in `ESP32/master/src/config.h`.
+- Ensure endpoint is reachable from ESP32 network.
+- For cloud hosts, prefer `wss` on port `443`.
 
-### 12.4 Device Stays Offline
-- Heartbeat not arriving or stale
-- Verify `HEARTBEAT_*` thresholds
-- Check ESP32 serial logs and backend WebSocket logs
+### 3. Device Appears Offline
+Symptoms:
+- Device listed but status not updating.
 
-### 12.5 No VFD Data in UI
-- Ensure ESP32 sends `sensor_data` with VFD keys (`frequency`, `speed`, etc.)
-- Backend rejects non-VFD payloads on ESP32 channel
-- Confirm DB writes and `/vfd-readings/latest` endpoint output
+Fix:
+- Confirm heartbeat payload is being sent every `HEARTBEAT_INTERVAL_MS`.
+- Check server heartbeat thresholds.
+- Verify backend writes `last_heartbeat` and `is_online`.
 
-### 12.6 Modbus Poller Issues
-- On Linux, use `/dev/ttyUSB*` or `/dev/ttyACM*` for `MODBUS_PORT`
-- Confirm serial permissions and cable/adapter
-- Verify register map path exists: `frontend/public/vfd_brand_model_registers.json`
+### 4. VFD Data Missing in DB
+Symptoms:
+- No new rows in `vfd_readings`.
 
-## 13. Security Notes
+Fix:
+- Validate incoming JSON contains required VFD fields under `data`.
+- Confirm `device_id` and `device_key` are valid.
+- Run `python backend/check_vfd.py` to inspect rows quickly.
 
-- Change default credentials and JWT secret before production use
-- Restrict CORS origins in production (`allow_origins`)
-- Rotate device keys if leaked (`/devices/{id}/regenerate-key`)
-- Use HTTPS/WSS in production deployments
+### 5. Frontend Realtime Not Updating
+Symptoms:
+- UI loads but live values never change.
 
-## 14. Known Implementation Notes
+Fix:
+- Confirm frontend is connecting to `/ws/device/{device_id}`.
+- Set `VITE_API_BASE` to the correct backend URL if frontend/backend are on different hosts.
+- Check browser console for WebSocket close/error frames.
 
-- "Admin" dependency currently allows any authenticated user (`get_admin_user` returns current user)
-- Access token expiry is intentionally long (10 years) by current design
-- `ModbusPoller` starts automatically on backend startup
+## Cloud Deployment (Vercel + Railway)
 
-## 15. Useful Commands
+This section explains where Vercel and Railway fit in production deployment.
 
-Backend:
-```bash
-cd backend
-source venv/bin/activate
-python main.py
-```
+### Deployment Architecture
 
-Frontend:
-```bash
-cd frontend
-npm run dev
-```
-
-ESP32 upload:
-```bash
-cd ESP32/master
-pio run --target upload
-pio device monitor --baud 115200
-```
-
-API docs:
-```bash
-xdg-open http://localhost:8000/docs
-```
-
-## 16. Data Model Summary
-
-- `users`: login identities and roles
-- `devices`: inventory, owner, key, MAC, online/heartbeat state
-- `sensor_readings`: generic sensor stream records
-- `vfd_readings`: VFD telemetry records (frequency, speed, current, voltage, power, torque, status, fault)
-
-## 17. Operational Flow Summary
+- Railway:
+  - Hosts the backend API service.
+  - Hosts PostgreSQL database.
+- Vercel:
+  - Hosts the frontend (Vite/React build).
+  - Calls Railway backend using HTTPS and WebSocket endpoints.
 
 ```mermaid
-sequenceDiagram
-  participant ESP32
-  participant API as FastAPI
-  participant DB as Database
-  participant UI as Frontend
-
-  ESP32->>API: WS connect /ws/esp32/connect (+ MAC/credentials)
-  API->>DB: Find or create device
-  API-->>ESP32: registration success (device_id, device_key)
-  loop Every heartbeat interval
-    ESP32->>API: heartbeat
-    API->>DB: update last_heartbeat + is_online
-    API-->>ESP32: heartbeat_ack
-  end
-  loop Every sensor poll interval
-    ESP32->>API: sensor_data(VFD)
-    API->>DB: insert vfd_reading
-    API-->>UI: vfd_update via ws/device/{id}
-  end
-  UI->>API: REST fetch devices/history
-  API->>DB: query data
-  API-->>UI: JSON responses
+flowchart LR
+  U["User Browser"] --> V["Vercel Frontend"]
+  V --> R["Railway Backend API"]
+  R --> P[("Railway PostgreSQL")]
+  E["ESP32 Device"] --> R
 ```
 
----
-If you keep this repository updated, maintain this file as the single source of truth for setup and operations.
+### Railway Setup (Backend + Database)
+
+Railway project URL:
+- `https://railway.com/project/172e780e-421a-40e2-9115-2c4dff249e6a?environmentId=b7f0b655-26c0-4ad8-944c-1ebfe83100b3`
+
+Railway backend invite URL:
+- `https://railway.com/invite/mLcWaM9C2XK`
+
+Railway backend onboarding flow:
+
+```mermaid
+flowchart TD
+  A["Open Railway invite link"] --> B["Join Railway project"]
+  B --> C["Open backend service in Railway"]
+  C --> D["Configure env vars DATABASE_URL JWT_SECRET_KEY AUTH_SALT"]
+  D --> E["Deploy backend service"]
+  E --> F["Copy backend public domain"]
+  F --> G["Set VITE_API_BASE in Vercel frontend"]
+```
+
+1. Create a Railway project.
+2. Add a PostgreSQL service.
+3. Add a backend service connected to this repository.
+4. Set backend environment variables:
+   - `DATABASE_URL` (from Railway Postgres)
+   - `JWT_SECRET_KEY`
+   - `AUTH_SALT`
+5. Deploy backend and copy the generated public URL.
+
+### Vercel Setup (Frontend)
+
+1. Import this repository in Vercel.
+2. Set root directory to `frontend`.
+3. Add environment variable:
+   - `VITE_API_BASE=https://<your-railway-backend-domain>`
+4. Deploy and open the Vercel domain.
+
+Live frontend URL:
+- `https://internship-murex-xi.vercel.app/home`
+
+### ESP32 for Cloud Backend
+
+In `ESP32/master/src/config.h`, use cloud settings:
+
+- `SERVER_HOST` = Railway backend domain
+- `SERVER_PORT` = 443
+- `USE_WSS` = 1
+- `SERVER_PATH` = `/ws/esp32/connect`
+
+### Basic Cloud Verification
+
+1. Open backend health endpoint on Railway:
+   - `https://<railway-domain>/health`
+2. Open frontend on Vercel and log in:
+  - `https://internship-murex-xi.vercel.app/home`
+3. Confirm frontend can list devices.
+4. Connect ESP32 and check backend logs for heartbeat/sensor messages.
+
+## Notes
+- This repository currently contains backend models/schemas/utilities and ESP32 firmware, while backend route entrypoint code may be maintained separately or omitted in this snapshot.
+- Local run instructions in this README assume a FastAPI app entrypoint at `backend/main.py`.
+- If missing locally, restore/create `backend/main.py` before running API services.
